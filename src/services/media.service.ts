@@ -5,9 +5,6 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
-  query,
-  where,
-  orderBy,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { MediaAsset } from '@/types';
@@ -17,26 +14,30 @@ const COLLECTION_NAME = 'media';
 export const mediaService = {
   async getAll(): Promise<MediaAsset[]> {
     try {
-      const q = query(collection(db, COLLECTION_NAME), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() } as MediaAsset));
+      const snapshot = await getDocs(collection(db, COLLECTION_NAME));
+      const items = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() } as MediaAsset));
+      // Sort in-memory to ensure documents without createdAt are never omitted by Firestore index
+      return items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
     } catch (err) {
-      console.warn('Firestore media fetch warning:', err);
-      return [];
+      console.error('Firestore media fetch error:', err);
+      throw err;
     }
   },
 
   async getByType(type: 'image' | 'document' | 'raw'): Promise<MediaAsset[]> {
     try {
-      const q = query(
-        collection(db, COLLECTION_NAME),
-        where('resourceType', '==', type),
-        orderBy('createdAt', 'desc')
-      );
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() } as MediaAsset));
+      const all = await this.getAll();
+      return all.filter((item) => {
+        if (type === 'image') {
+          return item.resourceType === 'image' || ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(item.format?.toLowerCase());
+        }
+        if (type === 'document') {
+          return item.resourceType === 'document' || ['pdf', 'doc', 'docx', 'xls', 'xlsx'].includes(item.format?.toLowerCase());
+        }
+        return item.resourceType === type;
+      });
     } catch (err) {
-      console.warn(`Firestore media fetch warning for type ${type}:`, err);
+      console.error(`Firestore media fetch error for type ${type}:`, err);
       return [];
     }
   },
