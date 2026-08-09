@@ -45,7 +45,7 @@ export const mediaService = {
     const id = asset.id || doc(collection(db, COLLECTION_NAME)).id;
     const now = new Date().toISOString();
 
-    const payload: MediaAsset = {
+    const payload: Record<string, unknown> = {
       id,
       publicId: asset.publicId || `media_${id}`,
       resourceType: asset.resourceType || 'image',
@@ -53,8 +53,6 @@ export const mediaService = {
       secureUrl: asset.secureUrl || asset.url,
       format: asset.format || 'jpg',
       bytes: asset.bytes || 1024,
-      width: asset.width,
-      height: asset.height,
       fileName: asset.fileName,
       originalName: asset.originalName || asset.fileName,
       altText: asset.altText || '',
@@ -62,6 +60,9 @@ export const mediaService = {
       createdAt: asset.createdAt || now,
       uploadedBy: asset.uploadedBy || 'Admin',
     };
+
+    if (asset.width !== undefined) payload.width = asset.width;
+    if (asset.height !== undefined) payload.height = asset.height;
 
     await setDoc(doc(db, COLLECTION_NAME, id), payload, { merge: true });
     return id;
