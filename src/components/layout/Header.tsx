@@ -36,9 +36,6 @@ export const Header: React.FC = () => {
               <Link href="/search" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
                 🔍 Search
               </Link>
-              <Link href="/admin/login" style={{ color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600 }}>
-                🔒 Admin Login
-              </Link>
             </div>
           </div>
         </div>

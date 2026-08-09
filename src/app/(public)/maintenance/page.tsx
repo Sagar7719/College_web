@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 
 export default function MaintenancePage({ message }: { message?: string }) {
   return (
@@ -32,14 +31,7 @@ export default function MaintenancePage({ message }: { message?: string }) {
           {message ||
             'We are currently performing scheduled maintenance to improve your experience. Please check back shortly.'}
         </p>
-        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem', marginTop: '1.5rem' }}>
-          <p className="small-text" style={{ color: 'var(--text-muted)' }}>
-            College Administrators can access the CMS via{' '}
-            <Link href="/admin/login" style={{ fontWeight: 600, color: 'var(--primary)' }}>
-              Admin Login
-            </Link>
-          </p>
-        </div>
+
       </div>
     </div>
   );
