@@ -127,11 +127,27 @@ export function MediaPickerModal({
         throw new Error(result.error || 'Failed to upload media asset.');
       }
 
+      // Persist metadata to Firestore from the authenticated browser client
+      await mediaService.saveMediaAsset({
+        publicId: result.publicId,
+        resourceType: result.resourceType,
+        url: result.secureUrl || result.url,
+        secureUrl: result.secureUrl || result.url,
+        format: result.format,
+        bytes: result.bytes,
+        width: result.width,
+        height: result.height,
+        fileName: result.fileName,
+        originalName: result.originalName || result.fileName,
+        altText: uploadAltText || result.altText || '',
+        caption: uploadCaption || result.caption || '',
+      });
+
       // Refresh list
       await handleRefresh();
 
       // Automatically select the newly uploaded asset
-      onSelectMedia(result.url, uploadAltText || result.fileName);
+      onSelectMedia(result.secureUrl || result.url, uploadAltText || result.fileName);
       onClose();
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : 'Upload failed.';

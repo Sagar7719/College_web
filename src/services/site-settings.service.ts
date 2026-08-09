@@ -50,24 +50,7 @@ export const defaultSettings: SiteSettings = {
   updatedAt: new Date().toISOString(),
 };
 
-function sanitizeForFirestore<T>(data: T): T {
-  if (data === undefined || data === null) {
-    return null as unknown as T;
-  }
-  if (Array.isArray(data)) {
-    return data.map(sanitizeForFirestore) as unknown as T;
-  }
-  if (typeof data === 'object' && !(data instanceof Date)) {
-    const cleaned: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(data)) {
-      if (v !== undefined) {
-        cleaned[k] = sanitizeForFirestore(v);
-      }
-    }
-    return cleaned as T;
-  }
-  return data;
-}
+import { sanitizeForFirestore } from '@/lib/firestore-utils';
 
 export const siteSettingsService = {
   async getSettings(): Promise<SiteSettings> {

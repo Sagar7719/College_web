@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   setDoc,
   updateDoc,
@@ -12,6 +13,17 @@ import { MediaAsset } from '@/types';
 const COLLECTION_NAME = 'media';
 
 export const mediaService = {
+  async getById(id: string): Promise<MediaAsset | null> {
+    try {
+      const snap = await getDoc(doc(db, COLLECTION_NAME, id));
+      if (!snap.exists()) return null;
+      return { id: snap.id, ...snap.data() } as MediaAsset;
+    } catch (err) {
+      console.error(`Firestore media fetch error for id ${id}:`, err);
+      return null;
+    }
+  },
+
   async getAll(): Promise<MediaAsset[]> {
     try {
       const snapshot = await getDocs(collection(db, COLLECTION_NAME));

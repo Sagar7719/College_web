@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Page, PageStatus } from '@/types';
+import { sanitizeForFirestore } from '@/lib/firestore-utils';
 
 const COLLECTION_NAME = 'pages';
 
@@ -74,7 +75,7 @@ export const pagesService = {
     const pageId = pageData.id || doc(collection(db, COLLECTION_NAME)).id;
     const now = new Date().toISOString();
     
-    const pagePayload: Page = {
+    const rawPayload: Page = {
       id: pageId,
       title: pageData.title,
       slug: pageData.slug,
@@ -83,9 +84,11 @@ export const pagesService = {
       navigationOrder: pageData.navigationOrder ?? 0,
       sections: pageData.sections || [],
       featuredImage: pageData.featuredImage || '',
-      seo: pageData.seo || {
-        metaTitle: pageData.title,
-        metaDescription: '',
+      seo: {
+        metaTitle: pageData.seo?.metaTitle || pageData.title,
+        metaDescription: pageData.seo?.metaDescription || '',
+        ogImageUrl: pageData.seo?.ogImageUrl || '',
+        keywords: pageData.seo?.keywords || [],
       },
       createdAt: pageData.createdAt || now,
       updatedAt: now,
@@ -93,7 +96,8 @@ export const pagesService = {
       updatedBy: pageData.updatedBy || 'Admin',
     };
 
-    await setDoc(doc(db, COLLECTION_NAME, pageId), pagePayload, { merge: true });
+    const cleanPayload = sanitizeForFirestore(rawPayload);
+    await setDoc(doc(db, COLLECTION_NAME, pageId), cleanPayload, { merge: true });
     return pageId;
   },
 

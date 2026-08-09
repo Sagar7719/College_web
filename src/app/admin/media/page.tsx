@@ -92,6 +92,22 @@ export default function AdminMediaPage() {
         throw new Error(data.error || 'Failed to upload media asset');
       }
 
+      // Persist metadata in Firestore from authenticated admin client
+      await mediaService.saveMediaAsset({
+        publicId: data.publicId,
+        resourceType: data.resourceType,
+        url: data.secureUrl || data.url,
+        secureUrl: data.secureUrl || data.url,
+        format: data.format,
+        bytes: data.bytes,
+        width: data.width,
+        height: data.height,
+        fileName: data.fileName,
+        originalName: data.originalName || data.fileName,
+        altText: uploadAltText,
+        caption: uploadCaption,
+      });
+
       setIsUploadModalOpen(false);
       loadData();
     } catch (err: unknown) {

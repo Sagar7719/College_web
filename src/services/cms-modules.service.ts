@@ -11,6 +11,7 @@ import {
   QueryConstraint,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
+import { sanitizeForFirestore } from '@/lib/firestore-utils';
 import {
   Department,
   Course,
@@ -58,7 +59,7 @@ export const departmentsService = {
       createdAt: dept.createdAt || now,
       updatedAt: now,
     };
-    await setDoc(doc(db, 'departments', id), payload, { merge: true });
+    await setDoc(doc(db, 'departments', id), sanitizeForFirestore(payload), { merge: true });
     return id;
   },
   delete: (id: string) => deleteDoc(doc(db, 'departments', id)),
@@ -88,7 +89,7 @@ export const coursesService = {
       createdAt: course.createdAt || now,
       updatedAt: now,
     };
-    await setDoc(doc(db, 'courses', id), payload, { merge: true });
+    await setDoc(doc(db, 'courses', id), sanitizeForFirestore(payload), { merge: true });
     return id;
   },
   delete: (id: string) => deleteDoc(doc(db, 'courses', id)),
@@ -118,7 +119,7 @@ export const facultyService = {
       createdAt: fac.createdAt || now,
       updatedAt: now,
     };
-    await setDoc(doc(db, 'faculty', id), payload, { merge: true });
+    await setDoc(doc(db, 'faculty', id), sanitizeForFirestore(payload), { merge: true });
     return id;
   },
   delete: (id: string) => deleteDoc(doc(db, 'faculty', id)),
@@ -146,7 +147,7 @@ export const noticesService = {
       createdAt: notice.createdAt || now,
       updatedAt: now,
     };
-    await setDoc(doc(db, 'notices', id), payload, { merge: true });
+    await setDoc(doc(db, 'notices', id), sanitizeForFirestore(payload), { merge: true });
     return id;
   },
   delete: (id: string) => deleteDoc(doc(db, 'notices', id)),
@@ -164,7 +165,7 @@ export const announcementsService = {
       active: anc.active ?? true,
       createdAt: anc.createdAt || new Date().toISOString(),
     };
-    await setDoc(doc(db, 'announcements', id), payload, { merge: true });
+    await setDoc(doc(db, 'announcements', id), sanitizeForFirestore(payload), { merge: true });
     return id;
   },
   delete: (id: string) => deleteDoc(doc(db, 'announcements', id)),
@@ -189,7 +190,7 @@ export const newsService = {
       createdAt: item.createdAt || now,
       updatedAt: now,
     };
-    await setDoc(doc(db, 'news', id), payload, { merge: true });
+    await setDoc(doc(db, 'news', id), sanitizeForFirestore(payload), { merge: true });
     return id;
   },
   delete: (id: string) => deleteDoc(doc(db, 'news', id)),
@@ -216,7 +217,7 @@ export const eventsService = {
       createdAt: item.createdAt || now,
       updatedAt: now,
     };
-    await setDoc(doc(db, 'events', id), payload, { merge: true });
+    await setDoc(doc(db, 'events', id), sanitizeForFirestore(payload), { merge: true });
     return id;
   },
   delete: (id: string) => deleteDoc(doc(db, 'events', id)),
@@ -240,7 +241,7 @@ export const galleryService = {
       createdAt: album.createdAt || now,
       updatedAt: now,
     };
-    await setDoc(doc(db, 'gallery', id), payload, { merge: true });
+    await setDoc(doc(db, 'gallery', id), sanitizeForFirestore(payload), { merge: true });
     return id;
   },
   delete: (id: string) => deleteDoc(doc(db, 'gallery', id)),
@@ -266,7 +267,7 @@ export const downloadsService = {
       createdAt: docItem.createdAt || now,
       updatedAt: now,
     };
-    await setDoc(doc(db, 'downloads', id), payload, { merge: true });
+    await setDoc(doc(db, 'downloads', id), sanitizeForFirestore(payload), { merge: true });
     return id;
   },
   delete: (id: string) => deleteDoc(doc(db, 'downloads', id)),
