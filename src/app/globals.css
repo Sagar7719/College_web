@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Colors - Pure White + Navy System */
+  --primary: #0A2540;
+  --primary-hover: #07192C;
+  --primary-light: #F0F4F8;
+  --primary-active: #051322;
+  
+  --bg-main: #FFFFFF;
+  --bg-light: #F8FAFC;
+  --bg-muted: #F1F5F9;
+  
+  --text-main: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-on-primary: #FFFFFF;
+  
+  --border-color: #E2E8F0;
+  --border-dark: #CBD5E1;
+  --border-focus: #0A2540;
+
+  /* Semantic State Colors - Only for alerts, badges, and validation */
+  --semantic-error: #DC2626;
+  --semantic-error-bg: #FEF2F2;
+  --semantic-error-border: #FCA5A5;
+  
+  --semantic-success: #16A34A;
+  --semantic-success-bg: #F0FDF4;
+  --semantic-success-border: #86EFAC;
+  
+  --semantic-warning: #D97706;
+  --semantic-warning-bg: #FFFBEB;
+  --semantic-warning-border: #FDE68A;
+
+  /* Elevation Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(10, 37, 64, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(10, 37, 64, 0.08), 0 2px 4px -2px rgba(10, 37, 64, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(10, 37, 64, 0.1), 0 4px 6px -4px rgba(10, 37, 64, 0.05);
+  
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+/* Reset & Base Styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  color: var(--text-main);
+  background-color: var(--bg-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--text-main);
+  background-color: var(--bg-main);
+}
+
+/* Accessibility Focus Ring */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Typography Scale */
+h1, .h1 {
+  font-size: 2.25rem; /* 36px */
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+}
+
+h2, .h2 {
+  font-size: 1.75rem; /* 28px */
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: -0.015em;
+}
+
+h3, .h3 {
+  font-size: 1.375rem; /* 22px */
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+h4, .h4 {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+p, .body-text {
+  font-size: 1rem; /* 16px */
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.small-text {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.tiny-text {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+/* Responsive Container */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Skeleton Keyframes */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

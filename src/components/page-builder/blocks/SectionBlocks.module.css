@@ -1,0 +1,144 @@
+/* Page Builder Blocks Styling */
+.heroBlock {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  padding: 5rem 0;
+  text-align: center;
+  border-radius: var(--radius-lg);
+  margin-bottom: 2.5rem;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroOverlay {
+  background: linear-gradient(180deg, rgba(10, 37, 64, 0.85) 0%, rgba(10, 37, 64, 0.95) 100%);
+  padding: 3rem 1.5rem;
+  border-radius: var(--radius-lg);
+}
+
+.heroTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 1rem;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 700px;
+  margin: 0 auto 2rem;
+}
+
+.headingBlock {
+  margin-bottom: 2rem;
+}
+
+.richTextBlock {
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.richTextBlock p {
+  margin-bottom: 1.25rem;
+}
+
+.imageBlock {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.imageBlock img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.imageCaption {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.imageTextBlock {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .imageTextBlock {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.twoColumnBlock,
+.threeColumnBlock {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .twoColumnBlock {
+    grid-template-columns: 1fr 1fr;
+  }
+  .threeColumnBlock {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.cardGridBlock {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.ctaBlock {
+  background-color: var(--bg-light);
+  border: 2px solid var(--primary);
+  padding: 3rem 2rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.faqBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.faqItem {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+
+.faqQuestion {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.faqAnswer {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.spacerSm { height: 24px; }
+.spacerMd { height: 48px; }
+.spacerLg { height: 96px; }
