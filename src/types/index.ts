@@ -20,6 +20,11 @@ export interface OptionItem {
   disabled?: boolean;
 }
 
+export interface OptionGroup {
+  label: string;
+  options: OptionItem[];
+}
+
 export interface EmptyStateProps {
   title: string;
   description?: string;
@@ -35,3 +40,5 @@ export * from './page';
 export * from './navigation';
 export * from './site-settings';
 export * from './cms-modules';
+export * from './contact-message';
+

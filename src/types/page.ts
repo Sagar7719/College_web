@@ -16,6 +16,7 @@ export interface Page {
   status: PageStatus;
   showInNavigation: boolean;
   navigationOrder: number;
+  navigationParentId?: string;
   sections: PageSection[];
   featuredImage?: string;
   seo: SEOConfig;
@@ -23,4 +24,9 @@ export interface Page {
   updatedAt: string; // ISO date string
   createdBy?: string;
   updatedBy?: string;
+  /** If true, this page is a system/core page and cannot be permanently deleted. */
+  isSystemPage?: boolean;
+  systemKey?: 'home' | 'about' | 'academics' | 'admissions' | 'notices' | 'contact';
 }
+
+

@@ -15,4 +15,19 @@ const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) 
 const auth: Auth = getAuth(app);
 const db: Firestore = getFirestore(app);
 
+if (typeof window !== 'undefined') {
+  window.addEventListener('unhandledrejection', (event) => {
+    const reason = event.reason;
+    const msg = reason?.message || String(reason || '');
+    if (
+      msg.includes('Database is closing') ||
+      msg.includes('Database is hidden') ||
+      msg.includes('IndexedDB') ||
+      msg.includes('client is offline')
+    ) {
+      event.preventDefault();
+    }
+  });
+}
+
 export { app, auth, db };

@@ -28,11 +28,36 @@ export interface SocialLinks {
   linkedin?: string;
 }
 
+export type FooterLinkType = 'system' | 'custom' | 'external';
+
+export interface FooterLink {
+  id: string;
+  label: string;
+  type: FooterLinkType;
+  path: string;
+  pageId?: string;
+  systemKey?: string;
+  isSystemPage?: boolean;
+  isExternal?: boolean;
+  targetBlank?: boolean;
+  order: number;
+  visible: boolean;
+}
+
+export interface FooterColumn {
+  id: string;
+  title: string;
+  order: number;
+  visible: boolean;
+  links: FooterLink[];
+}
+
 export interface FooterConfig {
   aboutText: string;
   copyrightText: string;
   usefulLinksHeader?: string;
   contactHeader?: string;
+  columns?: FooterColumn[];
 }
 
 export interface GlobalSeoConfig {

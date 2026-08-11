@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { pagesService } from '@/services/pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
 import { PageSectionRenderer } from '@/components/page-builder';
@@ -13,7 +13,11 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const page = await pagesService.getPageBySlug(slug);
+  const cleanSlug = slug.toLowerCase().replace(/^\//, '');
+  if (cleanSlug === 'home') {
+    redirect('/');
+  }
+  const page = await pagesService.getPageBySlug(cleanSlug);
 
   if (!page || page.status !== 'published') {
     return {
@@ -35,12 +39,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     alternates: {
-      canonical: `/${slug}`,
+      canonical: `/${cleanSlug}`,
     },
     openGraph: {
       title,
       description,
-      url: `/${slug}`,
+      url: `/${cleanSlug}`,
       siteName: collegeName,
       type: 'article',
       locale: 'en_US',
@@ -75,7 +79,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function DynamicCMSPage({ params }: PageProps) {
   const { slug } = await params;
-  const page = await pagesService.getPageBySlug(slug);
+  const cleanSlug = slug.toLowerCase().replace(/^\//, '');
+  if (cleanSlug === 'home') {
+    redirect('/');
+  }
+  const page = await pagesService.getPageBySlug(cleanSlug);
 
   if (!page || page.status !== 'published') {
     notFound();

@@ -1,8 +1,20 @@
 import type { Metadata } from 'next';
+import { pagesService } from '@/services/pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
+import { PageSectionRenderer } from '@/components/page-builder';
 import { Card, CardBody, Badge } from '@/components/ui';
 
 export async function generateMetadata(): Promise<Metadata> {
+  const cmsPage = await pagesService.getPageBySlug('about');
+  if (cmsPage && cmsPage.status === 'published' && (cmsPage.seo?.metaTitle || cmsPage.title)) {
+    return {
+      title: cmsPage.seo?.metaTitle || cmsPage.title,
+      description: cmsPage.seo?.metaDescription,
+      alternates: { canonical: '/about' },
+      openGraph: cmsPage.seo?.ogImageUrl ? { images: [{ url: cmsPage.seo.ogImageUrl }] } : undefined,
+    };
+  }
+
   const settings = await siteSettingsService.getSettings();
   const collegeName = settings.collegeInfo?.name || 'College';
   const title = `About Us — ${collegeName}`;
@@ -26,8 +38,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-
 export default async function AboutPage() {
+  // If published CMS page exists with custom Page Builder sections, render sections dynamically
+  const cmsPage = await pagesService.getPageBySlug('about');
+  if (cmsPage && cmsPage.status === 'published' && cmsPage.sections?.length > 0) {
+    return <PageSectionRenderer sections={cmsPage.sections} />;
+  }
+
+  // Fallback to institutional default template when no custom sections added
   const settings = await siteSettingsService.getSettings();
   const info = settings.collegeInfo;
 

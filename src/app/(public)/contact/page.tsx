@@ -1,9 +1,23 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { pagesService } from '@/services/pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
-import { Card, CardBody, Badge, Input, Button } from '@/components/ui';
+import { PageSectionRenderer } from '@/components/page-builder';
+import { Card, CardBody, Badge } from '@/components/ui';
+import { ContactForm } from '@/components/public/ContactForm';
+
+
 
 export async function generateMetadata(): Promise<Metadata> {
+  const cmsPage = await pagesService.getPageBySlug('contact');
+  if (cmsPage && cmsPage.status === 'published' && (cmsPage.seo?.metaTitle || cmsPage.title)) {
+    return {
+      title: cmsPage.seo?.metaTitle || cmsPage.title,
+      description: cmsPage.seo?.metaDescription,
+      alternates: { canonical: '/contact' },
+    };
+  }
+
   const settings = await siteSettingsService.getSettings();
   const collegeName = settings.collegeInfo?.name || 'College';
   const title = `Contact Us — ${collegeName}`;
@@ -27,8 +41,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-
 export default async function ContactPage() {
+  const cmsPage = await pagesService.getPageBySlug('contact');
+  if (cmsPage && cmsPage.status === 'published' && cmsPage.sections?.length > 0) {
+    return <PageSectionRenderer sections={cmsPage.sections} />;
+  }
+
   const settings = await siteSettingsService.getSettings();
   const info = settings.collegeInfo;
   const social = settings.socialLinks || {};
@@ -105,29 +123,8 @@ export default async function ContactPage() {
         </Card>
 
         {/* Public Contact Form */}
-        <Card variant="bordered">
-          <CardBody style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <h3>Send A Message</h3>
-            <Input label="Your Name" placeholder="Enter full name" required />
-            <Input label="Email Address" type="email" placeholder="name@example.com" required />
-            <Input label="Subject" placeholder="e.g. Admission Inquiry" required />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-              <label style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--primary)' }}>Message</label>
-              <textarea
-                rows={4}
-                placeholder="Type your message here..."
-                style={{
-                  padding: '0.625rem 1rem',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--border-color)',
-                  fontFamily: 'inherit',
-                  fontSize: '1rem',
-                }}
-              />
-            </div>
-            <Button variant="primary" size="md">Send Message</Button>
-          </CardBody>
-        </Card>
+        <ContactForm />
+
       </div>
     </div>
   );

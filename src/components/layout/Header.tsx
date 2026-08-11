@@ -3,14 +3,23 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { siteSettingsService, defaultSettings } from '@/services/site-settings.service';
-import { SiteSettings } from '@/types';
+import { SiteSettings, NavigationItem } from '@/types';
 import styles from './layout.module.css';
 import { Navbar } from './Navbar';
 
-export const Header: React.FC = () => {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+export interface HeaderProps {
+  initialSettings?: SiteSettings | null;
+  initialNavItems?: NavigationItem[];
+}
+
+export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems }) => {
+  const [settings, setSettings] = useState<SiteSettings | null>(initialSettings || null);
 
   useEffect(() => {
+    if (initialSettings) {
+      setSettings(initialSettings);
+      return;
+    }
     let alive = true;
     siteSettingsService.getSettings()
       .then((data) => {
@@ -18,7 +27,7 @@ export const Header: React.FC = () => {
       })
       .catch(() => {});
     return () => { alive = false; };
-  }, []);
+  }, [initialSettings]);
 
   const collegeInfo = settings?.collegeInfo || defaultSettings.collegeInfo;
 
@@ -31,11 +40,6 @@ export const Header: React.FC = () => {
             <div className={styles.contactMeta}>
               {collegeInfo.phone && <span className={styles.contactItem}>📞 {collegeInfo.phone}</span>}
               {collegeInfo.email && <span className={styles.contactItem}>✉️ {collegeInfo.email}</span>}
-            </div>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <Link href="/search" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                🔍 Search
-              </Link>
             </div>
           </div>
         </div>
@@ -67,7 +71,7 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Dynamic Navbar */}
-      <Navbar />
+      <Navbar initialNavItems={initialNavItems} />
     </header>
   );
 };

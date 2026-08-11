@@ -5,6 +5,37 @@ import { SiteSettings } from '@/types';
 const COLLECTION_NAME = 'siteSettings';
 const SETTINGS_DOC_ID = 'general';
 
+import { FooterColumn } from '@/types';
+
+export const defaultFooterColumns: FooterColumn[] = [
+  {
+    id: 'col_quick_links',
+    title: 'Quick Links',
+    order: 0,
+    visible: true,
+    links: [
+      { id: 'link_sys_about', label: 'About Us', type: 'system', path: '/about', pageId: 'sys_page_about', systemKey: 'about', isSystemPage: true, order: 0, visible: true },
+      { id: 'link_sys_academics', label: 'Academics & Departments', type: 'system', path: '/departments', pageId: 'sys_page_academics', systemKey: 'academics', isSystemPage: true, order: 1, visible: true },
+      { id: 'link_sys_admissions', label: 'Admissions Process', type: 'system', path: '/admissions', pageId: 'sys_page_admissions', systemKey: 'admissions', isSystemPage: true, order: 2, visible: true },
+      { id: 'link_sys_notices', label: 'Latest Notices', type: 'system', path: '/notices', pageId: 'sys_page_notices', systemKey: 'notices', isSystemPage: true, order: 3, visible: true },
+      { id: 'link_sys_contact', label: 'Contact Campus', type: 'system', path: '/contact', pageId: 'sys_page_contact', systemKey: 'contact', isSystemPage: true, order: 4, visible: true },
+    ],
+  },
+  {
+    id: 'col_resources',
+    title: 'Resources',
+    order: 1,
+    visible: true,
+    links: [
+      { id: 'link_sys_courses', label: 'Courses Offered', type: 'system', path: '/courses', systemKey: 'courses', isSystemPage: true, order: 0, visible: true },
+      { id: 'link_sys_faculty', label: 'Faculty Directory', type: 'system', path: '/faculty', systemKey: 'faculty', isSystemPage: true, order: 1, visible: true },
+      { id: 'link_sys_downloads', label: 'Document Downloads', type: 'system', path: '/downloads', systemKey: 'downloads', isSystemPage: true, order: 2, visible: true },
+      { id: 'link_sys_gallery', label: 'Photo Gallery', type: 'system', path: '/gallery', systemKey: 'gallery', isSystemPage: true, order: 3, visible: true },
+      { id: 'link_sys_news', label: 'News & Updates', type: 'system', path: '/news', systemKey: 'news', isSystemPage: true, order: 4, visible: true },
+    ],
+  },
+];
+
 export const defaultSettings: SiteSettings = {
   id: SETTINGS_DOC_ID,
   collegeInfo: {
@@ -38,6 +69,7 @@ export const defaultSettings: SiteSettings = {
     copyrightText: `© ${new Date().getFullYear()} College Name. All rights reserved.`,
     usefulLinksHeader: 'Quick Links',
     contactHeader: 'Contact Campus',
+    columns: defaultFooterColumns,
   },
   seoConfig: {
     defaultMetaTitle: 'Official College Portal | Higher Education & Research',
@@ -50,10 +82,11 @@ export const defaultSettings: SiteSettings = {
   updatedAt: new Date().toISOString(),
 };
 
+import { cache } from 'react';
 import { sanitizeForFirestore } from '@/lib/firestore-utils';
 
 export const siteSettingsService = {
-  async getSettings(): Promise<SiteSettings> {
+  getSettings: cache(async (): Promise<SiteSettings> => {
     try {
       const ref = doc(db, COLLECTION_NAME, SETTINGS_DOC_ID);
       const snap = await getDoc(ref);
@@ -61,6 +94,11 @@ export const siteSettingsService = {
         return defaultSettings;
       }
       const data = snap.data() as Partial<SiteSettings>;
+      const existingColumns = data.footerConfig?.columns;
+      const columnsToUse = existingColumns && Array.isArray(existingColumns) && existingColumns.length > 0
+        ? existingColumns
+        : defaultFooterColumns;
+
       return {
         ...defaultSettings,
         ...data,
@@ -75,6 +113,7 @@ export const siteSettingsService = {
         footerConfig: {
           ...defaultSettings.footerConfig,
           ...(data.footerConfig || {}),
+          columns: columnsToUse,
         },
         seoConfig: {
           ...defaultSettings.seoConfig,
@@ -85,7 +124,7 @@ export const siteSettingsService = {
       console.warn('Firestore siteSettings fetch warning:', err);
       return defaultSettings;
     }
-  },
+  }),
 
   async updateSettings(partialSettings: Partial<SiteSettings>): Promise<void> {
     const ref = doc(db, COLLECTION_NAME, SETTINGS_DOC_ID);

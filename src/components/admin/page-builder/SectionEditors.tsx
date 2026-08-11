@@ -308,10 +308,10 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({ section, onChange 
         const s = section as CTASection;
         return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <Input label="Call To Action Title" value={s.title} onChange={(e) => onChange({ ...s, title: e.target.value })} required />
+            <Input label="Call To Action Title" value={s.title || ''} onChange={(e) => onChange({ ...s, title: e.target.value })} required />
             <Input label="Description" value={s.description || ''} onChange={(e) => onChange({ ...s, description: e.target.value })} />
-            <Input label="Button Text" value={s.buttonLabel} onChange={(e) => onChange({ ...s, buttonLabel: e.target.value })} required />
-            <Input label="Target URL" value={s.buttonUrl} onChange={(e) => onChange({ ...s, buttonUrl: e.target.value })} required />
+            <Input label="Button Text" value={s.buttonLabel || ''} onChange={(e) => onChange({ ...s, buttonLabel: e.target.value })} required />
+            <Input label="Target URL" value={s.buttonUrl || ''} onChange={(e) => onChange({ ...s, buttonUrl: e.target.value })} placeholder="/contact" required />
           </div>
         );
       }

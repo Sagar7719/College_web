@@ -38,29 +38,53 @@ export const Footer: React.FC = () => {
               </p>
             </div>
 
-            {/* Col 2: Useful Links */}
-            <div>
-              <h3 className={styles.footerColTitle}>Quick Links</h3>
-              <ul className={styles.footerList}>
-                <li><Link href="/about" className={styles.footerLink}>About Us</Link></li>
-                <li><Link href="/departments" className={styles.footerLink}>Academics &amp; Departments</Link></li>
-                <li><Link href="/admissions" className={styles.footerLink}>Admissions Process</Link></li>
-                <li><Link href="/notices" className={styles.footerLink}>Latest Notices</Link></li>
-                <li><Link href="/contact" className={styles.footerLink}>Contact Campus</Link></li>
-              </ul>
-            </div>
+            {/* Dynamic Configured Columns */}
+            {footerConfig.columns
+              ?.filter((col) => col.visible !== false)
+              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+              .map((col) => {
+                const visibleLinks = (col.links || [])
+                  .filter((link) => link.visible !== false)
+                  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-            {/* Col 3: Academic Resources */}
-            <div>
-              <h3 className={styles.footerColTitle}>Resources</h3>
-              <ul className={styles.footerList}>
-                <li><Link href="/courses" className={styles.footerLink}>Courses Offered</Link></li>
-                <li><Link href="/faculty" className={styles.footerLink}>Faculty Directory</Link></li>
-                <li><Link href="/downloads" className={styles.footerLink}>Document Downloads</Link></li>
-                <li><Link href="/gallery" className={styles.footerLink}>Photo Gallery</Link></li>
-                <li><Link href="/news" className={styles.footerLink}>News &amp; Updates</Link></li>
-              </ul>
-            </div>
+                return (
+                  <div key={col.id}>
+                    <h3 className={styles.footerColTitle}>{col.title}</h3>
+                    <ul className={styles.footerList}>
+                      {visibleLinks.map((link) => {
+                        const isExt =
+                          link.isExternal ||
+                          link.type === 'external' ||
+                          link.path.startsWith('http://') ||
+                          link.path.startsWith('https://');
+
+                        if (isExt) {
+                          return (
+                            <li key={link.id}>
+                              <a
+                                href={link.path}
+                                className={styles.footerLink}
+                                target={link.targetBlank ? '_blank' : undefined}
+                                rel={link.targetBlank ? 'noreferrer' : undefined}
+                              >
+                                {link.label}
+                              </a>
+                            </li>
+                          );
+                        }
+
+                        return (
+                          <li key={link.id}>
+                            <Link href={link.path} className={styles.footerLink}>
+                              {link.label}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                );
+              })}
 
             {/* Col 4: Contact Info */}
             <div>

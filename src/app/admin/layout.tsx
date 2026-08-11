@@ -36,6 +36,8 @@ export default function AdminLayout({
     if (path.includes('/notices')) return 'Notices & Circulars';
     if (path.includes('/news')) return 'Campus News';
     if (path.includes('/events')) return 'Events Calendar';
+    if (path.includes('/contact-messages')) return 'Contact Messages Management';
+
     if (path.includes('/gallery')) return 'Photo Gallery Albums';
     if (path.includes('/downloads')) return 'Document Downloads';
     if (path.includes('/media')) return 'Cloudinary Media Library';

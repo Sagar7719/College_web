@@ -1,10 +1,21 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { siteSettingsService } from '@/services/site-settings.service';
-import { Card, CardBody, Badge, Button } from '@/components/ui';
 import Link from 'next/link';
+import { pagesService } from '@/services/pages.service';
+import { siteSettingsService } from '@/services/site-settings.service';
+import { PageSectionRenderer } from '@/components/page-builder';
+import { Card, CardBody, Badge, Button } from '@/components/ui';
 
 export async function generateMetadata(): Promise<Metadata> {
+  const cmsPage = await pagesService.getPageBySlug('admissions');
+  if (cmsPage && cmsPage.status === 'published' && (cmsPage.seo?.metaTitle || cmsPage.title)) {
+    return {
+      title: cmsPage.seo?.metaTitle || cmsPage.title,
+      description: cmsPage.seo?.metaDescription,
+      alternates: { canonical: '/admissions' },
+    };
+  }
+
   const settings = await siteSettingsService.getSettings();
   const collegeName = settings.collegeInfo?.name || 'College';
   const title = `Admissions 2026-2027 — ${collegeName}`;
@@ -28,13 +39,17 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+export default async function AdmissionsPage() {
+  const cmsPage = await pagesService.getPageBySlug('admissions');
+  if (cmsPage && cmsPage.status === 'published' && cmsPage.sections?.length > 0) {
+    return <PageSectionRenderer sections={cmsPage.sections} />;
+  }
 
-export default function AdmissionsPage() {
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
         <Badge variant="success" style={{ marginBottom: '0.5rem' }}>Admissions 2026 - 2027</Badge>
-        <h1>Admission Process & Guidelines</h1>
+        <h1>Admission Process &amp; Guidelines</h1>
         <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
           Find detailed information on application criteria, required documentation, and important dates.
         </p>
@@ -51,7 +66,7 @@ export default function AdmissionsPage() {
         </Card>
         <Card variant="bordered">
           <CardBody>
-            <h3>2. Verification & Merit List</h3>
+            <h3>2. Verification &amp; Merit List</h3>
             <p style={{ marginTop: '0.5rem', color: 'var(--text-secondary)' }}>
               Submitted documents are verified by the admissions committee for eligibility ranking.
             </p>
@@ -59,7 +74,7 @@ export default function AdmissionsPage() {
         </Card>
         <Card variant="bordered">
           <CardBody>
-            <h3>3. Counseling & Enrollment</h3>
+            <h3>3. Counseling &amp; Enrollment</h3>
             <p style={{ marginTop: '0.5rem', color: 'var(--text-secondary)' }}>
               Selected candidates finalize course seat selection and fee payment.
             </p>

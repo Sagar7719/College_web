@@ -76,5 +76,27 @@ service cloud.firestore {
     match /users/{userId} {
       allow read, write: if isAdmin();
     }
+
+    match /contactMessages/{messageId} {
+      allow create: if request.resource.data.keys().hasAll(['id', 'name', 'email', 'subject', 'message', 'status', 'createdAt', 'updatedAt'])
+                    && request.resource.data.keys().hasOnly(['id', 'name', 'email', 'subject', 'message', 'status', 'createdAt', 'updatedAt'])
+                    && request.resource.data.id is string
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() >= 2
+                    && request.resource.data.name.size() <= 100
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() >= 3
+                    && request.resource.data.email.size() <= 150
+                    && request.resource.data.subject is string
+                    && request.resource.data.subject.size() >= 2
+                    && request.resource.data.subject.size() <= 200
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() >= 5
+                    && request.resource.data.message.size() <= 2000
+                    && request.resource.data.status == 'new';
+      allow read, update, delete: if isAdmin();
+    }
   }
 }
+
+

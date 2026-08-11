@@ -4,6 +4,8 @@ export interface NavigationItem {
   path: string; // e.g. '/about', '/scholarship-information', or 'https://...'
   isCMSPage?: boolean;
   cmsPageId?: string;
+  isSystemPage?: boolean;
+  systemKey?: 'home' | 'about' | 'academics' | 'admissions' | 'notices' | 'contact';
   order: number;
   visible: boolean;
   isExternal?: boolean;
@@ -12,3 +14,4 @@ export interface NavigationItem {
   parentId?: string; // For optional nested dropdown menus
   children?: NavigationItem[];
 }
+

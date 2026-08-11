@@ -1,11 +1,22 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { pagesService } from '@/services/pages.service';
 import { departmentsService } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
+import { PageSectionRenderer } from '@/components/page-builder';
 import { Card, CardBody, Badge, Button, EmptyState } from '@/components/ui';
 
 export async function generateMetadata(): Promise<Metadata> {
+  const cmsPage = await pagesService.getPageBySlug('departments');
+  if (cmsPage && cmsPage.status === 'published' && (cmsPage.seo?.metaTitle || cmsPage.title)) {
+    return {
+      title: cmsPage.seo?.metaTitle || cmsPage.title,
+      description: cmsPage.seo?.metaDescription,
+      alternates: { canonical: '/departments' },
+    };
+  }
+
   const settings = await siteSettingsService.getSettings();
   const collegeName = settings.collegeInfo?.name || 'College';
   const title = `Academic Departments — ${collegeName}`;
@@ -29,8 +40,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-
 export default async function DepartmentsPage() {
+  const cmsPage = await pagesService.getPageBySlug('departments');
+  if (cmsPage && cmsPage.status === 'published' && cmsPage.sections?.length > 0) {
+    return <PageSectionRenderer sections={cmsPage.sections} />;
+  }
+
   const departments = await departmentsService.getPublished();
 
   return (

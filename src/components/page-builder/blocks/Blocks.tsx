@@ -148,11 +148,17 @@ export const CTABlock: React.FC<{ section: CTASection }> = ({ section }) => (
   <div className={styles.ctaBlock}>
     <h2>{section.title}</h2>
     {section.description && <p style={{ margin: '1rem 0 1.5rem', color: 'var(--text-secondary)' }}>{section.description}</p>}
-    <Link href={section.buttonUrl}>
+    {section.buttonUrl ? (
+      <Link href={section.buttonUrl}>
+        <Button variant="primary" size="lg">
+          {section.buttonLabel || 'Learn More'}
+        </Button>
+      </Link>
+    ) : section.buttonLabel ? (
       <Button variant="primary" size="lg">
         {section.buttonLabel}
       </Button>
-    </Link>
+    ) : null}
   </div>
 );
 

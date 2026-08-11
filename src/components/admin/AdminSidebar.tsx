@@ -20,6 +20,7 @@ const adminNavGroups: NavGroup[] = [
     items: [
       { label: 'Pages (Page Builder)', href: '/admin/pages', icon: '📄' },
       { label: 'Navigation Menu', href: '/admin/navigation', icon: '🧭' },
+      { label: 'Footer Links', href: '/admin/footer', icon: '🦶' },
       { label: 'SEO Settings', href: '/admin/seo', icon: '🔎' },
     ],
   },
@@ -38,6 +39,7 @@ const adminNavGroups: NavGroup[] = [
       { label: 'Announcements Ticker', href: '/admin/announcements', icon: '📢' },
       { label: 'News & Press', href: '/admin/news', icon: '📰' },
       { label: 'Campus Events', href: '/admin/events', icon: '📅' },
+      { label: 'Contact Messages', href: '/admin/contact-messages', icon: '✉️' },
     ],
   },
   {

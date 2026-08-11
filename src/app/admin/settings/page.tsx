@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { SiteSettings, CollegeInfo, SocialLinks, FooterConfig, GlobalSeoConfig } from '@/types';
 import { siteSettingsService, defaultSettings } from '@/services/site-settings.service';
 import { MediaPickerModal } from '@/components/admin/MediaPickerModal';
@@ -561,6 +562,19 @@ export default function AdminSettingsPage() {
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
                 📄 Footer Text &amp; Copyright Notice
               </h3>
+              <div style={{ padding: '1rem 1.25rem', backgroundColor: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <strong>🦶 Manage Footer Columns &amp; Links</strong>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>
+                    Configure dynamic footer columns, custom/system page links, ordering, and visibility.
+                  </p>
+                </div>
+                <Link href="/admin/footer">
+                  <Button variant="outline" size="sm">
+                    Open Footer Links Manager →
+                  </Button>
+                </Link>
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
                   Footer About / Mission Summary

@@ -1,10 +1,21 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { pagesService } from '@/services/pages.service';
 import { noticesService } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
+import { PageSectionRenderer } from '@/components/page-builder';
 import { Card, CardBody, Badge, EmptyState } from '@/components/ui';
 
 export async function generateMetadata(): Promise<Metadata> {
+  const cmsPage = await pagesService.getPageBySlug('notices');
+  if (cmsPage && cmsPage.status === 'published' && (cmsPage.seo?.metaTitle || cmsPage.title)) {
+    return {
+      title: cmsPage.seo?.metaTitle || cmsPage.title,
+      description: cmsPage.seo?.metaDescription,
+      alternates: { canonical: '/notices' },
+    };
+  }
+
   const settings = await siteSettingsService.getSettings();
   const collegeName = settings.collegeInfo?.name || 'College';
   const title = `Official Notices & Circulars — ${collegeName}`;
@@ -28,15 +39,19 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-
 export default async function NoticesPage() {
+  const cmsPage = await pagesService.getPageBySlug('notices');
+  if (cmsPage && cmsPage.status === 'published' && cmsPage.sections?.length > 0) {
+    return <PageSectionRenderer sections={cmsPage.sections} />;
+  }
+
   const notices = await noticesService.getPublished(20);
 
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
         <Badge variant="info" style={{ marginBottom: '0.5rem' }}>Official Circulars</Badge>
-        <h1>College Notices & Circulars</h1>
+        <h1>College Notices &amp; Circulars</h1>
         <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
           Stay updated with official academic announcements and administrative notices.
         </p>

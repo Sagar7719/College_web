@@ -7,6 +7,8 @@ import { pagesService } from '@/services/pages.service';
 import { navigationService } from '@/services/navigation.service';
 import { isReservedSlug } from '@/validations/page.schema';
 import { PageBuilderManager } from '@/components/admin/page-builder/PageBuilderManager';
+import { NavigationPlacementPicker } from '@/components/admin/NavigationPlacementPicker';
+import { NavigationItem } from '@/types';
 import { Input, Select, Button, Card, CardBody, Badge, Skeleton, EmptyState } from '@/components/ui';
 
 interface EditPageProps {
@@ -28,7 +30,15 @@ export default function EditPageScreen({ params }: EditPageProps) {
   const [status, setStatus] = useState<PageStatus>('draft');
   const [showInNavigation, setShowInNavigation] = useState(false);
   const [navigationOrder, setNavigationOrder] = useState(0);
+  const [navigationParentId, setNavigationParentId] = useState<string | undefined>(undefined);
+  const [navSequence, setNavSequence] = useState<NavigationItem[] | undefined>(undefined);
   const [featuredImage, setFeaturedImage] = useState('');
+
+  const handleNavPlacementChange = (newOrder: number, newParentId?: string, sequence?: NavigationItem[]) => {
+    setNavigationOrder(newOrder);
+    setNavigationParentId(newParentId);
+    if (sequence) setNavSequence(sequence);
+  };
 
   // SEO
   const [metaTitle, setMetaTitle] = useState('');
@@ -53,6 +63,7 @@ export default function EditPageScreen({ params }: EditPageProps) {
         setStatus(existing.status);
         setShowInNavigation(existing.showInNavigation);
         setNavigationOrder(existing.navigationOrder || 0);
+        setNavigationParentId(existing.navigationParentId);
         setFeaturedImage(existing.featuredImage || '');
         setMetaTitle(existing.seo?.metaTitle || existing.title);
         setMetaDescription(existing.seo?.metaDescription || '');
@@ -92,6 +103,7 @@ export default function EditPageScreen({ params }: EditPageProps) {
         status: targetStatus,
         showInNavigation,
         navigationOrder,
+        navigationParentId,
         featuredImage: featuredImage.trim() || undefined,
         sections,
         seo: {
@@ -99,6 +111,7 @@ export default function EditPageScreen({ params }: EditPageProps) {
           metaDescription: metaDescription.trim() || undefined,
           ogImageUrl: ogImageUrl.trim() || undefined,
         },
+        ...(page?.isSystemPage && page?.systemKey ? { isSystemPage: true, systemKey: page.systemKey } : {}),
       });
 
       // Sync Navigation
@@ -107,8 +120,37 @@ export default function EditPageScreen({ params }: EditPageProps) {
         title.trim(),
         cleanSlug,
         targetStatus === 'published' ? showInNavigation : false,
-        navigationOrder
+        navigationOrder,
+        page?.isSystemPage,
+        page?.systemKey,
+        navigationParentId
       );
+
+      if (navSequence && navSequence.length > 0 && showInNavigation && targetStatus === 'published') {
+        const finalNavSequence = navSequence.map((item) => {
+          if (item.id === 'current_page_target' || item.cmsPageId === id) {
+            const updatedItem: NavigationItem = {
+              ...item,
+              id: `nav_cms_${id}`,
+              cmsPageId: id,
+            };
+            if (navigationParentId) {
+              updatedItem.parentId = navigationParentId;
+            } else {
+              delete updatedItem.parentId;
+            }
+            if (!updatedItem.systemKey) delete updatedItem.systemKey;
+            return updatedItem;
+          }
+          if (!item.systemKey) {
+            const copy = { ...item };
+            delete copy.systemKey;
+            return copy;
+          }
+          return item;
+        });
+        await navigationService.saveNavigationItems(finalNavSequence);
+      }
 
       router.push('/admin/pages');
     } catch (err: unknown) {
@@ -155,7 +197,7 @@ export default function EditPageScreen({ params }: EditPageProps) {
             Save Draft 💾
           </Button>
           <Button variant="primary" isLoading={isSaving} onClick={() => handleUpdatePage('published')}>
-            Update & Publish 🚀
+            Update &amp; Publish 🚀
           </Button>
         </div>
       </div>
@@ -181,7 +223,7 @@ export default function EditPageScreen({ params }: EditPageProps) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
         <Card variant="bordered">
           <CardBody style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <h3>1. Page Identity & URL</h3>
+            <h3>1. Page Identity &amp; URL</h3>
             <Input
               label="Page Title *"
               value={title}
@@ -204,7 +246,7 @@ export default function EditPageScreen({ params }: EditPageProps) {
 
         <Card variant="bordered">
           <CardBody style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <h3>2. Visibility & Navbar Sync</h3>
+            <h3>2. Visibility &amp; Status Settings</h3>
             <Select
               label="Publish Status"
               value={status}
@@ -227,15 +269,24 @@ export default function EditPageScreen({ params }: EditPageProps) {
                 Show in Public Navigation Bar
               </label>
             </div>
-            <Input
-              label="Navigation Order Index"
-              type="number"
-              value={navigationOrder}
-              onChange={(e) => setNavigationOrder(parseInt(e.target.value, 10) || 0)}
-            />
           </CardBody>
         </Card>
       </div>
+
+      {/* Visual Navigation Placement & Preview Card */}
+      <Card variant="bordered" style={{ marginBottom: '2rem' }}>
+        <CardBody>
+          <NavigationPlacementPicker
+            showInNavigation={showInNavigation}
+            currentPageId={id}
+            currentPageTitle={title}
+            currentPageSlug={slug}
+            navigationOrder={navigationOrder}
+            navigationParentId={navigationParentId}
+            onChangePlacement={handleNavPlacementChange}
+          />
+        </CardBody>
+      </Card>
 
       {/* Page Builder Section Manager */}
       <Card variant="bordered" style={{ marginBottom: '2rem' }}>

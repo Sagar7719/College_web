@@ -1,10 +1,11 @@
 import React from 'react';
-import { OptionItem, InputSize } from '@/types';
+import { OptionItem, OptionGroup, InputSize } from '@/types';
 import styles from './ui.module.css';
 
 export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
   label?: string;
-  options: OptionItem[];
+  options?: OptionItem[];
+  groups?: OptionGroup[];
   error?: string;
   helperText?: string;
   inputSize?: InputSize;
@@ -16,6 +17,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     {
       label,
       options,
+      groups,
       error,
       helperText,
       inputSize = 'md',
@@ -56,11 +58,21 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                 {placeholder}
               </option>
             )}
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value} disabled={opt.disabled}>
-                {opt.label}
-              </option>
-            ))}
+            {groups
+              ? groups.map((group) => (
+                  <optgroup key={group.label} label={group.label}>
+                    {group.options.map((opt) => (
+                      <option key={opt.value} value={opt.value} disabled={opt.disabled}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))
+              : options?.map((opt) => (
+                  <option key={opt.value} value={opt.value} disabled={opt.disabled}>
+                    {opt.label}
+                  </option>
+                ))}
           </select>
           <span className={styles.selectCaret} aria-hidden="true">
             ▼

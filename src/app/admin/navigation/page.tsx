@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { NavigationItem, Page } from '@/types';
-import { navigationService } from '@/services/navigation.service';
+import { NavigationItem, Page, OptionGroup } from '@/types';
+import { navigationService, buildNavigationTree } from '@/services/navigation.service';
 import { pagesService } from '@/services/pages.service';
+import { selectablePagesService, SelectablePageOption } from '@/services/selectable-pages.service';
 import {
-  SYSTEM_ROUTE_OPTIONS,
   isValidExternalUrl,
 } from '@/validations/navigation.schema';
 import {
@@ -29,6 +29,7 @@ import {
 export default function AdminNavigationManagerScreen() {
   const [navItems, setNavItems] = useState<NavigationItem[]>([]);
   const [publishedPages, setPublishedPages] = useState<Page[]>([]);
+  const [selectablePages, setSelectablePages] = useState<SelectablePageOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -38,9 +39,9 @@ export default function AdminNavigationManagerScreen() {
 
   // Form State inside Modal
   const [label, setLabel] = useState('');
-  const [linkType, setLinkType] = useState<'system' | 'cms' | 'external'>('system');
-  const [systemPath, setSystemPath] = useState('/');
-  const [selectedCmsPageId, setSelectedCmsPageId] = useState('');
+  const [parentId, setParentId] = useState('');
+  const [linkType, setLinkType] = useState<'existing' | 'external'>('existing');
+  const [selectedPageId, setSelectedPageId] = useState('');
   const [externalUrl, setExternalUrl] = useState('https://');
   const [visible, setVisible] = useState(true);
   const [order, setOrder] = useState(0);
@@ -53,12 +54,14 @@ export default function AdminNavigationManagerScreen() {
 
   const loadData = async () => {
     setLoading(true);
-    const [allNav, allPages] = await Promise.all([
+    const [allNav, allPages, discoveredPages] = await Promise.all([
       navigationService.getAllAdminNavigationItems(),
       pagesService.getPublishedPages(),
+      selectablePagesService.getSelectablePages(),
     ]);
     setNavItems(allNav);
     setPublishedPages(allPages);
+    setSelectablePages(discoveredPages);
     setLoading(false);
   };
 
@@ -67,11 +70,13 @@ export default function AdminNavigationManagerScreen() {
     Promise.all([
       navigationService.getAllAdminNavigationItems(),
       pagesService.getPublishedPages(),
+      selectablePagesService.getSelectablePages(),
     ])
-      .then(([allNav, allPages]) => {
+      .then(([allNav, allPages, discoveredPages]) => {
         if (alive) {
           setNavItems(allNav);
           setPublishedPages(allPages);
+          setSelectablePages(discoveredPages);
           setLoading(false);
         }
       })
@@ -90,13 +95,27 @@ export default function AdminNavigationManagerScreen() {
       item.path.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleSelectPageOption = (optId: string) => {
+    setSelectedPageId(optId);
+    const selectedOpt = selectablePages.find((p) => p.id === optId);
+    if (selectedOpt && (!label.trim() || editingItem === null)) {
+      setLabel(selectedOpt.title);
+    }
+  };
+
   // Open Modal for Create
   const handleOpenCreateModal = () => {
     setEditingItem(null);
     setLabel('');
-    setLinkType('system');
-    setSystemPath('/');
-    setSelectedCmsPageId(publishedPages[0]?.id || '');
+    setParentId('');
+    setLinkType('existing');
+    const firstOption = selectablePages[0];
+    if (firstOption) {
+      setSelectedPageId(firstOption.id);
+      setLabel(firstOption.title);
+    } else {
+      setSelectedPageId('');
+    }
     setExternalUrl('https://');
     setVisible(true);
     setOrder(navItems.length);
@@ -109,16 +128,24 @@ export default function AdminNavigationManagerScreen() {
   const handleOpenEditModal = (item: NavigationItem) => {
     setEditingItem(item);
     setLabel(item.label);
+    setParentId(item.parentId || '');
 
     if (item.isExternal) {
       setLinkType('external');
       setExternalUrl(item.path);
-    } else if (item.isCMSPage) {
-      setLinkType('cms');
-      setSelectedCmsPageId(item.cmsPageId || '');
     } else {
-      setLinkType('system');
-      setSystemPath(item.path);
+      setLinkType('existing');
+      const matched = selectablePages.find(
+        (p) =>
+          (item.cmsPageId && p.pageId === item.cmsPageId) ||
+          (item.systemKey && p.systemKey === item.systemKey) ||
+          p.path === item.path
+      );
+      if (matched) {
+        setSelectedPageId(matched.id);
+      } else if (selectablePages.length > 0) {
+        setSelectedPageId(selectablePages[0].id);
+      }
     }
 
     setVisible(item.visible);
@@ -127,6 +154,14 @@ export default function AdminNavigationManagerScreen() {
     setErrorMessage('');
     setIsModalOpen(true);
   };
+
+  // Parent Select Options (Top-level items only, excluding self)
+  const parentSelectOptions = [
+    { label: '📌 Main Navigation (Top-Level Item)', value: '' },
+    ...navItems
+      .filter((i) => !i.parentId && i.id !== editingItem?.id)
+      .map((i) => ({ label: `📁 Dropdown Menu: ${i.label}`, value: i.id })),
+  ];
 
   // Save Modal Item
   const handleSaveModalItem = async () => {
@@ -141,37 +176,41 @@ export default function AdminNavigationManagerScreen() {
     let isCMSPage = false;
     let isExternal = false;
     let cmsPageId: string | undefined = undefined;
+    let systemKey: string | undefined = undefined;
+    let isSystemPage: boolean | undefined = undefined;
 
-    if (linkType === 'system') {
-      finalPath = systemPath;
-    } else if (linkType === 'cms') {
-      const selectedPage = publishedPages.find((p) => p.id === selectedCmsPageId);
-      if (!selectedPage) {
-        setErrorMessage('Please select a valid published CMS page.');
+    if (linkType === 'existing') {
+      const selectedOpt = selectablePages.find((p) => p.id === selectedPageId);
+      if (!selectedOpt) {
+        setErrorMessage('Please select an existing page from the dropdown.');
         return;
       }
-      finalPath = `/${selectedPage.slug}`;
-      isCMSPage = true;
-      cmsPageId = selectedPage.id;
+      finalPath = selectedOpt.path;
+      isCMSPage = selectedOpt.category === 'custom_page';
+      cmsPageId = selectedOpt.pageId;
+      isSystemPage = selectedOpt.isSystemPage;
+      systemKey = selectedOpt.systemKey;
     } else if (linkType === 'external') {
       if (!isValidExternalUrl(externalUrl)) {
         setErrorMessage('Please enter a valid external URL starting with http:// or https://');
         return;
       }
-      finalPath = externalUrl;
+      finalPath = externalUrl.trim();
       isExternal = true;
     }
 
     setIsSaving(true);
     try {
       const newItem: NavigationItem = {
-        id: editingItem?.id || `nav_${Date.now()}`,
+        id: editingItem?.id || (isSystemPage && systemKey ? `nav_sys_${systemKey}_${Date.now()}` : isCMSPage && cmsPageId ? `nav_cms_${cmsPageId}` : `nav_${Date.now()}`),
         label: label.trim(),
         path: finalPath,
         order,
         visible,
         isCMSPage,
         cmsPageId,
+        ...(parentId ? { parentId } : {}),
+        ...(isSystemPage && systemKey ? { isSystemPage: true, systemKey: systemKey as any } : {}),
         isExternal,
         targetBlank: isExternal ? openInNewTab : undefined,
       };
@@ -218,20 +257,29 @@ export default function AdminNavigationManagerScreen() {
 
   // Delete Item (Does NOT delete CMS page!)
   const confirmDelete = async (id: string) => {
-    await navigationService.deleteNavigationItem(id);
-    setDeleteConfirmId(null);
-    loadData();
+    try {
+      await navigationService.deleteNavigationItem(id);
+      setDeleteConfirmId(null);
+      loadData();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete navigation item';
+      alert(msg);
+      setDeleteConfirmId(null);
+    }
   };
+
+  const parentMap = new Map<string, string>();
+  navItems.forEach((i) => parentMap.set(i.id, i.label));
 
   return (
     <div>
       {/* Page Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <Badge variant="info" style={{ marginBottom: '0.375rem' }}>Dynamic Navigation</Badge>
+          <Badge variant="info" style={{ marginBottom: '0.375rem' }}>2-Level Mega Navigation</Badge>
           <h1 style={{ fontSize: '1.75rem', color: 'var(--primary)' }}>Header Navigation Manager</h1>
           <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Configure menu items, order, visibility, and link destinations for the public website header.
+            Manage 2-level top-level and dropdown child navigation items for system and custom CMS pages.
           </p>
         </div>
         <Button variant="primary" size="md" onClick={handleOpenCreateModal}>
@@ -284,24 +332,50 @@ export default function AdminNavigationManagerScreen() {
               <TableHeader>
                 <TableRow>
                   <TableHead style={{ width: '60px' }}>Order</TableHead>
-                  <TableHead>Menu Label</TableHead>
-                  <TableHead>Link Destination & Type</TableHead>
+                  <TableHead>Menu Label &amp; Hierarchy</TableHead>
+                  <TableHead>Link Destination &amp; Type</TableHead>
                   <TableHead>Visibility Status</TableHead>
                   <TableHead style={{ textAlign: 'right' }}>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredNavItems.map((item, idx) => {
-                  return (
-                    <TableRow key={item.id} style={{ opacity: item.visible ? 1 : 0.6 }}>
-                      <TableCell style={{ fontWeight: 700 }}>#{idx + 1}</TableCell>
+                {(() => {
+                  const topLevelItemsList = navItems.filter((i) => !i.parentId);
+                  return filteredNavItems.map((item, idx) => {
+                    const isSys = item.isSystemPage;
+                    const isChild = Boolean(item.parentId);
+                    const parentLabel = item.parentId ? parentMap.get(item.parentId) : undefined;
+
+                    let orderDisplay = '';
+                    if (!isChild) {
+                      const topIdx = topLevelItemsList.findIndex((i) => i.id === item.id);
+                      orderDisplay = `#${topIdx !== -1 ? topIdx + 1 : item.order + 1}`;
+                    } else {
+                      const siblings = navItems.filter((i) => i.parentId === item.parentId);
+                      const childIdx = siblings.findIndex((i) => i.id === item.id);
+                      orderDisplay = `↳ #${childIdx !== -1 ? childIdx + 1 : item.order + 1}`;
+                    }
+
+                    return (
+                      <TableRow key={item.id} style={{ opacity: item.visible ? 1 : 0.6 }}>
+                        <TableCell style={{ fontWeight: 700, color: isChild ? 'var(--primary)' : 'var(--text-main)' }}>
+                          {orderDisplay}
+                        </TableCell>
                       <TableCell>
-                        <strong style={{ color: 'var(--primary)' }}>{item.label}</strong>
+                        <div style={{ paddingLeft: isChild ? '1.5rem' : 0, display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                          {isChild && <span style={{ color: 'var(--primary)', fontWeight: 700 }}>↳ </span>}
+                          <strong style={{ color: 'var(--primary)' }}>{item.label}</strong>
+                          {isChild && parentLabel && (
+                            <Badge variant="default" style={{ fontSize: '0.6875rem' }}>
+                              Inside {parentLabel}
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
-                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                          <Badge variant={item.isExternal ? 'warning' : item.isCMSPage ? 'info' : 'default'}>
-                            {item.isExternal ? 'External URL' : item.isCMSPage ? 'CMS Page' : 'System Route'}
+                        <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                          <Badge variant={isSys ? 'info' : item.isExternal ? 'warning' : 'default'}>
+                            {isSys ? 'SYSTEM' : item.isExternal ? 'EXTERNAL' : 'CUSTOM CMS'}
                           </Badge>
                           <span className="small-text">{item.path}</span>
                         </div>
@@ -312,7 +386,7 @@ export default function AdminNavigationManagerScreen() {
                         </Badge>
                       </TableCell>
                       <TableCell style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.25rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.25rem', flexWrap: 'wrap' }}>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -345,7 +419,10 @@ export default function AdminNavigationManagerScreen() {
                           <Button
                             variant="danger"
                             size="sm"
-                            onClick={() => setDeleteConfirmId(item.id)}
+                            disabled={isSys}
+                            title={isSys ? 'System page navigation items cannot be deleted.' : 'Remove menu item'}
+                            onClick={() => !isSys && setDeleteConfirmId(item.id)}
+                            style={isSys ? { opacity: 0.4, cursor: 'not-allowed' } : undefined}
                             aria-label="Remove menu item"
                           >
                             ✕
@@ -354,7 +431,8 @@ export default function AdminNavigationManagerScreen() {
                       </TableCell>
                     </TableRow>
                   );
-                })}
+                });
+              })()}
               </TableBody>
             </Table>
           </CardBody>
@@ -366,7 +444,7 @@ export default function AdminNavigationManagerScreen() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingItem ? 'Edit Navigation Menu Item' : 'Add New Navigation Menu Item'}
-        description="Configure menu label, link destination, and public navbar visibility."
+        description="Configure menu label, parent dropdown location, link destination, and public navbar visibility."
         footer={
           <>
             <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
@@ -402,42 +480,61 @@ export default function AdminNavigationManagerScreen() {
           />
 
           <Select
-            label="Link Destination Type"
+            label="Navbar Parent Location"
+            value={parentId}
+            onChange={(e) => setParentId(e.target.value)}
+            options={parentSelectOptions}
+          />
+
+          <Select
+            label="Link Destination Type *"
             value={linkType}
-            onChange={(e) => setLinkType(e.target.value as 'system' | 'cms' | 'external')}
+            onChange={(e) => {
+              const val = e.target.value as 'existing' | 'external';
+              setLinkType(val);
+              if (val === 'existing' && selectablePages.length > 0) {
+                handleSelectPageOption(selectablePages[0].id);
+              }
+            }}
             options={[
-              { label: 'Internal System Page (e.g. /about, /admissions)', value: 'system' },
-              { label: 'Published CMS Page', value: 'cms' },
-              { label: 'External Web Link (http:// or https://)', value: 'external' },
+              { label: '📌 Existing Page (System Page, System Module, or Custom Page)', value: 'existing' },
+              { label: '🌐 External Web Link (http:// or https://)', value: 'external' },
             ]}
           />
 
-          {linkType === 'system' && (
-            <Select
-              label="Select System Route"
-              value={systemPath}
-              onChange={(e) => setSystemPath(e.target.value)}
-              options={SYSTEM_ROUTE_OPTIONS}
-            />
-          )}
-
-          {linkType === 'cms' && (
-            <div>
+          {linkType === 'existing' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <Select
-                label="Select Published CMS Page"
-                value={selectedCmsPageId}
-                onChange={(e) => setSelectedCmsPageId(e.target.value)}
-                options={
-                  publishedPages.length > 0
-                    ? publishedPages.map((p) => ({ label: `${p.title} (/${p.slug})`, value: p.id }))
-                    : [{ label: 'No published CMS pages found', value: '' }]
-                }
+                label="Select Existing Page / Route *"
+                value={selectedPageId}
+                onChange={(e) => handleSelectPageOption(e.target.value)}
+                groups={[
+                  {
+                    label: 'System Pages',
+                    options: selectablePages
+                      .filter((p) => p.category === 'system_page')
+                      .map((p) => ({ label: `${p.title} (${p.path})`, value: p.id })),
+                  },
+                  {
+                    label: 'System Modules',
+                    options: selectablePages
+                      .filter((p) => p.category === 'system_module')
+                      .map((p) => ({ label: `${p.title} (${p.path})`, value: p.id })),
+                  },
+                  {
+                    label: 'Custom CMS Pages',
+                    options:
+                      selectablePages.filter((p) => p.category === 'custom_page').length > 0
+                        ? selectablePages
+                            .filter((p) => p.category === 'custom_page')
+                            .map((p) => ({ label: `${p.title} (${p.path})`, value: p.id }))
+                        : [{ label: 'No published custom pages found', value: '', disabled: true }],
+                  },
+                ].filter((g) => g.options.length > 0)}
               />
-              {publishedPages.length === 0 && (
-                <span className="tiny-text" style={{ color: 'var(--semantic-warning)', marginTop: '0.25rem', display: 'block' }}>
-                  ⚠️ Create and publish a CMS page first in Page Builder to select it here.
-                </span>
-              )}
+              <span className="tiny-text" style={{ color: 'var(--text-muted)' }}>
+                Selecting an existing route reuses its canonical path without creating duplicate page documents.
+              </span>
             </div>
           )}
 
@@ -497,7 +594,7 @@ export default function AdminNavigationManagerScreen() {
         }
       >
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-          Removing a navigation menu item only removes the link from the public header menu. <strong>The underlying CMS page or system route will NOT be deleted.</strong>
+          Removing a navigation menu item only removes the link from the public header menu. <strong>The underlying custom CMS page will NOT be deleted.</strong>
         </p>
       </Modal>
     </div>
