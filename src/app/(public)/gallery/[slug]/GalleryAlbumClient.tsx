@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { GalleryImage } from '@/types';
 import { GalleryLightbox } from '@/components/layout/GalleryLightbox';
+import styles from '../../inner.module.css';
 
 interface Props {
   images: GalleryImage[];
@@ -13,29 +14,18 @@ export function GalleryAlbumClient({ images }: Props) {
 
   return (
     <>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-          gap: '1rem',
-        }}
-      >
+      <div className={styles.galleryGrid}>
         {images.map((img, idx) => (
           <button
             key={img.id || idx}
             onClick={() => setLightboxIndex(idx)}
             aria-label={`Open photo ${idx + 1}${img.caption ? `: ${img.caption}` : ''}`}
-            style={{
-              background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-              borderRadius: 'var(--radius-md)', overflow: 'hidden',
-              display: 'block', width: '100%',
-            }}
+            className={styles.lightboxButton}
           >
             <div
               style={{
-                width: '100%', height: '200px',
-                backgroundColor: 'var(--neutral-200)',
-                borderRadius: 'var(--radius-md)', overflow: 'hidden',
+                width: '100%', height: '220px',
+                backgroundColor: 'var(--color-surface-muted)',
                 position: 'relative',
               }}
             >
@@ -44,7 +34,7 @@ export function GalleryAlbumClient({ images }: Props) {
                 alt={img.altText || `Photo ${idx + 1}`}
                 style={{
                   width: '100%', height: '100%', objectFit: 'cover',
-                  display: 'block', transition: 'transform 0.25s ease',
+                  display: 'block', transition: 'transform var(--transition-normal)'
                 }}
                 loading="lazy"
                 onError={(e) => {
@@ -54,17 +44,18 @@ export function GalleryAlbumClient({ images }: Props) {
               {/* Hover overlay */}
               <div style={{
                 position: 'absolute', inset: 0,
-                background: 'rgba(10,37,64,0)',
-                transition: 'background 0.2s ease',
+                background: 'rgba(11,31,58,0)',
+                transition: 'background 0.25s ease',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }} />
             </div>
             {img.caption && (
               <p style={{
-                fontSize: '0.8rem', color: 'var(--text-muted)',
-                marginTop: '0.375rem', textAlign: 'center',
-                padding: '0 0.25rem',
+                fontSize: '0.8125rem', color: 'var(--color-text-secondary)',
+                marginTop: '0.5rem', textAlign: 'center',
+                padding: '0 0.5rem',
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                fontWeight: 500
               }}>
                 {img.caption}
               </p>

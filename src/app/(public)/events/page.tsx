@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { eventsService } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
 import { Card, CardBody, Badge, EmptyState } from '@/components/ui';
+import styles from '../inner.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await siteSettingsService.getSettings();
@@ -33,27 +34,31 @@ export default async function EventsPage() {
   const events = await eventsService.getUpcoming();
 
   return (
-    <div>
-      <div style={{ marginBottom: '2rem' }}>
-        <Badge variant="info" style={{ marginBottom: '0.5rem' }}>Campus Calendar</Badge>
-        <h1>Upcoming Events</h1>
-        <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+    <div className="container" style={{ padding: '3rem 1.5rem' }}>
+      <div className={styles.pageHeader}>
+        <Badge variant="default" style={{ marginBottom: '0.75rem' }}>Campus Calendar</Badge>
+        <h1 className={styles.pageTitle}>Upcoming Events</h1>
+        <p className={styles.pageSubtitle}>
           Conferences, workshops, cultural meets, and sports tournaments.
         </p>
       </div>
 
       {events.length > 0 ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
           {events.map((evt) => (
             <Card key={evt.id} variant="bordered" hoverable>
-              <CardBody>
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <Badge variant="success">Upcoming</Badge>
-                  <span className="tiny-text">📅 {evt.eventDate.slice(0, 10)}</span>
+              <CardBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                    <Badge variant="success">Upcoming</Badge>
+                    <span className="tiny-text" style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>📅 {evt.eventDate.slice(0, 10)}</span>
+                  </div>
+                  <h3 className={styles.sectionTitle} style={{ color: 'var(--color-primary)', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+                    {evt.title}
+                  </h3>
+                  <p className="small-text" style={{ fontWeight: 700, margin: '0.5rem 0', color: 'var(--color-accent)' }}>📍 {evt.venue}</p>
+                  <p className={styles.bodyText} style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>{evt.description}</p>
                 </div>
-                <h3>{evt.title}</h3>
-                <p className="small-text" style={{ margin: '0.5rem 0', color: 'var(--text-secondary)' }}>📍 {evt.venue}</p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{evt.description}</p>
               </CardBody>
             </Card>
           ))}

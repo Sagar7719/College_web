@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { coursesService } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
 import { Card, CardBody, Badge, EmptyState, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui';
+import styles from '../inner.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await siteSettingsService.getSettings();
@@ -33,11 +34,11 @@ export default async function CoursesPage() {
   const courses = await coursesService.getAll();
 
   return (
-    <div>
-      <div style={{ marginBottom: '2rem' }}>
-        <Badge variant="info" style={{ marginBottom: '0.5rem' }}>Programs Offered</Badge>
-        <h1>Courses & Degree Programs</h1>
-        <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+    <div className="container" style={{ padding: '3rem 1.5rem' }}>
+      <div className={styles.pageHeader}>
+        <Badge variant="default" style={{ marginBottom: '0.75rem' }}>Programs Offered</Badge>
+        <h1 className={styles.pageTitle}>Courses &amp; Degree Programs</h1>
+        <p className={styles.pageSubtitle}>
           Explore undergraduate, postgraduate, and diploma programs.
         </p>
       </div>
@@ -59,7 +60,7 @@ export default async function CoursesPage() {
                 {courses.map((course) => (
                   <TableRow key={course.id}>
                     <TableCell><Badge variant="default">{course.code}</Badge></TableCell>
-                    <TableCell style={{ fontWeight: 600, color: 'var(--primary)' }}>{course.title}</TableCell>
+                    <TableCell style={{ fontWeight: 700, color: 'var(--color-primary)' }}>{course.title}</TableCell>
                     <TableCell>{course.degreeType}</TableCell>
                     <TableCell>{course.durationYears} Years</TableCell>
                     <TableCell style={{ fontSize: '0.875rem' }}>{course.eligibility || 'Higher Secondary Pass'}</TableCell>

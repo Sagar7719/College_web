@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { pagesService } from '@/services/pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
 import { PageSectionRenderer } from '@/components/page-builder';
+import styles from '../inner.module.css';
 
 
 interface PageProps {
@@ -90,14 +91,14 @@ export default async function DynamicCMSPage({ params }: PageProps) {
   }
 
   return (
-    <article className="cms-page-wrapper">
+    <article className="container" style={{ padding: '3rem 1.5rem' }}>
       {/* Featured Header if featured image exists */}
       {page.featuredImage && (
-        <div style={{ marginBottom: '2.5rem', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        <div style={{ marginBottom: '3rem', borderRadius: 'var(--radius-2xl)', overflow: 'hidden', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)' }}>
           <img
             src={page.featuredImage}
             alt={page.title}
-            style={{ width: '100%', maxHeight: '380px', objectFit: 'cover' }}
+            style={{ width: '100%', maxHeight: '420px', objectFit: 'cover', display: 'block' }}
           />
         </div>
       )}

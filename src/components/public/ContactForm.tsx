@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardBody, Input, Button } from '@/components/ui';
 import { contactMessageSchema } from '@/validations/contact-message.schema';
+import styles from '@/app/(public)/inner.module.css';
 
 export const ContactForm: React.FC = () => {
   const [name, setName] = useState('');
@@ -86,8 +87,8 @@ export const ContactForm: React.FC = () => {
 
   return (
     <Card variant="bordered">
-      <CardBody style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        <h3>Send A Message</h3>
+      <CardBody style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '2rem' }}>
+        <h2 className={styles.sectionTitle} style={{ marginBottom: 0, fontSize: '1.25rem' }}>Send A Message</h2>
 
         {successMessage && (
           <div
@@ -98,7 +99,7 @@ export const ContactForm: React.FC = () => {
               border: '1px solid #a7f3d0',
               color: '#065f46',
               fontSize: '0.875rem',
-              fontWeight: 500,
+              fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -136,7 +137,7 @@ export const ContactForm: React.FC = () => {
               border: '1px solid #fecaca',
               color: '#991b1b',
               fontSize: '0.875rem',
-              fontWeight: 500,
+              fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -207,8 +208,8 @@ export const ContactForm: React.FC = () => {
           />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-            <label style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--primary)' }}>
-              Message <span style={{ color: 'var(--danger, #ef4444)' }}>*</span>
+            <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-primary)' }}>
+              Message <span style={{ color: 'var(--color-danger, #ef4444)' }}>*</span>
             </label>
             <textarea
               rows={4}
@@ -221,16 +222,19 @@ export const ContactForm: React.FC = () => {
               disabled={submitting}
               required
               style={{
-                padding: '0.625rem 1rem',
+                padding: '0.625rem 1.05rem',
                 borderRadius: 'var(--radius-md)',
-                border: `1px solid ${errors.message ? 'var(--danger, #ef4444)' : 'var(--border-color)'}`,
+                border: `1.5px solid ${errors.message ? 'var(--color-danger, #ef4444)' : 'var(--color-border)'}`,
                 fontFamily: 'inherit',
                 fontSize: '1rem',
                 outline: 'none',
+                backgroundColor: 'var(--color-background)',
+                color: 'var(--color-text-main)',
+                transition: 'border-color var(--transition-fast)'
               }}
             />
             {errors.message && (
-              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--danger, #ef4444)' }} role="alert">
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-danger, #ef4444)' }} role="alert">
                 {errors.message}
               </p>
             )}

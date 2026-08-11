@@ -52,7 +52,7 @@ export const AdminMobileDrawer: React.FC<AdminMobileDrawerProps> = ({ isOpen, on
   if (!isOpen) return null;
 
   return (
-    <div className={styles.drawerOverlay} onClick={onClose} role="dialog" aria-modal="true" style={{ position: 'fixed', inset: 0, zIndex: 1000, backgroundColor: 'rgba(15, 23, 42, 0.6)' }}>
+    <div className={styles.drawerOverlay} onClick={onClose} role="dialog" aria-modal="true">
       <div className={styles.sidebar} style={{ display: 'flex', width: '280px', height: '100%', position: 'absolute', right: 0 }} onClick={(e) => e.stopPropagation()}>
         <div className={styles.sidebarHeader} style={{ justifyContent: 'space-between' }}>
           <span>CMS Navigation</span>

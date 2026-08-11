@@ -59,8 +59,8 @@ export default async function AdminDashboardPage() {
   return (
     <div>
       {/* Welcome Banner */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+      <div style={{ marginBottom: '2.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
           <Badge variant="info">CMS Administration</Badge>
           {isSetupCompleted ? (
             <Badge variant="success">Setup Completed ✓</Badge>
@@ -71,33 +71,20 @@ export default async function AdminDashboardPage() {
             <Badge variant="danger">🚨 Maintenance Mode Active</Badge>
           )}
         </div>
-        <h1 style={{ fontSize: '1.75rem', color: 'var(--primary)' }}>{collegeName} Overview</h1>
-        <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+        <h1 className={styles.headerTitle} style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{collegeName} Overview</h1>
+        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9375rem', margin: 0 }}>
           Manage dynamic pages, dynamic navigation, academic departments, media, and site settings.
         </p>
       </div>
 
       {/* Onboarding Notice Banner if Setup Incomplete */}
       {!isSetupCompleted && (
-        <div
-          style={{
-            padding: '1.25rem 1.5rem',
-            borderRadius: 'var(--radius-lg)',
-            marginBottom: '2rem',
-            backgroundColor: '#EFF6FF',
-            border: '1px solid #BFDBFE',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
+        <div className={styles.noticeBannerBlue}>
           <div>
-            <strong style={{ color: '#1E40AF', fontSize: '1.0625rem' }}>
+            <h4 className={styles.noticeBannerTitle}>
               🚀 Complete Your First-Time College Setup
-            </strong>
-            <p style={{ fontSize: '0.875rem', color: '#1E3A8A', margin: '0.25rem 0 0' }}>
+            </h4>
+            <p className={styles.noticeBannerDesc}>
               Configure your college branding, campus address, contact details, and principal information using the guided wizard.
             </p>
           </div>
@@ -111,25 +98,12 @@ export default async function AdminDashboardPage() {
 
       {/* Maintenance Mode Warning Banner if Active */}
       {isMaintenanceActive && (
-        <div
-          style={{
-            padding: '1.25rem 1.5rem',
-            borderRadius: 'var(--radius-lg)',
-            marginBottom: '2rem',
-            backgroundColor: '#FEF2F2',
-            border: '1px solid #FECACA',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
+        <div className={styles.noticeBannerRed}>
           <div>
-            <strong style={{ color: '#991B1B', fontSize: '1.0625rem' }}>
+            <h4 className={styles.noticeBannerTitle}>
               🚨 Public Maintenance Mode is Active
-            </strong>
-            <p style={{ fontSize: '0.875rem', color: '#7F1D1D', margin: '0.25rem 0 0' }}>
+            </h4>
+            <p className={styles.noticeBannerDesc}>
               Public visitors are seeing the maintenance page. Admin CMS remains accessible for you.
             </p>
           </div>
@@ -157,11 +131,11 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Quick Action & Draft Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
         <Card variant="bordered">
-          <CardBody>
-            <h3 style={{ marginBottom: '1rem' }}>⚡ Quick Content Actions</h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <CardBody style={{ padding: '1.75rem' }}>
+            <h3 className={styles.headerTitle} style={{ marginBottom: '0.25rem', fontSize: '1.1875rem' }}>⚡ Quick Content Actions</h3>
+            <div className={styles.quickActionsFlex}>
               <Link href="/admin/pages">
                 <Button variant="primary" size="sm">Create New Page 📄</Button>
               </Link>
@@ -175,22 +149,22 @@ export default async function AdminDashboardPage() {
                 <Button variant="outline" size="sm">Manage Menu 🧭</Button>
               </Link>
               <Link href="/admin/settings">
-                <Button variant="ghost" size="sm">Site Settings ⚙️</Button>
+                <Button variant="ghost" size="sm">Settings ⚙️</Button>
               </Link>
             </div>
           </CardBody>
         </Card>
 
         <Card variant="bordered">
-          <CardBody>
-            <h3 style={{ marginBottom: '0.5rem' }}>📝 Content Overview</h3>
-            <p className="small-text" style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          <CardBody style={{ padding: '1.75rem' }}>
+            <h3 className={styles.headerTitle} style={{ marginBottom: '0.5rem', fontSize: '1.1875rem' }}>📝 Content Overview</h3>
+            <p className="small-text" style={{ color: 'var(--color-text-muted)', lineHeight: 1.6, margin: 0 }}>
               {pages.length > 0
                 ? `${pages.filter((p) => p.status === 'published').length} published page(s) currently active on the public website.`
                 : 'No dynamic pages configured yet. Click "Create New Page" to add website pages without coding.'}
             </p>
-            <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-color)' }}>
-              <Link href="/admin/settings" style={{ fontSize: '0.875rem', color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}>
+            <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
+              <Link href="/admin/settings" style={{ fontSize: '0.875rem', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 700 }}>
                 Configure College Settings &amp; Branding →
               </Link>
             </div>

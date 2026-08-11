@@ -8,13 +8,14 @@ import { NavigationItem } from '@/types';
 import styles from './layout.module.css';
 import { MobileDrawer } from './MobileDrawer';
 
+// Standardized fallback navigation matching requested structure
 const defaultFallbackNav: NavigationItem[] = [
   { id: 'nav_sys_home', label: 'Home', path: '/', isCMSPage: true, isSystemPage: true, systemKey: 'home', order: 0, visible: true },
-  { id: 'nav_sys_about', label: 'About Us', path: '/about', isCMSPage: true, isSystemPage: true, systemKey: 'about', order: 1, visible: true },
-  { id: 'nav_sys_academics', label: 'Academics', path: '/departments', isCMSPage: true, isSystemPage: true, systemKey: 'academics', order: 2, visible: true },
-  { id: 'nav_sys_admissions', label: 'Admissions', path: '/admissions', isCMSPage: true, isSystemPage: true, systemKey: 'admissions', order: 3, visible: true },
-  { id: 'nav_sys_notices', label: 'Notices', path: '/notices', isCMSPage: true, isSystemPage: true, systemKey: 'notices', order: 4, visible: true },
-  { id: 'nav_sys_contact', label: 'Contact Us', path: '/contact', isCMSPage: true, isSystemPage: true, systemKey: 'contact', order: 5, visible: true },
+  { id: 'nav_sys_academics', label: 'Academics', path: '/courses', isCMSPage: true, isSystemPage: true, systemKey: 'academics', order: 1, visible: true },
+  { id: 'nav_sys_admissions', label: 'Admissions', path: '/admissions', isCMSPage: true, isSystemPage: true, systemKey: 'admissions', order: 2, visible: true },
+  { id: 'nav_sys_notices', label: 'Notices', path: '/notices', isCMSPage: true, isSystemPage: true, systemKey: 'notices', order: 3, visible: true },
+  { id: 'nav_sys_contact', label: 'Contact Us', path: '/contact', isCMSPage: true, isSystemPage: true, systemKey: 'contact', order: 4, visible: true },
+  { id: 'nav_sys_about', label: 'About Us', path: '/about', isCMSPage: true, isSystemPage: true, systemKey: 'about', order: 5, visible: true },
 ];
 
 export interface NavbarProps {
@@ -46,7 +47,6 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
     return () => { alive = false; };
   }, [initialNavItems]);
 
-  // Close dropdown on click outside or Escape key
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
@@ -66,10 +66,19 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
     };
   }, []);
 
-  // Close open dropdown on route change
   useEffect(() => {
     setOpenDropdownId(null);
   }, [pathname]);
+
+  const handleDropdownKeyDown = (e: React.KeyboardEvent, itemId: string) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      setOpenDropdownId(openDropdownId === itemId ? null : itemId);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setOpenDropdownId(itemId);
+    }
+  };
 
   return (
     <>
@@ -92,75 +101,49 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
                       onMouseEnter={() => setOpenDropdownId(item.id)}
                       onMouseLeave={() => setOpenDropdownId(null)}
                     >
-                      {item.isExternal ? (
-                        <a
-                          href={item.externalUrl || item.path}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`${styles.navItemLink} ${styles.navItemWithDropdown} ${isActive ? styles.navItemActive : ''}`}
-                          onClick={() => setOpenDropdownId(null)}
-                        >
-                          {item.label}
-                          <span
-                            className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.dropdownArrowOpen : ''}`}
-                          >
-                            ▼
-                          </span>
-                        </a>
-                      ) : (
-                        <Link
-                          href={item.path}
-                          className={`${styles.navItemLink} ${styles.navItemWithDropdown} ${isActive ? styles.navItemActive : ''}`}
-                          onClick={() => setOpenDropdownId(null)}
-                        >
-                          {item.label}
-                          <span
-                            className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.dropdownArrowOpen : ''}`}
-                          >
-                            ▼
-                          </span>
-                        </Link>
-                      )}
-
+                      <button
+                        type="button"
+                        className={`${styles.navItemLink} ${styles.navItemWithDropdown} ${isActive ? styles.navItemActive : ''}`}
+                        aria-expanded={isDropdownOpen}
+                        aria-haspopup="true"
+                        onClick={() => setOpenDropdownId(isDropdownOpen ? null : item.id)}
+                        onKeyDown={(e) => handleDropdownKeyDown(e, item.id)}
+                      >
+                        <span>{item.label}</span>
+                        <span className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.dropdownArrowOpen : ''}`}>▼</span>
+                      </button>
                       {isDropdownOpen && (
                         <ul className={styles.dropdownMenu} role="menu">
-                          {item.path && item.path !== '#' && (
-                            <li role="none">
-                              <Link
-                                href={item.path}
-                                role="menuitem"
-                                className={`${styles.dropdownItemLink} ${isSelfActive ? styles.dropdownItemActive : ''}`}
-                                onClick={() => setOpenDropdownId(null)}
-                              >
-                                Overview ({item.label})
-                              </Link>
-                            </li>
-                          )}
                           {item.children?.map((child) => {
-                            const isSubActive = pathname === child.path;
-                            return (
-                              <li key={child.id} role="none">
-                                {child.isExternal ? (
+                            const isChildItemActive = pathname === child.path;
+                            const isExt =
+                              child.isExternal ||
+                              child.path.startsWith('http://') ||
+                              child.path.startsWith('https://');
+
+                            if (isExt) {
+                              return (
+                                <li key={child.id} role="menuitem">
                                   <a
-                                    href={child.externalUrl || child.path}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    role="menuitem"
-                                    className={styles.dropdownItemLink}
-                                    onClick={() => setOpenDropdownId(null)}
-                                  >
-                                    {child.label} ↗
-                                  </a>
-                                ) : (
-                                  <Link
                                     href={child.path}
-                                    role="menuitem"
-                                    className={`${styles.dropdownItemLink} ${isSubActive ? styles.dropdownItemActive : ''}`}
-                                    onClick={() => setOpenDropdownId(null)}
+                                    className={styles.dropdownItemLink}
+                                    target={child.targetBlank ? '_blank' : undefined}
+                                    rel={child.targetBlank ? 'noopener noreferrer' : undefined}
                                   >
                                     {child.label}
-                                  </Link>
-                                )}
+                                  </a>
+                                </li>
+                              );
+                            }
+
+                            return (
+                              <li key={child.id} role="menuitem">
+                                <Link
+                                  href={child.path}
+                                  className={`${styles.dropdownItemLink} ${isChildItemActive ? styles.dropdownItemActive : ''}`}
+                                >
+                                  {child.label}
+                                </Link>
                               </li>
                             );
                           })}
@@ -170,34 +153,44 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
                   );
                 }
 
-                return (
-                  <li key={item.id}>
-                    {item.isExternal ? (
+                const isExt =
+                  item.isExternal ||
+                  item.path.startsWith('http://') ||
+                  item.path.startsWith('https://');
+
+                if (isExt) {
+                  return (
+                    <li key={item.id}>
                       <a
-                        href={item.externalUrl || item.path}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.navItemLink}
-                      >
-                        {item.label} ↗
-                      </a>
-                    ) : (
-                      <Link
                         href={item.path}
-                        className={`${styles.navItemLink} ${isActive ? styles.navItemActive : ''}`}
+                        className={styles.navItemLink}
+                        target={item.targetBlank ? '_blank' : undefined}
+                        rel={item.targetBlank ? 'noopener noreferrer' : undefined}
                       >
                         {item.label}
-                      </Link>
-                    )}
+                      </a>
+                    </li>
+                  );
+                }
+
+                return (
+                  <li key={item.id}>
+                    <Link
+                      href={item.path}
+                      className={`${styles.navItemLink} ${isActive ? styles.navItemActive : ''}`}
+                    >
+                      {item.label}
+                    </Link>
                   </li>
                 );
               })}
             </ul>
 
             <button
+              type="button"
               className={styles.mobileToggleBtn}
               onClick={() => setIsMobileOpen(true)}
-              aria-label="Open mobile navigation menu"
+              aria-label="Open Navigation Menu"
             >
               ☰
             </button>
@@ -205,6 +198,7 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
         </div>
       </nav>
 
+      {/* Mobile Accordion Drawer */}
       <MobileDrawer
         isOpen={isMobileOpen}
         onClose={() => setIsMobileOpen(false)}

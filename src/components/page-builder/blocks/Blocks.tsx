@@ -20,6 +20,7 @@ import { galleryService, downloadsService } from '@/services/cms-modules.service
 import { Button, Card, CardBody, Badge } from '@/components/ui';
 import { sanitizeHtml } from '@/lib/sanitize';
 import styles from './SectionBlocks.module.css';
+import { FAQAccordion } from './FAQAccordion';
 
 // 1. Hero Block
 export const HeroBlock: React.FC<{ section: HeroSection }> = ({ section }) => (
@@ -165,29 +166,22 @@ export const CTABlock: React.FC<{ section: CTASection }> = ({ section }) => (
 // 10. FAQ Block
 export const FAQBlock: React.FC<{ section: FAQSection }> = ({ section }) => (
   <div style={{ marginBottom: '3rem' }}>
-    {section.title && <h2 style={{ marginBottom: '1.5rem' }}>{section.title}</h2>}
-    <div className={styles.faqBlock}>
-      {section.items.map((item) => (
-        <div key={item.id} className={styles.faqItem}>
-          <h4 className={styles.faqQuestion}>Q: {item.question}</h4>
-          <p className={styles.faqAnswer}>{item.answer}</p>
-        </div>
-      ))}
-    </div>
+    {section.title && <h2 style={{ marginBottom: '1.5rem', color: 'var(--color-primary)' }}>{section.title}</h2>}
+    <FAQAccordion items={section.items} />
   </div>
 );
 
 // 11. Notice List Embed Block
 export const NoticeListBlock: React.FC<{ section: NoticeListSection }> = ({ section }) => (
-  <div style={{ marginBottom: '3rem', padding: '1.5rem', backgroundColor: 'var(--bg-light)', borderRadius: 'var(--radius-lg)' }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-      <h3>{section.title || 'Official College Notices'}</h3>
+  <div className={styles.embedBlockContainer}>
+    <div className={styles.embedBlockHeader}>
+      <h3 className={styles.embedBlockTitle}>{section.title || 'Official College Notices'}</h3>
       <Link href="/notices">
         <Button variant="outline" size="sm">View All Notices</Button>
       </Link>
     </div>
     <Badge variant="info">Category: {section.categoryLimit || 'All Categories'}</Badge>
-    <p className="small-text" style={{ marginTop: '0.5rem' }}>
+    <p className="small-text" style={{ marginTop: '0.75rem', color: 'var(--color-text-muted)' }}>
       Embedded notice feed displays latest college updates dynamically.
     </p>
   </div>
@@ -203,38 +197,31 @@ export async function DocumentDownloadsBlock({ section }: { section: DocumentDow
   }
 
   return (
-    <div style={{ marginBottom: '3rem', padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-        <h3>{section.title || 'Downloads & Resources'}</h3>
+    <div className={styles.embedBlockContainer}>
+      <div className={styles.embedBlockHeader}>
+        <h3 className={styles.embedBlockTitle}>{section.title || 'Downloads & Resources'}</h3>
         <Link href="/downloads">
           <Button variant="outline" size="sm">View All Downloads</Button>
         </Link>
       </div>
 
       {docs.length === 0 ? (
-        <p className="small-text" style={{ color: 'var(--text-muted)' }}>
+        <p className="small-text" style={{ color: 'var(--color-text-muted)' }}>
           {section.categoryFilter
             ? `No published documents in the "${section.categoryFilter}" category.`
             : 'No downloadable documents published yet.'}
         </p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div className={styles.downloadList}>
           {docs.slice(0, 6).map((doc) => (
-            <div
-              key={doc.id}
-              style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                gap: '1rem', padding: '0.75rem 1rem',
-                backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)',
-                flexWrap: 'wrap',
-              }}
-            >
-              <div>
-                <Badge variant="default" style={{ marginBottom: '0.25rem' }}>{doc.category || 'General'}</Badge>
-                <p style={{ fontWeight: 600, color: 'var(--primary)', fontSize: '0.9rem', margin: 0 }}>{doc.title}</p>
+            <div key={doc.id} className={styles.downloadItem}>
+              <div className={styles.downloadMeta}>
+                <div>
+                  <Badge variant="default" style={{ marginBottom: '0.25rem' }}>{doc.category || 'General'}</Badge>
+                </div>
+                <p className={styles.downloadTitle}>{doc.title}</p>
                 {doc.fileSizeFormatted && (
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
+                  <p className={styles.downloadInfo}>
                     {doc.fileType || 'PDF'} · {doc.fileSizeFormatted}
                   </p>
                 )}
@@ -252,7 +239,7 @@ export async function DocumentDownloadsBlock({ section }: { section: DocumentDow
             </div>
           ))}
           {docs.length > 6 && (
-            <Link href="/downloads" style={{ fontSize: '0.875rem', color: 'var(--primary)', textDecoration: 'none', marginTop: '0.25rem' }}>
+            <Link href="/downloads" style={{ fontSize: '0.875rem', color: 'var(--color-primary)', textDecoration: 'none', marginTop: '0.5rem', fontWeight: 600 }}>
               View all {docs.length} documents →
             </Link>
           )}

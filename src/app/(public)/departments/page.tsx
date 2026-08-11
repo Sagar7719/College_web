@@ -6,6 +6,7 @@ import { departmentsService } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
 import { PageSectionRenderer } from '@/components/page-builder';
 import { Card, CardBody, Badge, Button, EmptyState } from '@/components/ui';
+import styles from '../inner.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const cmsPage = await pagesService.getPageBySlug('departments');
@@ -49,33 +50,39 @@ export default async function DepartmentsPage() {
   const departments = await departmentsService.getPublished();
 
   return (
-    <div>
-      <div style={{ marginBottom: '2rem' }}>
-        <Badge variant="info" style={{ marginBottom: '0.5rem' }}>Academic Departments</Badge>
-        <h1>Our Departments</h1>
-        <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+    <div className="container" style={{ padding: '3rem 1.5rem' }}>
+      <div className={styles.pageHeader}>
+        <Badge variant="default" style={{ marginBottom: '0.75rem' }}>Academic Departments</Badge>
+        <h1 className={styles.pageTitle}>Our Departments</h1>
+        <p className={styles.pageSubtitle}>
           Discover state-of-the-art faculties, laboratories, and specialized degree paths.
         </p>
       </div>
 
       {departments.length > 0 ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
           {departments.map((dept) => (
             <Card key={dept.id} variant="bordered" hoverable>
-              <CardBody>
-                <Badge variant="info" style={{ marginBottom: '0.5rem' }}>{dept.code}</Badge>
-                <h3>{dept.name}</h3>
-                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: '0.5rem 0 1rem' }}>
-                  {dept.description || 'Fostering academic excellence and research.'}
-                </p>
-                {dept.hodName && (
-                  <p className="small-text" style={{ marginBottom: '1rem' }}>
-                    <strong>HOD:</strong> {dept.hodName}
+              <CardBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div style={{ flex: 1 }}>
+                  <Badge variant="info" style={{ marginBottom: '0.75rem' }}>{dept.code}</Badge>
+                  <h3 className={styles.sectionTitle} style={{ color: 'var(--color-primary)', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+                    {dept.name}
+                  </h3>
+                  <p className={styles.bodyText} style={{ fontSize: '0.875rem', marginBottom: '1rem', color: 'var(--color-text-muted)' }}>
+                    {dept.description || 'Fostering academic excellence, innovation, and holistic student growth.'}
                   </p>
-                )}
-                <Link href={`/courses?dept=${dept.id}`}>
-                  <Button variant="outline" size="sm">View Courses ➔</Button>
-                </Link>
+                  {dept.hodName && (
+                    <p className="small-text" style={{ marginBottom: '1.5rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                      👤 Head: {dept.hodName}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <Link href={`/courses?dept=${dept.id}`}>
+                    <Button variant="outline" size="sm">View Courses ➔</Button>
+                  </Link>
+                </div>
               </CardBody>
             </Card>
           ))}

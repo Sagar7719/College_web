@@ -45,34 +45,22 @@ export default function AdminLoginPage() {
   return (
     <div className={styles.loginContainer}>
       <Card className={styles.loginCard} variant="bordered">
-        <CardBody style={{ padding: 0 }}>
+        <CardBody className={styles.loginBody}>
           <div className={styles.loginLogoGroup}>
             <div className={styles.loginLogoBadge}>🎓</div>
-            <h1 style={{ fontSize: '1.5rem', color: 'var(--primary)' }}>College CMS Admin</h1>
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+            <h1 className={styles.headerTitle}>College CMS Admin</h1>
+            <p className={styles.headerSubtitle}>
               Authenticated Administrator Portal
             </p>
           </div>
 
           {errorMsg && (
-            <div
-              style={{
-                backgroundColor: 'var(--semantic-error-bg)',
-                border: '1px solid var(--semantic-error-border)',
-                color: 'var(--semantic-error)',
-                padding: '0.875rem 1rem',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                marginBottom: '1.25rem',
-                lineHeight: 1.5,
-              }}
-              role="alert"
-            >
+            <div className={styles.errorMessage} role="alert">
               ⚠️ {errorMsg}
             </div>
           )}
 
-          <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <form onSubmit={handleLoginSubmit} className={styles.loginForm}>
             <Input
               label="Admin Email Address"
               type="email"
@@ -96,9 +84,9 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          <div style={{ marginTop: '2rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem', textAlign: 'center' }}>
+          <div className={styles.loginFooter}>
             <Badge variant="info">🔒 Protected Administrator Route</Badge>
-            <p className="tiny-text" style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>
+            <p className={styles.footerText}>
               Public registration is disabled. Unauthorized access attempts are monitored.
             </p>
           </div>

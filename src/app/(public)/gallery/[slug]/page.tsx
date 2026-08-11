@@ -5,6 +5,7 @@ import { siteSettingsService } from '@/services/site-settings.service';
 import { Badge, EmptyState } from '@/components/ui';
 import Link from 'next/link';
 import { GalleryAlbumClient } from './GalleryAlbumClient';
+import styles from '../../inner.module.css';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -83,20 +84,20 @@ export default async function GalleryAlbumPage({ params }: Props) {
   if (!album) notFound();
 
   return (
-    <div>
+    <div className="container" style={{ padding: '3rem 1.5rem' }}>
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" style={{ marginBottom: '1.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-        <Link href="/gallery" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Photo Gallery</Link>
+      <nav aria-label="Breadcrumb" style={{ marginBottom: '1.5rem', fontSize: '0.875rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+        <Link href="/gallery" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>Photo Gallery</Link>
         {' › '}
-        <span>{album.title}</span>
+        <span style={{ color: 'var(--color-text-secondary)' }}>{album.title}</span>
       </nav>
 
       {/* Album header */}
-      <div style={{ marginBottom: '2rem' }}>
-        {album.category && <Badge variant="info" style={{ marginBottom: '0.5rem' }}>{album.category}</Badge>}
-        <h1 style={{ marginBottom: '0.25rem' }}>{album.title}</h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          {album.images?.length || 0} photo{(album.images?.length || 0) !== 1 ? 's' : ''}
+      <div className={styles.pageHeader}>
+        {album.category && <Badge variant="default" style={{ marginBottom: '0.75rem' }}>{album.category}</Badge>}
+        <h1 className={styles.pageTitle}>{album.title}</h1>
+        <p className={styles.pageSubtitle}>
+          📂 {album.images?.length || 0} photo{(album.images?.length || 0) !== 1 ? 's' : ''}
         </p>
       </div>
 
@@ -111,8 +112,8 @@ export default async function GalleryAlbumPage({ params }: Props) {
       )}
 
       {/* Back link */}
-      <div style={{ marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
-        <Link href="/gallery" style={{ color: 'var(--primary)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
+      <div style={{ marginTop: '4rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)' }}>
+        <Link href="/gallery" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.9375rem', fontWeight: 700 }}>
           ← Back to Gallery
         </Link>
       </div>

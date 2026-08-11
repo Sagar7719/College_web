@@ -1,90 +1,148 @@
-/* Page Builder Blocks Styling */
+/* ==============================================================================
+   PAGE BUILDER BLOCKS BRAND STYLING
+   ============================================================================== */
+
+/* --- Hero Block --- */
 .heroBlock {
-  background-color: var(--primary);
+  background-color: var(--color-primary-dark);
   color: #FFFFFF;
-  padding: 5rem 0;
-  text-align: center;
-  border-radius: var(--radius-lg);
-  margin-bottom: 2.5rem;
+  border-radius: var(--radius-2xl);
+  margin-bottom: var(--space-8);
   background-size: cover;
   background-position: center;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-lg);
 }
 
 .heroOverlay {
-  background: linear-gradient(180deg, rgba(10, 37, 64, 0.85) 0%, rgba(10, 37, 64, 0.95) 100%);
-  padding: 3rem 1.5rem;
-  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(11, 31, 58, 0.45) 0%, rgba(11, 31, 58, 0.75) 100%);
+  padding: var(--space-12) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  min-height: 380px;
 }
 
 .heroTitle {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: clamp(2rem, 3.8vw, 3.25rem);
+  font-weight: 800;
   color: #FFFFFF;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  max-width: 800px;
 }
 
 .heroSubtitle {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   color: rgba(255, 255, 255, 0.9);
-  max-width: 700px;
-  margin: 0 auto 2rem;
+  max-width: 640px;
+  margin: 0 auto var(--space-8);
+  line-height: 1.6;
 }
 
+/* --- Heading Block --- */
 .headingBlock {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-6);
 }
 
+.headingBlock h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+.headingBlock h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  letter-spacing: -0.015em;
+}
+
+.headingBlock h3 {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+/* --- Rich Text Block --- */
 .richTextBlock {
-  line-height: 1.8;
-  color: var(--text-secondary);
-  margin-bottom: 2rem;
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+  font-size: 1rem;
 }
 
 .richTextBlock p {
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-4);
 }
 
+.richTextBlock p:last-child {
+  margin-bottom: 0;
+}
+
+.richTextBlock ul,
+.richTextBlock ol {
+  margin-left: var(--space-6);
+  margin-bottom: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* --- Image Block --- */
 .imageBlock {
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--space-8);
   text-align: center;
 }
 
 .imageBlock img {
   max-width: 100%;
   height: auto;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
 }
 
 .imageCaption {
   font-size: 0.875rem;
-  color: var(--text-muted);
-  margin-top: 0.5rem;
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
   font-style: italic;
 }
 
+/* --- Image + Text Block --- */
 .imageTextBlock {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2.5rem;
+  gap: var(--space-8);
   align-items: center;
-  margin-bottom: 3rem;
+  margin-bottom: var(--space-8);
 }
 
 @media (min-width: 768px) {
   .imageTextBlock {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.1fr 0.9fr;
   }
 }
 
-.twoColumnBlock,
+/* --- Columns Blocks --- */
+.twoColumnBlock {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+
 .threeColumnBlock {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
-  margin-bottom: 3rem;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
 }
 
 @media (min-width: 768px) {
@@ -92,53 +150,192 @@
     grid-template-columns: 1fr 1fr;
   }
   .threeColumnBlock {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
+/* --- Card Grid Block --- */
 .cardGridBlock {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 3rem;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
 }
 
+/* --- Call To Action (CTA) Block --- */
 .ctaBlock {
-  background-color: var(--bg-light);
-  border: 2px solid var(--primary);
-  padding: 3rem 2rem;
-  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  padding: var(--space-10) var(--space-6);
+  border-radius: var(--radius-xl);
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: var(--space-8);
+  box-shadow: var(--shadow-sm);
 }
 
+.ctaBlock h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.015em;
+}
+
+/* ==============================================================================
+   ACCESSIBLE FAQ ACCORDION
+   ============================================================================== */
 .faqBlock {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 3rem;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
 }
 
 .faqItem {
-  background-color: var(--bg-main);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--transition-fast);
 }
 
-.faqQuestion {
-  font-weight: 600;
-  font-size: 1.125rem;
-  color: var(--primary);
-  margin-bottom: 0.5rem;
+.faqItem:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.faqItemOpen {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.faqQuestionBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 1.125rem 1.5rem;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: background-color var(--transition-fast);
+}
+
+.faqQuestionBtn:hover {
+  background-color: var(--color-surface);
+}
+
+.faqQuestionBtn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.faqQuestionText {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-primary);
+  padding-right: var(--space-4);
+}
+
+.faqIcon {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.faqItemOpen .faqIcon {
+  color: var(--color-accent);
+  transform: rotate(180deg);
+}
+
+.faqAnswerContainer {
+  border-top: 1px solid var(--color-border);
 }
 
 .faqAnswer {
   font-size: 0.9375rem;
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
   line-height: 1.6;
+  padding: 1.125rem 1.5rem;
+  background-color: var(--color-surface);
 }
 
-.spacerSm { height: 24px; }
+/* --- Embedded Notice List Block --- */
+.embedBlockContainer {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-6) var(--space-8);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-8);
+}
+
+.embedBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.embedBlockTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.01em;
+}
+
+/* --- Spacers --- */
+.spacerSm { height: 20px; }
 .spacerMd { height: 48px; }
 .spacerLg { height: 96px; }
+
+/* --- Downloads List --- */
+.downloadList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.downloadItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  transition: all var(--transition-fast);
+}
+
+.downloadItem:hover {
+  border-color: var(--color-border-strong);
+  background-color: var(--color-surface-muted);
+}
+
+.downloadMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.downloadTitle {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+.downloadInfo {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}

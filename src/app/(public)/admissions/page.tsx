@@ -5,6 +5,7 @@ import { pagesService } from '@/services/pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
 import { PageSectionRenderer } from '@/components/page-builder';
 import { Card, CardBody, Badge, Button } from '@/components/ui';
+import styles from '../inner.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const cmsPage = await pagesService.getPageBySlug('admissions');
@@ -46,50 +47,58 @@ export default async function AdmissionsPage() {
   }
 
   return (
-    <div>
-      <div style={{ marginBottom: '2rem' }}>
-        <Badge variant="success" style={{ marginBottom: '0.5rem' }}>Admissions 2026 - 2027</Badge>
-        <h1>Admission Process &amp; Guidelines</h1>
-        <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+    <div className="container" style={{ padding: '3rem 1.5rem' }}>
+      <div className={styles.pageHeader}>
+        <Badge variant="success" style={{ marginBottom: '0.75rem' }}>Admissions 2026 - 2027</Badge>
+        <h1 className={styles.pageTitle}>Admission Process &amp; Guidelines</h1>
+        <p className={styles.pageSubtitle}>
           Find detailed information on application criteria, required documentation, and important dates.
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
         <Card variant="bordered">
           <CardBody>
-            <h3>1. Application Submission</h3>
-            <p style={{ marginTop: '0.5rem', color: 'var(--text-secondary)' }}>
-              Complete the online registration form and upload required academic transcripts.
+            <h3 className={styles.sectionTitle} style={{ color: 'var(--color-primary)', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+              1. Application Submission
+            </h3>
+            <p className={styles.bodyText} style={{ fontSize: '0.9375rem' }}>
+              Complete the online registration form and upload required academic transcripts and documents.
             </p>
           </CardBody>
         </Card>
+        
         <Card variant="bordered">
           <CardBody>
-            <h3>2. Verification &amp; Merit List</h3>
-            <p style={{ marginTop: '0.5rem', color: 'var(--text-secondary)' }}>
+            <h3 className={styles.sectionTitle} style={{ color: 'var(--color-primary)', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+              2. Verification &amp; Merit List
+            </h3>
+            <p className={styles.bodyText} style={{ fontSize: '0.9375rem' }}>
               Submitted documents are verified by the admissions committee for eligibility ranking.
             </p>
           </CardBody>
         </Card>
+
         <Card variant="bordered">
           <CardBody>
-            <h3>3. Counseling &amp; Enrollment</h3>
-            <p style={{ marginTop: '0.5rem', color: 'var(--text-secondary)' }}>
-              Selected candidates finalize course seat selection and fee payment.
+            <h3 className={styles.sectionTitle} style={{ color: 'var(--color-primary)', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+              3. Counseling &amp; Enrollment
+            </h3>
+            <p className={styles.bodyText} style={{ fontSize: '0.9375rem' }}>
+              Selected candidates finalize course seat selection and complete admission fee payment.
             </p>
           </CardBody>
         </Card>
       </div>
 
       <Card variant="flat">
-        <CardBody style={{ textAlign: 'center', padding: '2.5rem' }}>
-          <h2>Need Assistance With Your Application?</h2>
-          <p style={{ margin: '1rem 0 1.5rem', color: 'var(--text-muted)' }}>
-            Our admissions desk is available Monday through Saturday.
+        <CardBody style={{ textAlign: 'center', padding: '3rem 2rem' }}>
+          <h2 className={styles.sectionTitle} style={{ marginBottom: '0.75rem' }}>Need Assistance With Your Application?</h2>
+          <p className={styles.bodyText} style={{ color: 'var(--color-text-secondary)', marginBottom: '1.5rem' }}>
+            Our admissions desk is available Monday through Saturday to resolve registration queries.
           </p>
           <Link href="/contact">
-            <Button variant="primary" size="md">Contact Admission Office</Button>
+            <Button variant="primary">Contact Admission Office</Button>
           </Link>
         </CardBody>
       </Card>

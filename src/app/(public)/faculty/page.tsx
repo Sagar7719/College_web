@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { facultyService } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
 import { Card, CardBody, Badge, EmptyState } from '@/components/ui';
+import styles from '../inner.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await siteSettingsService.getSettings();
@@ -33,44 +34,42 @@ export default async function FacultyPage() {
   const members = await facultyService.getAll();
 
   return (
-    <div>
-      <div style={{ marginBottom: '2rem' }}>
-        <Badge variant="info" style={{ marginBottom: '0.5rem' }}>Academic Staff</Badge>
-        <h1>Faculty Directory</h1>
-        <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+    <div className="container" style={{ padding: '3rem 1.5rem' }}>
+      <div className={styles.pageHeader}>
+        <Badge variant="default" style={{ marginBottom: '0.75rem' }}>Academic Staff</Badge>
+        <h1 className={styles.pageTitle}>Faculty Directory</h1>
+        <p className={styles.pageSubtitle}>
           Meet our distinguished professors, researchers, and academic mentors.
         </p>
       </div>
 
       {members.length > 0 ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+        <div className={styles.facultyGrid}>
           {members.map((fac) => (
-            <Card key={fac.id} variant="bordered" hoverable>
-              <CardBody style={{ textAlign: 'center' }}>
-                <div
-                  style={{
-                    width: '80px',
-                    height: '80px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--bg-muted)',
-                    color: 'var(--primary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.75rem',
-                    margin: '0 auto 1rem',
-                  }}
-                >
-                  🎓
+            <div key={fac.id} className={styles.facultyCard}>
+              <div className={styles.facultyPhotoWrapper}>
+                {fac.photoUrl ? (
+                  <img
+                    src={fac.photoUrl}
+                    alt={fac.name}
+                    className={styles.facultyPhoto}
+                  />
+                ) : (
+                  <div className={styles.facultyPhotoFallback}>🎓</div>
+                )}
+              </div>
+              <h3 className={styles.facultyName}>{fac.name}</h3>
+              <p className={styles.facultyDesignation}>{fac.designation}</p>
+              {fac.departmentName && <p className={styles.facultyDept}>{fac.departmentName}</p>}
+              <p className="small-text" style={{ fontStyle: 'italic', marginBottom: '1rem', color: 'var(--color-text-secondary)' }}>
+                {fac.qualification}
+              </p>
+              {fac.email && (
+                <div className={styles.facultyContact}>
+                  <span>✉️ {fac.email}</span>
                 </div>
-                <h3>{fac.name}</h3>
-                <p style={{ fontSize: '0.875rem', color: 'var(--primary)', fontWeight: 600, marginTop: '0.25rem' }}>
-                  {fac.designation}
-                </p>
-                <p className="small-text" style={{ marginTop: '0.5rem' }}>{fac.qualification}</p>
-                {fac.email && <p className="tiny-text" style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>✉️ {fac.email}</p>}
-              </CardBody>
-            </Card>
+              )}
+            </div>
           ))}
         </div>
       ) : (
