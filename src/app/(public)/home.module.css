@@ -1905,6 +1905,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  height: 100%;
   box-shadow: 0 4px 20px rgba(20, 18, 15, 0.03);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -2004,6 +2005,12 @@
   color: #24221F;
   margin-bottom: 8px;
   line-height: 1.35;
+  letter-spacing: -0.015em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.7em;
 }
 
 .evDesc {
@@ -2011,13 +2018,21 @@
   color: #68705A;
   line-height: 1.6;
   margin-bottom: 20px;
-  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.8em;
 }
 
 .evFoot {
   margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(222, 212, 197, 0.6);
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  width: 100%;
 }
 
 .evEmptyBox {

@@ -132,11 +132,11 @@ export function EventsCarousel({ events }: EventsCarouselProps) {
                       <span>{evt.venue || 'Main Auditorium'}</span>
                     </p>
                     <h3 className={styles.evTitle}>{evt.title}</h3>
-                    {evt.description && (
-                      <p className={styles.evDesc}>
-                        {evt.description.slice(0, 100)}{evt.description.length > 100 ? '…' : ''}
-                      </p>
-                    )}
+                    <p className={styles.evDesc}>
+                      {evt.description && evt.description.trim()
+                        ? (evt.description.length > 100 ? `${evt.description.slice(0, 100)}…` : evt.description)
+                        : 'Official campus event featuring academic sessions and student activities.'}
+                    </p>
                     <div className={styles.evFoot}>
                       {evt.registrationUrl ? (
                         <a href={evt.registrationUrl} target="_blank" rel="noopener noreferrer" className={styles.btnSmall}>
