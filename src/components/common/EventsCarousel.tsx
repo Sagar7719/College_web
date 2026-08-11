@@ -69,39 +69,33 @@ export function EventsCarousel({ events }: EventsCarouselProps) {
   return (
     <section className={styles.sec} aria-label="Upcoming Events">
       <div className="container">
-        <div className={styles.secHeadWithNav}>
-          <div className={styles.secHeadText}>
+        <div className={styles.secHeadRow}>
+          <div>
             <span className={styles.eyebrow}>Campus Life</span>
             <h2 className={styles.secTitle}>Upcoming Events</h2>
           </div>
-          <div className={styles.secHeadActions}>
-            {isCarousel && (
-              <div className={styles.carouselNavControls}>
-                <button
-                  type="button"
-                  className={`${styles.carouselArrowBtn} ${!canScrollLeft ? styles.carouselBtnDisabled : ''}`}
-                  onClick={() => handleScroll('left')}
-                  disabled={!canScrollLeft}
-                  aria-label="Previous events"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.carouselArrowBtn} ${!canScrollRight ? styles.carouselBtnDisabled : ''}`}
-                  onClick={() => handleScroll('right')}
-                  disabled={!canScrollRight}
-                  aria-label="Next events"
-                >
-                  <ChevronRight size={20} />
-                </button>
-              </div>
-            )}
-            <Link href="/events" className={styles.btnOutlineDark}>
-              <span>View All Events</span>
-              <ArrowRight size={16} />
-            </Link>
-          </div>
+          {isCarousel && (
+            <div className={styles.carouselNavControls}>
+              <button
+                type="button"
+                className={`${styles.carouselArrowBtn} ${!canScrollLeft ? styles.carouselBtnDisabled : ''}`}
+                onClick={() => handleScroll('left')}
+                disabled={!canScrollLeft}
+                aria-label="Previous events"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                type="button"
+                className={`${styles.carouselArrowBtn} ${!canScrollRight ? styles.carouselBtnDisabled : ''}`}
+                onClick={() => handleScroll('right')}
+                disabled={!canScrollRight}
+                aria-label="Next events"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
         </div>
 
         {events.length > 0 ? (
@@ -164,6 +158,13 @@ export function EventsCarousel({ events }: EventsCarouselProps) {
             <p className={styles.ndEmptyDesc}>Check back soon for upcoming academic seminars, workshops, and cultural fests.</p>
           </div>
         )}
+
+        <div className={styles.secAction}>
+          <Link href="/events" className={styles.btnOutlineDark}>
+            <span>View All Events</span>
+            <ArrowRight size={16} />
+          </Link>
+        </div>
       </div>
     </section>
   );
