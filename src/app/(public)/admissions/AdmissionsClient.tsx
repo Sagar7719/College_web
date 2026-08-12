@@ -64,7 +64,7 @@ export function AdmissionsClient() {
   return (
     <div className={styles.pageContainer}>
       {/* 1. HERO BANNER */}
-      <section className={styles.heroBanner}>
+      <section className={styles.admissionsHeroBanner}>
         <div className="container">
           <div className={styles.heroContent}>
             <div className={styles.heroBadge}>
