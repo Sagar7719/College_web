@@ -419,3 +419,535 @@
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+
+/* ==============================================================================
+   ULTRA-PREMIUM EXECUTIVE DEPARTMENTS & ACADEMICS PAGE SYSTEM
+   ============================================================================== */
+.pageContainer {
+  background-color: #F7F2E9;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* 1. HERO BANNER */
+.heroBanner {
+  background: linear-gradient(135deg, #1A1816 0%, #292420 100%);
+  color: #FFFFFF;
+  padding: 80px 0 64px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 3px solid var(--color-accent);
+}
+
+.heroContent {
+  max-width: 800px;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #E29578;
+  background: rgba(226, 149, 120, 0.12);
+  border: 1px solid rgba(226, 149, 120, 0.3);
+  padding: 6px 16px;
+  border-radius: 100px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.heroTitle {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(2.35rem, 4.5vw, 3.5rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+}
+
+.heroSubtitle {
+  font-size: 1.125rem;
+  color: #D5CDC0;
+  line-height: 1.65;
+  margin-bottom: 36px;
+  max-width: 680px;
+}
+
+.heroStatsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.heroStatItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 12px 18px;
+  border-radius: 14px;
+}
+
+.statIcon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.heroStatItem strong {
+  display: block;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.2;
+}
+
+.heroStatItem span {
+  font-size: 0.78125rem;
+  color: #A8A095;
+}
+
+/* 2. FILTER & SEARCH TOOLBAR */
+.filterSection {
+  margin-top: -32px;
+  position: relative;
+  z-index: 10;
+  margin-bottom: 48px;
+}
+
+.toolbarBox {
+  background: #FFFFFF;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: 0 16px 40px rgba(20, 18, 15, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .toolbarBox {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 480px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  color: #9E978C;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 46px;
+  padding: 0 40px 0 44px;
+  background-color: #F7F2E9;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  color: #24221F;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.searchInput:focus {
+  border-color: var(--color-accent);
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(184, 92, 58, 0.15);
+}
+
+.clearBtn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 0.78125rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+.categoryTabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tabBtn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 100px;
+  background-color: #F7F2E9;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  color: #68705A;
+  font-size: 0.84375rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.tabBtn:hover {
+  background-color: #EFE7DA;
+  color: #24221F;
+}
+
+.tabBtnActive {
+  background-color: var(--color-accent) !important;
+  color: #FFFFFF !important;
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 4px 14px rgba(184, 92, 58, 0.25);
+}
+
+/* 3. DEPARTMENTS GRID & CARDS */
+.contentSection {
+  margin-bottom: 64px;
+}
+
+.deptCardGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 28px;
+}
+
+@media (min-width: 640px) {
+  .deptCardGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .deptCardGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.deptExecutiveCard {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  border-radius: 24px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 6px 24px rgba(20, 18, 15, 0.04);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.deptExecutiveCard:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 24px 56px rgba(184, 92, 58, 0.14);
+  transform: translateY(-6px);
+}
+
+.deptCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.deptCodeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78125rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  background-color: #F4EBE6;
+  padding: 6px 14px;
+  border-radius: 100px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.deptIconCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #F7F2E9;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  color: #24221F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.deptExecutiveCard:hover .deptIconCircle {
+  background-color: var(--color-accent);
+  color: #FFFFFF;
+  border-color: var(--color-accent);
+  transform: scale(1.08);
+}
+
+.deptCardTitle {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #24221F;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.deptCardDesc {
+  font-size: 0.90625rem;
+  color: #68705A;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* HOD BLOCK */
+.hodBlock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background-color: #F7F2E9;
+  border: 1px solid rgba(222, 212, 197, 0.6);
+  border-radius: 14px;
+  margin-bottom: 24px;
+}
+
+.hodAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #F4EBE6;
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hodDetails {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hodLabel {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: #9E978C;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hodName {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.90625rem;
+  font-weight: 800;
+  color: #24221F;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hodEmailLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78125rem;
+  color: var(--color-accent);
+  text-decoration: none;
+  margin-top: 2px;
+}
+
+.hodEmailLink:hover {
+  text-decoration: underline;
+}
+
+.deptCardFooter {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid rgba(222, 212, 197, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.emptyResultsBox {
+  text-align: center;
+  padding: 64px 24px;
+  background-color: #FFFFFF;
+  border-radius: 24px;
+  border: 1px dashed rgba(222, 212, 197, 0.8);
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.emptyIcon {
+  color: var(--color-accent);
+  margin-bottom: 16px;
+}
+
+.emptyResultsBox h3 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #24221F;
+  margin-bottom: 8px;
+}
+
+.emptyResultsBox p {
+  font-size: 0.90625rem;
+  color: #68705A;
+  margin-bottom: 24px;
+}
+
+/* 4. HIGHLIGHTS STRIP */
+.highlightsSection {
+  padding: 64px 0;
+  background-color: #FFFFFF;
+  border-top: 1px solid rgba(222, 212, 197, 0.6);
+  border-bottom: 1px solid rgba(222, 212, 197, 0.6);
+  margin-bottom: 64px;
+}
+
+.highlightsHead {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 44px;
+}
+
+.highlightsGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .highlightsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .highlightsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.highlightCard {
+  padding: 28px 24px;
+  background-color: #F7F2E9;
+  border-radius: 20px;
+  border: 1px solid rgba(222, 212, 197, 0.6);
+  transition: all 0.3s ease;
+}
+
+.highlightCard:hover {
+  background-color: #FFFFFF;
+  box-shadow: 0 12px 32px rgba(184, 92, 58, 0.1);
+  transform: translateY(-4px);
+  border-color: var(--color-accent);
+}
+
+.highlightIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background-color: #F4EBE6;
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.highlightCard h3 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: #24221F;
+  margin-bottom: 8px;
+}
+
+.highlightCard p {
+  font-size: 0.875rem;
+  color: #68705A;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 5. CTA BANNER CARD */
+.ctaBannerSection {
+  margin-bottom: 40px;
+}
+
+.ctaBannerCard {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 56px 40px;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F7F2E9 100%);
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  border-radius: 28px;
+  box-shadow: 0 20px 48px rgba(20, 18, 15, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ctaBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  background-color: #F4EBE6;
+  padding: 6px 16px;
+  border-radius: 100px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.ctaBannerCard h2 {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(1.85rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: #24221F;
+  margin-bottom: 12px;
+}
+
+.ctaBannerCard p {
+  font-size: 1.0625rem;
+  color: #68705A;
+  margin-bottom: 32px;
+}
+
+.ctaBtns {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
