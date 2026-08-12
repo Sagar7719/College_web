@@ -431,10 +431,15 @@
 
 /* 1. HERO BANNER */
 .heroBanner {
+  position: relative;
+  min-height: 660px;
+  width: 100%;
+  display: flex;
+  align-items: center;
   background: linear-gradient(135deg, #1A1816 0%, #292420 100%);
   color: #FFFFFF;
-  padding: 80px 0 64px;
-  position: relative;
+  padding: 160px 0 120px;
+  margin-top: -150px;
   overflow: hidden;
   border-bottom: 3px solid var(--color-accent);
 }
