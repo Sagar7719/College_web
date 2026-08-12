@@ -63,53 +63,39 @@ export function AdmissionsClient() {
 
   return (
     <div className={styles.pageContainer}>
-      {/* 1. ULTRA-PREMIUM PANORAMIC ADMISSIONS HERO SECTION */}
-      <section className={styles.admissionsHeroBleed}>
-        <div className={styles.admissionsHeroOverlay} />
-        <div className={`container ${styles.admissionsHeroGrid}`}>
-          {/* Left Text Block */}
-          <div className={styles.admissionsLeftBlock}>
-            <div className={styles.admissionsBadgePill}>
-              <Sparkles size={15} />
-              <span>JAYSINGPUR COLLEGE • ADMISSIONS SESSION 2026–2027 NOW OPEN</span>
+      {/* 1. HERO BANNER */}
+      <section className={styles.admissionsHeroBanner}>
+        <div className="container">
+          <div className={styles.heroContent}>
+            <div className={styles.heroBadge}>
+              <Sparkles size={16} />
+              <span>Admissions Session 2026 – 2027 Now Open</span>
             </div>
-            <h1 className={styles.admissionsHeadlineLight}>Admission Process & Guidelines</h1>
-            <p className={styles.admissionsSubtitleLight}>
+            <h1 className={styles.heroTitle}>Admission Process & Guidelines</h1>
+            <p className={styles.heroSubtitle}>
               Step-by-step guidance, merit eligibility criteria, fee structures, and document submission portal for prospective students.
             </p>
-            <div className={styles.admissionsCtaGroup}>
-              <a href="#eligibility" className={homeStyles.btnPrimaryTerracotta}>
-                <span>Apply Online Now</span>
-                <ArrowRight size={18} strokeWidth={2.2} className={homeStyles.ctaArrowSvg} />
-              </a>
-              <a href="#documents" className={homeStyles.btnGlassOutline}>
-                <span>View Mandatory Documents</span>
-                <ArrowRight size={18} strokeWidth={2.2} className={homeStyles.ctaArrowSvg} />
-              </a>
-            </div>
-          </div>
-
-          {/* Right Frosted Glass Stat Deck */}
-          <div className={styles.admissionsGlassDeck}>
-            <div className={styles.admissionsGlassStatCard}>
-              <GraduationCap size={32} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-              <div>
-                <strong style={{ display: 'block', fontSize: '1.125rem', fontWeight: 800 }}>43+ Accredited Programmes</strong>
-                <span style={{ fontSize: '0.875rem', color: '#D5CDC0' }}>Science, Arts, Commerce & Tech</span>
+            <div className={styles.heroStatsRow}>
+              <div className={styles.heroStatItem}>
+                <GraduationCap size={20} className={styles.statIcon} />
+                <div>
+                  <strong>43+ Accredited</strong>
+                  <span>Degree Programmes</span>
+                </div>
               </div>
-            </div>
-            <div className={styles.admissionsGlassStatCard}>
-              <Award size={32} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-              <div>
-                <strong style={{ display: 'block', fontSize: '1.125rem', fontWeight: 800 }}>NAAC 'A+' Grade Recognized</strong>
-                <span style={{ fontSize: '0.875rem', color: '#D5CDC0' }}>UGC 2(f) & 12(B) Approved</span>
+              <div className={styles.heroStatItem}>
+                <Award size={20} className={styles.statIcon} />
+                <div>
+                  <strong>NAAC Accredited</strong>
+                  <span>UGC 2(f) & 12(B) Recognized</span>
+                </div>
               </div>
-            </div>
-            <div className={styles.admissionsGlassStatCard}>
-              <Clock size={32} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-              <div>
-                <strong style={{ display: 'block', fontSize: '1.125rem', fontWeight: 800 }}>Application Window Active</strong>
-                <span style={{ fontSize: '0.875rem', color: '#D5CDC0' }}>Deadline: August 31, 2026</span>
+              <div className={styles.heroStatItem}>
+                <Clock size={20} className={styles.statIcon} />
+                <div>
+                  <strong>Deadline: Aug 31, 2026</strong>
+                  <span>Application Window Active</span>
+                </div>
               </div>
             </div>
           </div>
