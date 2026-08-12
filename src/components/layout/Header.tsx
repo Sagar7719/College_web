@@ -81,7 +81,14 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
     setOpenDropdownId(null);
   }, [pathname]);
 
-  const isHomePage = pathname === '/';
+  const isHeroOverlayPage =
+    pathname === '/' ||
+    pathname === '/admissions' ||
+    pathname === '/departments' ||
+    pathname === '/notices' ||
+    pathname === '/contact' ||
+    pathname === '/about';
+
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -110,12 +117,12 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
     }
   };
 
-  const navClassName = isHomePage
+  const navClassName = isHeroOverlayPage
     ? `${styles.unifiedHeaderNav} ${styles.heroTransparentNav} ${isScrolled ? styles.heroNavScrolled : ''}`
     : styles.unifiedHeaderNav;
 
   return (
-    <header className={isHomePage ? styles.headerShellTransparent : styles.headerShell}>
+    <header className={isHeroOverlayPage ? styles.headerShellTransparent : styles.headerShell}>
       {/* UNIFIED BRAND & NAVBAR (Transparent Overlay on Home, Surface on Subpages) */}
       <nav className={navClassName} aria-label="Main Navigation">
         <div className="container" ref={navRef}>
