@@ -951,3 +951,412 @@
   flex-wrap: wrap;
   justify-content: center;
 }
+
+/* ==============================================================================
+   ULTRA-PREMIUM ADMISSIONS 2026-2027 MODULE CSS
+   ============================================================================== */
+.sectionHeaderCenter {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+
+.sectionSub {
+  font-size: 1.0625rem;
+  color: #68705A;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+/* 2. ADMISSION JOURNEY STEPS */
+.journeySection {
+  padding: 64px 0;
+  margin-bottom: 32px;
+}
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .stepsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stepsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stepCard {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  border-radius: 24px;
+  padding: 32px 24px;
+  position: relative;
+  box-shadow: 0 6px 24px rgba(20, 18, 15, 0.04);
+  transition: all 0.35s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.stepCard:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 20px 44px rgba(184, 92, 58, 0.12);
+  transform: translateY(-6px);
+}
+
+.stepNumberBadge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: rgba(184, 92, 58, 0.2);
+  line-height: 1;
+}
+
+.stepIconCircle {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background-color: #F4EBE6;
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.stepCard h3 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.1875rem;
+  font-weight: 800;
+  color: #24221F;
+  margin-bottom: 10px;
+}
+
+.stepCard p {
+  font-size: 0.875rem;
+  color: #68705A;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 3. PROGRAMME ELIGIBILITY CARDS */
+.eligibilitySection {
+  padding: 64px 0;
+  background-color: #FFFFFF;
+  border-top: 1px solid rgba(222, 212, 197, 0.6);
+  border-bottom: 1px solid rgba(222, 212, 197, 0.6);
+  margin-bottom: 64px;
+}
+
+.tabContainerCenter {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.eligibilityGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .eligibilityGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .eligibilityGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.eligibilityCard {
+  background-color: #F7F2E9;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  border-radius: 24px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: all 0.35s ease;
+}
+
+.eligibilityCard:hover {
+  background-color: #FFFFFF;
+  box-shadow: 0 16px 40px rgba(184, 92, 58, 0.1);
+  border-color: var(--color-accent);
+  transform: translateY(-4px);
+}
+
+.eligibilityTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.progTag {
+  font-size: 0.78125rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  background-color: #F4EBE6;
+  padding: 6px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+
+.minMarksBadge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #24221F;
+  background-color: #EFE7DA;
+  padding: 4px 12px;
+  border-radius: 100px;
+}
+
+.eligibilityCard h3 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #24221F;
+  margin-bottom: 10px;
+}
+
+.eligibilityCard p {
+  font-size: 0.875rem;
+  color: #68705A;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.eligList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.eligList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.84375rem;
+  color: #24221F;
+  font-weight: 600;
+}
+
+.eligList li svg {
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* 4. DOCUMENTS & SCHEDULE */
+.docsAndScheduleSection {
+  margin-bottom: 64px;
+}
+
+.twoColGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 992px) {
+  .twoColGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.docBox,
+.scheduleBox {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  border-radius: 24px;
+  padding: 36px 32px;
+  box-shadow: 0 8px 28px rgba(20, 18, 15, 0.04);
+}
+
+.boxHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.boxIcon {
+  color: var(--color-accent);
+}
+
+.boxHeader h3 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #24221F;
+  margin: 0;
+}
+
+.boxDesc {
+  font-size: 0.875rem;
+  color: #68705A;
+  margin-bottom: 24px;
+}
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.875rem;
+  color: #24221F;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.checkIcon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.scheduleTable {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.scheduleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  background-color: #F7F2E9;
+  border-radius: 14px;
+  border: 1px solid rgba(222, 212, 197, 0.6);
+  flex-wrap: wrap;
+}
+
+.scheduleRow strong {
+  display: block;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.90625rem;
+  font-weight: 800;
+  color: #24221F;
+}
+
+.scheduleRow span {
+  font-size: 0.78125rem;
+  color: #68705A;
+}
+
+.dateBadge {
+  font-size: 0.78125rem;
+  font-weight: 800;
+  color: #24221F;
+  background-color: #EFE7DA;
+  padding: 6px 14px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.badgeActive {
+  background-color: var(--color-accent) !important;
+  color: #FFFFFF !important;
+}
+
+.badgeProgress {
+  background-color: #F4EBE6 !important;
+  color: var(--color-accent) !important;
+}
+
+.badgeFinal {
+  background-color: #24221F !important;
+  color: #FFFFFF !important;
+}
+
+/* 5. FAQ ACCORDION */
+.faqSection {
+  margin-bottom: 64px;
+}
+
+.faqAccordionList {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faqItem {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  border-radius: 18px;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.faqItemOpen {
+  border-color: var(--color-accent);
+  box-shadow: 0 8px 24px rgba(184, 92, 58, 0.1);
+}
+
+.faqQuestionBtn {
+  width: 100%;
+  padding: 20px 24px;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  text-align: left;
+  cursor: pointer;
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: #24221F;
+}
+
+.faqChevron {
+  color: var(--color-accent);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.faqChevronRotate {
+  transform: rotate(180deg);
+}
+
+.faqAnswerBody {
+  padding: 0 24px 20px 24px;
+  font-size: 0.9375rem;
+  color: #68705A;
+  line-height: 1.65;
+  border-top: 1px dashed rgba(222, 212, 197, 0.6);
+  margin-top: -4px;
+  padding-top: 16px;
+}
