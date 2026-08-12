@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardBody, Input, Button } from '@/components/ui';
+import { Send, CheckCircle2, AlertCircle, MessageSquare, Sparkles } from 'lucide-react';
 import { contactMessageSchema } from '@/validations/contact-message.schema';
 import styles from '@/app/(public)/inner.module.css';
+import homeStyles from '@/app/(public)/home.module.css';
 
 export const ContactForm: React.FC = () => {
   const [name, setName] = useState('');
@@ -70,7 +71,7 @@ export const ContactForm: React.FC = () => {
       if (!res.ok || !data.success) {
         setServerError(data.error || 'Failed to submit your message. Please try again.');
       } else {
-        setSuccessMessage(data.message || "Your message has been sent successfully. We'll get back to you soon.");
+        setSuccessMessage(data.message || "Your message has been sent successfully. Our helpdesk team will respond to your email shortly.");
         setName('');
         setEmail('');
         setSubject('');
@@ -86,165 +87,138 @@ export const ContactForm: React.FC = () => {
   };
 
   return (
-    <Card variant="bordered">
-      <CardBody style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '2rem' }}>
-        <h2 className={styles.sectionTitle} style={{ marginBottom: 0, fontSize: '1.25rem' }}>Send A Message</h2>
+    <div className={styles.executiveFormCard}>
+      <div className={styles.cardHeaderBox}>
+        <MessageSquare size={24} className={styles.cardHeaderIcon} />
+        <div>
+          <h2>Send Us a Direct Message</h2>
+          <p>Fill out the form below and our administrative helpdesk will respond promptly.</p>
+        </div>
+      </div>
 
-        {successMessage && (
-          <div
-            style={{
-              padding: '0.875rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: '#ecfdf5',
-              border: '1px solid #a7f3d0',
-              color: '#065f46',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '0.5rem',
-            }}
-            role="alert"
-          >
-            <span>✓ {successMessage}</span>
-            <button
-              type="button"
-              onClick={() => setSuccessMessage(null)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#065f46',
-                cursor: 'pointer',
-                fontSize: '1rem',
-                lineHeight: 1,
-                padding: '0 0.25rem',
-                opacity: 0.8,
-              }}
-              aria-label="Dismiss message"
-            >
-              ✕
-            </button>
+      {successMessage && (
+        <div className={styles.alertSuccessBox} role="alert">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CheckCircle2 size={18} />
+            <span>{successMessage}</span>
           </div>
-        )}
-
-        {serverError && (
-          <div
-            style={{
-              padding: '0.875rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: '#fef2f2',
-              border: '1px solid #fecaca',
-              color: '#991b1b',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '0.5rem',
-            }}
-            role="alert"
+          <button
+            type="button"
+            onClick={() => setSuccessMessage(null)}
+            className={styles.alertCloseBtn}
+            aria-label="Dismiss message"
           >
-            <span>⚠️ {serverError}</span>
-            <button
-              type="button"
-              onClick={() => setServerError(null)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#991b1b',
-                cursor: 'pointer',
-                fontSize: '1rem',
-                lineHeight: 1,
-                padding: '0 0.25rem',
-                opacity: 0.8,
-              }}
-              aria-label="Dismiss error"
-            >
-              ✕
-            </button>
+            ✕
+          </button>
+        </div>
+      )}
+
+      {serverError && (
+        <div className={styles.alertErrorBox} role="alert">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertCircle size={18} />
+            <span>{serverError}</span>
           </div>
-        )}
+          <button
+            type="button"
+            onClick={() => setServerError(null)}
+            className={styles.alertCloseBtn}
+            aria-label="Dismiss error"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <Input
-            label="Your Name"
-            placeholder="Enter full name"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
-            }}
-            error={errors.name}
-            disabled={submitting}
-            required
-          />
+      <form onSubmit={handleSubmit} className={styles.contactFormBody}>
+        <div className={styles.formRowTwoCol}>
+          <div className={styles.inputGroup}>
+            <label className={styles.inputLabel}>
+              Your Full Name <span className={styles.reqStar}>*</span>
+            </label>
+            <input
+              type="text"
+              className={`${styles.formControl} ${errors.name ? styles.controlError : ''}`}
+              placeholder="e.g. Sagar Ulagadde"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
+              }}
+              disabled={submitting}
+              required
+            />
+            {errors.name && <span className={styles.fieldErrorText}>{errors.name}</span>}
+          </div>
 
-          <Input
-            label="Email Address"
-            type="email"
-            placeholder="name@example.com"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
-            }}
-            error={errors.email}
-            disabled={submitting}
-            required
-          />
+          <div className={styles.inputGroup}>
+            <label className={styles.inputLabel}>
+              Email Address <span className={styles.reqStar}>*</span>
+            </label>
+            <input
+              type="email"
+              className={`${styles.formControl} ${errors.email ? styles.controlError : ''}`}
+              placeholder="sagarulagadde1008@gmail.com"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
+              }}
+              disabled={submitting}
+              required
+            />
+            {errors.email && <span className={styles.fieldErrorText}>{errors.email}</span>}
+          </div>
+        </div>
 
-          <Input
-            label="Subject"
-            placeholder="e.g. Admission Inquiry"
+        <div className={styles.inputGroup}>
+          <label className={styles.inputLabel}>
+            Subject / Inquiry Department <span className={styles.reqStar}>*</span>
+          </label>
+          <input
+            type="text"
+            className={`${styles.formControl} ${errors.subject ? styles.controlError : ''}`}
+            placeholder="e.g. Admission Guidance / Course Inquiry"
             value={subject}
             onChange={(e) => {
               setSubject(e.target.value);
               if (errors.subject) setErrors((prev) => ({ ...prev, subject: '' }));
             }}
-            error={errors.subject}
             disabled={submitting}
             required
           />
+          {errors.subject && <span className={styles.fieldErrorText}>{errors.subject}</span>}
+        </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-            <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-primary)' }}>
-              Message <span style={{ color: 'var(--color-danger, #ef4444)' }}>*</span>
-            </label>
-            <textarea
-              rows={4}
-              placeholder="Type your message here..."
-              value={message}
-              onChange={(e) => {
-                setMessage(e.target.value);
-                if (errors.message) setErrors((prev) => ({ ...prev, message: '' }));
-              }}
-              disabled={submitting}
-              required
-              style={{
-                padding: '0.625rem 1.05rem',
-                borderRadius: 'var(--radius-md)',
-                border: `1.5px solid ${errors.message ? 'var(--color-danger, #ef4444)' : 'var(--color-border)'}`,
-                fontFamily: 'inherit',
-                fontSize: '1rem',
-                outline: 'none',
-                backgroundColor: 'var(--color-background)',
-                color: 'var(--color-text-main)',
-                transition: 'border-color var(--transition-fast)'
-              }}
-            />
-            {errors.message && (
-              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-danger, #ef4444)' }} role="alert">
-                {errors.message}
-              </p>
-            )}
-          </div>
+        <div className={styles.inputGroup}>
+          <label className={styles.inputLabel}>
+            Message <span className={styles.reqStar}>*</span>
+          </label>
+          <textarea
+            rows={5}
+            className={`${styles.formControl} ${errors.message ? styles.controlError : ''}`}
+            placeholder="Type your message, inquiry, or question here..."
+            value={message}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              if (errors.message) setErrors((prev) => ({ ...prev, message: '' }));
+            }}
+            disabled={submitting}
+            required
+          />
+          {errors.message && <span className={styles.fieldErrorText}>{errors.message}</span>}
+        </div>
 
-          <Button variant="primary" size="md" type="submit" isLoading={submitting} disabled={submitting}>
-            {submitting ? 'Sending Message...' : 'Send Message'}
-          </Button>
-        </form>
-      </CardBody>
-    </Card>
+        <button
+          type="submit"
+          disabled={submitting}
+          className={homeStyles.btnPrimaryTerracotta}
+          style={{ width: '100%', justifyContent: 'center', height: '48px', marginTop: '8px' }}
+        >
+          <Send size={18} />
+          <span>{submitting ? 'Sending Message...' : 'Send Message Directly'}</span>
+        </button>
+      </form>
+    </div>
   );
 };
