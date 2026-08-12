@@ -94,7 +94,7 @@ export function ContactClient({ collegeInfo, socialLinks }: ContactClientProps) 
       </section>
 
       {/* 2. CONTACT DETAILS & FORM GRID */}
-      <section className={styles.contentSection} style={{ marginTop: '-24px' }}>
+      <section className={styles.contentSection} style={{ paddingTop: '56px' }}>
         <div className="container">
           <div className={styles.contactSplitGrid}>
             {/* LEFT COLUMN: CAMPUS INFORMATION */}
