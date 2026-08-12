@@ -450,6 +450,125 @@
   border-bottom: 3px solid var(--color-accent);
 }
 
+/* ==============================================================================
+   UNIFORM ULTRA-PREMIUM ADMISSIONS HERO ARCHITECTURE (Matching Homepage)
+   ============================================================================== */
+.admissionsHeroBleed {
+  position: relative;
+  min-height: 640px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: url('/images/admissions_hero_bg.png') center center / cover no-repeat;
+  overflow: hidden;
+  padding: 165px 0 100px;
+  margin-top: -110px;
+  border-bottom: 3px solid var(--color-accent);
+}
+
+.admissionsHeroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 13, 11, 0.94) 0%,
+    rgba(15, 13, 11, 0.84) 45%,
+    rgba(15, 13, 11, 0.3) 80%,
+    rgba(15, 13, 11, 0.05) 100%
+  );
+  z-index: 1;
+}
+
+.admissionsHeroGrid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (min-width: 992px) {
+  .admissionsHeroGrid {
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+}
+
+.admissionsLeftBlock {
+  max-width: 720px;
+}
+
+.admissionsBadgePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #F4EBE6;
+  background: rgba(226, 149, 120, 0.14);
+  border: 1px solid rgba(226, 149, 120, 0.35);
+  padding: 6px 18px;
+  border-radius: 100px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.admissionsHeadlineLight {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(2.5rem, 4.8vw, 3.75rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.admissionsSubtitleLight {
+  font-size: 1.1875rem;
+  color: #EFE7DA;
+  line-height: 1.65;
+  max-width: 620px;
+  margin-bottom: 36px;
+  font-weight: 400;
+}
+
+.admissionsCtaGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admissionsGlassDeck {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admissionsGlassStatCard {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 20px 24px;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.admissionsGlassStatCard:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(226, 149, 120, 0.4);
+  transform: translateY(-3px);
+}
+
 .heroContent {
   max-width: 800px;
 }
