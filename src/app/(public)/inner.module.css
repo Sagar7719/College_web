@@ -440,10 +440,10 @@
 }
 
 .admissionsHeroBanner {
-  background: linear-gradient(180deg, rgba(20, 18, 15, 0.45) 0%, rgba(20, 18, 15, 0.2) 50%, rgba(20, 18, 15, 0.8) 100%),
+  background: linear-gradient(180deg, rgba(15, 13, 11, 0.72) 0%, rgba(15, 13, 11, 0.25) 45%, rgba(15, 13, 11, 0.85) 100%),
               url('/images/admissions_hero_bg.png') center/cover no-repeat;
   color: #FFFFFF;
-  padding: 140px 0 80px;
+  padding: 185px 0 90px;
   margin-top: -110px;
   position: relative;
   overflow: hidden;
