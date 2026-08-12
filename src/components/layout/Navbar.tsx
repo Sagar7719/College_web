@@ -114,6 +114,16 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
                       </button>
                       {isDropdownOpen && (
                         <ul className={styles.dropdownMenu} role="menu">
+                          {item.path && item.path !== '#' && !item.children?.some((c) => c.path === item.path) && (
+                            <li role="menuitem">
+                              <Link
+                                href={item.path}
+                                className={`${styles.dropdownItemLink} ${pathname === item.path ? styles.dropdownItemActive : ''}`}
+                              >
+                                Overview ({item.label})
+                              </Link>
+                            </li>
+                          )}
                           {item.children?.map((child) => {
                             const isChildItemActive = pathname === child.path;
                             const isExt =
