@@ -22,6 +22,32 @@ export interface NavbarProps {
   initialNavItems?: NavigationItem[];
 }
 
+function getItemPath(item: NavigationItem): string {
+  if (item.path && item.path !== '#' && item.path.trim() !== '') {
+    return item.path;
+  }
+  const labelLower = (item.label || '').toLowerCase();
+  const keyLower = (item.systemKey || '').toLowerCase();
+  const idLower = (item.id || '').toLowerCase();
+
+  if (keyLower === 'about' || idLower.includes('about') || labelLower.includes('about')) {
+    return '/about';
+  }
+  if (keyLower === 'academics' || idLower.includes('academics') || labelLower.includes('course') || labelLower.includes('department')) {
+    return '/departments';
+  }
+  if (keyLower === 'admissions' || idLower.includes('admissions') || labelLower.includes('admission')) {
+    return '/admissions';
+  }
+  if (keyLower === 'notices' || idLower.includes('notices') || labelLower.includes('notice') || labelLower.includes('circular')) {
+    return '/notices';
+  }
+  if (keyLower === 'contact' || idLower.includes('contact') || labelLower.includes('contact')) {
+    return '/contact';
+  }
+  return '/';
+}
+
 export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
   const [navItems, setNavItems] = useState<NavigationItem[]>(
     initialNavItems && initialNavItems.length > 0 ? initialNavItems : defaultFallbackNav
@@ -87,15 +113,14 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
           <div className={styles.navContainer}>
             <ul className={styles.navList}>
               {navItems.map((item) => {
+                const targetPath = getItemPath(item);
                 const hasChildren = Boolean(item.children && item.children.length > 0);
                 const isChildActive = Boolean(hasChildren && item.children?.some((child) => pathname === child.path));
-                const isSelfActive = pathname === item.path;
+                const isSelfActive = pathname === targetPath;
                 const isActive = isSelfActive || isChildActive;
                 const isDropdownOpen = openDropdownId === item.id;
 
                 if (hasChildren) {
-                  const targetPath = item.path && item.path !== '#' ? item.path : (item.systemKey === 'about' ? '/about' : '/');
-
                   return (
                     <li
                       key={item.id}
@@ -122,11 +147,12 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
                       </Link>
                       {isDropdownOpen && (
                         <ul className={styles.dropdownMenu} role="menu">
-                          {item.path && item.path !== '#' && !item.children?.some((c) => c.path === item.path) && (
+                          {targetPath && targetPath !== '#' && !item.children?.some((c) => c.path === targetPath) && (
                             <li role="menuitem">
                               <Link
-                                href={item.path}
-                                className={`${styles.dropdownItemLink} ${pathname === item.path ? styles.dropdownItemActive : ''}`}
+                                href={targetPath}
+                                className={`${styles.dropdownItemLink} ${pathname === targetPath ? styles.dropdownItemActive : ''}`}
+                                onClick={() => setOpenDropdownId(null)}
                               >
                                 Overview ({item.label})
                               </Link>
@@ -194,7 +220,7 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
                 return (
                   <li key={item.id}>
                     <Link
-                      href={item.path}
+                      href={targetPath}
                       className={`${styles.navItemLink} ${isActive ? styles.navItemActive : ''}`}
                     >
                       {item.label}

@@ -13,6 +13,32 @@ export interface MobileDrawerProps {
   pathname: string;
 }
 
+function getItemPath(item: NavigationItem): string {
+  if (item.path && item.path !== '#' && item.path.trim() !== '') {
+    return item.path;
+  }
+  const labelLower = (item.label || '').toLowerCase();
+  const keyLower = (item.systemKey || '').toLowerCase();
+  const idLower = (item.id || '').toLowerCase();
+
+  if (keyLower === 'about' || idLower.includes('about') || labelLower.includes('about')) {
+    return '/about';
+  }
+  if (keyLower === 'academics' || idLower.includes('academics') || labelLower.includes('course') || labelLower.includes('department')) {
+    return '/departments';
+  }
+  if (keyLower === 'admissions' || idLower.includes('admissions') || labelLower.includes('admission')) {
+    return '/admissions';
+  }
+  if (keyLower === 'notices' || idLower.includes('notices') || labelLower.includes('notice') || labelLower.includes('circular')) {
+    return '/notices';
+  }
+  if (keyLower === 'contact' || idLower.includes('contact') || labelLower.includes('contact')) {
+    return '/contact';
+  }
+  return '/';
+}
+
 export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   isOpen,
   onClose,
@@ -115,10 +141,11 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
         <div className={styles.drawerBody}>
           <ul className={styles.drawerNavList}>
             {navItems.map((item) => {
+              const targetPath = getItemPath(item);
               const hasChildren = Boolean(item.children && item.children.length > 0);
               const isExpanded = Boolean(expandedItems[item.id]);
               const isChildActive = Boolean(hasChildren && item.children?.some((child) => pathname === child.path));
-              const isSelfActive = pathname === item.path;
+              const isSelfActive = pathname === targetPath;
               const isActive = isSelfActive || isChildActive;
 
               if (hasChildren) {
@@ -138,10 +165,10 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
                     {isExpanded && (
                       <ul className={styles.drawerSubNavList}>
-                        {item.path && item.path !== '#' && (
+                        {targetPath && targetPath !== '#' && (
                           <li>
                             <Link
-                              href={item.path}
+                              href={targetPath}
                               className={`${styles.drawerSubNavLink} ${isSelfActive ? styles.drawerSubNavLinkActive : ''}`}
                               onClick={onClose}
                             >
