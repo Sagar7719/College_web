@@ -94,6 +94,8 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
                 const isDropdownOpen = openDropdownId === item.id;
 
                 if (hasChildren) {
+                  const targetPath = item.path && item.path !== '#' ? item.path : (item.systemKey === 'about' ? '/about' : '/');
+
                   return (
                     <li
                       key={item.id}
@@ -101,17 +103,23 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
                       onMouseEnter={() => setOpenDropdownId(item.id)}
                       onMouseLeave={() => setOpenDropdownId(null)}
                     >
-                      <button
-                        type="button"
+                      <Link
+                        href={targetPath}
                         className={`${styles.navItemLink} ${styles.navItemWithDropdown} ${isActive ? styles.navItemActive : ''}`}
-                        aria-expanded={isDropdownOpen}
-                        aria-haspopup="true"
-                        onClick={() => setOpenDropdownId(isDropdownOpen ? null : item.id)}
-                        onKeyDown={(e) => handleDropdownKeyDown(e, item.id)}
+                        onClick={() => setOpenDropdownId(null)}
                       >
                         <span>{item.label}</span>
-                        <span className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.dropdownArrowOpen : ''}`}>▼</span>
-                      </button>
+                        <span
+                          className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.dropdownArrowOpen : ''}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setOpenDropdownId(isDropdownOpen ? null : item.id);
+                          }}
+                        >
+                          ▼
+                        </span>
+                      </Link>
                       {isDropdownOpen && (
                         <ul className={styles.dropdownMenu} role="menu">
                           {item.path && item.path !== '#' && !item.children?.some((c) => c.path === item.path) && (
