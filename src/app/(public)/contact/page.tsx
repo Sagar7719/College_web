@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { pagesService } from '@/services/pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
+import { contactPageConfigService } from '@/services/enterprise-cms.service';
 import { ContactClient } from './ContactClient';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await siteSettingsService.getSettings();
   const collegeName = settings.collegeInfo?.name || 'Jaysingpur College';
   const title = `Contact Us — ${collegeName}`;
-  const description = `Get in touch with ${collegeName}. Official campus address, admissions helpline (+91 8669301878), and department contact emails.`;
+  const description = `Get in touch with ${collegeName}. Official campus address, admissions helpline, and department contact emails.`;
   const ogImageUrl = settings.seoConfig?.defaultOgImageUrl || settings.collegeInfo?.logoUrl;
 
   return {
@@ -38,9 +39,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ContactPage() {
-  const settings = await siteSettingsService.getSettings();
+  const [settings, contactData] = await Promise.all([
+    siteSettingsService.getSettings(),
+    contactPageConfigService.get(),
+  ]);
+
   const collegeInfo = settings.collegeInfo || {};
   const socialLinks = settings.socialLinks || {};
 
-  return <ContactClient collegeInfo={collegeInfo} socialLinks={socialLinks} />;
+  return <ContactClient collegeInfo={collegeInfo} socialLinks={socialLinks} contactData={contactData} />;
 }

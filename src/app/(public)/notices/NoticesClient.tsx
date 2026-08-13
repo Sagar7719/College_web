@@ -28,73 +28,12 @@ interface NoticesClientProps {
   initialNotices: Notice[];
 }
 
-const FALLBACK_NOTICES: Notice[] = [
-  {
-    id: 'n-1',
-    title: 'Schedule for End-Semester Examinations 2026–27 & Hall Ticket Distribution',
-    slug: 'exam-schedule-2026',
-    category: 'Exam',
-    content: 'All undergraduate and postgraduate students are hereby informed that the end-semester written examinations will commence from September 10, 2026. Hall tickets can be collected from respective department desks upon clearance of college dues.',
-    attachmentUrl: '#',
-    attachmentName: 'Exam_Schedule_Sep_2026.pdf',
-    isUrgent: true,
-    publishDate: '2026-08-10T09:00:00.000Z',
-    status: 'published',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'n-2',
-    title: 'First Merit List & Scrutiny Schedule for B.Sc & BCA Admissions 2026–27',
-    slug: 'merit-list-admissions-2026',
-    category: 'Admission',
-    content: 'The first provisional merit list for admission into B.Sc (Computer Science) and BCA degree programmes has been published. Selected candidates must report to the administrative building for document verification with original transcripts before August 25, 2026.',
-    attachmentUrl: '#',
-    attachmentName: 'Merit_List_UG_2026.pdf',
-    isUrgent: false,
-    publishDate: '2026-08-08T11:30:00.000Z',
-    status: 'published',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'n-3',
-    title: 'Submission Guidelines for Final Year Research Projects & Thesis Reports',
-    slug: 'thesis-submission-guidelines',
-    category: 'Academic',
-    content: 'Final year M.Sc and B.Tech candidates are required to submit two hardbound copies of their research dissertation along with soft copies to their respective department HOD office.',
-    attachmentUrl: '#',
-    attachmentName: 'Project_Format_Guidelines.pdf',
-    isUrgent: false,
-    publishDate: '2026-08-05T14:00:00.000Z',
-    status: 'published',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'n-4',
-    title: 'Independence Day Flag Hoisting Ceremony & Cultural Celebration Notice',
-    slug: 'independence-day-celebration',
-    category: 'General',
-    content: 'All faculty members, administrative staff, and students are invited to join the 80th Independence Day Flag Hoisting Ceremony on August 15, 2026 at 7:30 AM at the main campus ground.',
-    attachmentUrl: '#',
-    attachmentName: 'Circular_Independence_Day.pdf',
-    isUrgent: false,
-    publishDate: '2026-08-02T10:00:00.000Z',
-    status: 'published',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
 export function NoticesClient({ initialNotices }: NoticesClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<'all' | 'urgent' | 'Academic' | 'Exam' | 'Admission' | 'General'>('all');
   const [expandedNoticeId, setExpandedNoticeId] = useState<string | null>(null);
 
-  const noticesList = initialNotices && initialNotices.length > 0
-    ? initialNotices
-    : FALLBACK_NOTICES;
+  const noticesList = initialNotices || [];
 
   const filteredNotices = useMemo(() => {
     return noticesList.filter((notice) => {

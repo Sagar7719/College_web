@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { pagesService } from '@/services/pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
+import { aboutPageConfigService } from '@/services/enterprise-cms.service';
 import { AboutClient } from './AboutClient';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -39,8 +40,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const settings = await siteSettingsService.getSettings();
+  const [settings, aboutData] = await Promise.all([
+    siteSettingsService.getSettings(),
+    aboutPageConfigService.get(),
+  ]);
+
   const collegeInfo = settings.collegeInfo || {};
 
-  return <AboutClient collegeInfo={collegeInfo} />;
+  return <AboutClient collegeInfo={collegeInfo} aboutData={aboutData} />;
 }

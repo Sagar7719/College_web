@@ -27,64 +27,11 @@ interface DepartmentsClientProps {
   initialDepartments: Department[];
 }
 
-const FALLBACK_DEPARTMENTS: Department[] = [
-  {
-    id: 'dept-cs',
-    code: 'CS',
-    name: 'Computer Science & IT',
-    slug: 'computer-science',
-    description: 'Leading artificial intelligence, software engineering, cloud computing, and data science education equipped with advanced computing laboratories.',
-    hodName: 'Mr. Sagar Ulagadde',
-    hodEmail: 'sagarulagadde1008@gmail.com',
-    status: 'published',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'dept-comm',
-    code: 'COMM',
-    name: 'Commerce & Management Studies',
-    slug: 'commerce-management',
-    description: 'Empowering future business leaders in financial analytics, digital marketing, corporate governance, and entrepreneurial innovation.',
-    hodName: 'Dr. A. R. Patil',
-    hodEmail: 'commerce@college.edu',
-    status: 'published',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'dept-sci',
-    code: 'SCI',
-    name: 'Physical & Chemical Sciences',
-    slug: 'physical-sciences',
-    description: 'Fostering scientific inquiry, material research, chemical analysis, and quantum optics in state-of-the-art research laboratories.',
-    hodName: 'Dr. V. M. Deshmukh',
-    hodEmail: 'sciences@college.edu',
-    status: 'published',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'dept-arts',
-    code: 'ARTS',
-    name: 'Arts, Humanities & Social Sciences',
-    slug: 'arts-humanities',
-    description: 'Cultivating critical thinking, literature appreciation, historical research, and public administration competencies.',
-    hodName: 'Prof. S. B. Kulkarni',
-    hodEmail: 'arts@college.edu',
-    status: 'published',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
 export function DepartmentsClient({ initialDepartments }: DepartmentsClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'tech' | 'commerce' | 'sciences'>('all');
 
-  const departmentsList = initialDepartments && initialDepartments.length > 0
-    ? initialDepartments
-    : FALLBACK_DEPARTMENTS;
+  const departmentsList = initialDepartments || [];
 
   const filteredDepartments = useMemo(() => {
     return departmentsList.filter((dept) => {

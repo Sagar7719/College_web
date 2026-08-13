@@ -2,7 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { pagesService } from '@/services/pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
-import { PageSectionRenderer } from '@/components/page-builder';
+import { admissionsConfigService } from '@/services/enterprise-cms.service';
 import { AdmissionsClient } from './AdmissionsClient';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,7 +19,6 @@ export async function generateMetadata(): Promise<Metadata> {
   const collegeName = settings.collegeInfo?.name || 'Jaysingpur College';
   const title = `Admissions 2026-2027 — ${collegeName}`;
   const description = `Explore admissions criteria, eligibility, counseling dates, and online application guidelines for ${collegeName}.`;
-  const ogImageUrl = settings.seoConfig?.defaultOgImageUrl || settings.collegeInfo?.logoUrl;
 
   return {
     title,
@@ -33,11 +32,12 @@ export async function generateMetadata(): Promise<Metadata> {
       url: '/admissions',
       siteName: collegeName,
       type: 'website',
-      ...(ogImageUrl ? { images: [{ url: ogImageUrl, alt: title }] } : {}),
     },
   };
 }
 
 export default async function AdmissionsPage() {
-  return <AdmissionsClient />;
+  const admissionsData = await admissionsConfigService.get();
+
+  return <AdmissionsClient admissionsData={admissionsData} />;
 }

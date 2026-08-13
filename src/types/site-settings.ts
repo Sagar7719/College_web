@@ -18,6 +18,12 @@ export interface CollegeInfo {
   principalDesignation?: string;
   principalPhotoUrl?: string;
   principalMessage?: string;
+  // Extended fields for CMS dynamic pages
+  vision?: string;
+  mission?: string;
+  naacGrade?: string;
+  officeHours?: string;
+  officeHoursClosed?: string;
 }
 
 export interface SocialLinks {
@@ -66,6 +72,176 @@ export interface GlobalSeoConfig {
   defaultOgImageUrl?: string;
 }
 
+// ── Homepage Dynamic Sections ──
+
+export interface GatewayCard {
+  title: string;
+  subtitle: string;
+  ctaLabel: string;
+  href: string;
+  iconKey: string; // lucide icon name
+  colorVariant: string; // CSS class suffix: 'Terracotta', 'Emerald', 'Sapphire', 'Gold'
+}
+
+export interface FeaturePillar {
+  title: string;
+  subtitle: string;
+  iconKey: string;
+  colorClass: string;
+}
+
+export interface WhyChooseUsCard {
+  title: string;
+  description: string;
+  iconKey: string;
+  colorClass: string;
+}
+
+export interface StatItem {
+  label: string;
+  valueType: 'auto' | 'manual'; // 'auto' = calculated, 'manual' = fixed number
+  manualValue?: number;
+  suffix?: string;
+}
+
+export interface AccreditationItem {
+  title: string;
+  subtitle: string;
+  iconKey: string;
+}
+
+export interface QuickLinkItem {
+  label: string;
+  href: string;
+  iconKey: string;
+  colorClass: string;
+}
+
+export interface HomepageConfig {
+  heroCta1Label?: string;
+  heroCta2Label?: string;
+  gatewayCards?: GatewayCard[];
+  stats?: StatItem[];
+  featurePillars?: FeaturePillar[];
+  whyChooseUs?: WhyChooseUsCard[];
+  quickLinks?: QuickLinkItem[];
+  accreditations?: AccreditationItem[];
+  aboutCtaLabel?: string;
+  contactSectionTitle?: string;
+  contactSectionSubtitle?: string;
+  mapCardTitle?: string;
+  mapCardDesc?: string;
+  admissionCtaBadge?: string;
+  admissionCtaTitle?: string;
+  admissionCtaDesc?: string;
+}
+
+// ── About Page Dynamic Sections ──
+
+export interface HeroStatItem {
+  label: string;
+  sublabel: string;
+  iconKey: string;
+}
+
+export interface AboutHighlightItem {
+  text: string;
+}
+
+export interface AboutPillarCard {
+  title: string;
+  description: string;
+  iconKey: string;
+}
+
+export interface AboutPageConfig {
+  heroBadge?: string;
+  heroSubtitle?: string;
+  heroStats?: HeroStatItem[];
+  legacyTitle?: string;
+  highlights?: AboutHighlightItem[];
+  pillarsTitle?: string;
+  pillars?: AboutPillarCard[];
+  ctaBannerTitle?: string;
+  ctaBannerDesc?: string;
+}
+
+// ── Contact Page Dynamic Sections ──
+
+export interface HelpdeskEntry {
+  label: string;
+  email: string;
+}
+
+export interface EmergencyCard {
+  title: string;
+  description: string;
+  contactInfo: string;
+  iconKey: string;
+}
+
+export interface ContactPageConfig {
+  heroBadge?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  helpdesks?: HelpdeskEntry[];
+  emergencyCards?: EmergencyCard[];
+}
+
+// ── Admissions Config ──
+
+export interface AdmissionStep {
+  title: string;
+  description: string;
+  iconKey: string;
+}
+
+export interface EligibilityCard {
+  tag: string;
+  minMarks: string;
+  title: string;
+  description: string;
+  criteria: string[];
+}
+
+export interface EligibilityTab {
+  tabKey: string;
+  tabLabel: string;
+  cards: EligibilityCard[];
+}
+
+export interface AdmissionScheduleItem {
+  title: string;
+  subtitle: string;
+  date: string;
+  status?: 'active' | 'progress' | 'final' | '';
+}
+
+export interface AdmissionFAQ {
+  question: string;
+  answer: string;
+}
+
+export interface AdmissionsConfig {
+  heroBadge?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroStats?: HeroStatItem[];
+  applicationDeadline?: string;
+  stepsEyebrow?: string;
+  stepsTitle?: string;
+  stepsSubtitle?: string;
+  admissionSteps?: AdmissionStep[];
+  eligibilityTabs?: EligibilityTab[];
+  requiredDocuments?: string[];
+  admissionSchedule?: AdmissionScheduleItem[];
+  faqs?: AdmissionFAQ[];
+  helpdeskCtaTitle?: string;
+  helpdeskCtaDesc?: string;
+}
+
+// ── Main Site Settings ──
+
 export interface SiteSettings {
   id: string; // 'general'
   collegeInfo: CollegeInfo;
@@ -76,4 +252,9 @@ export interface SiteSettings {
   maintenanceMessage?: string;
   setupCompleted?: boolean;
   updatedAt: string;
+  // Dynamic page configs
+  homepage?: HomepageConfig;
+  aboutPage?: AboutPageConfig;
+  contactPage?: ContactPageConfig;
+  admissions?: AdmissionsConfig;
 }

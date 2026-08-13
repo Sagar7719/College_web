@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { pagesService } from '@/services/pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
+import { homepageConfigService } from '@/services/enterprise-cms.service';
 import {
   noticesService,
   eventsService,
@@ -12,7 +13,8 @@ import {
   facultyService,
   downloadsService,
 } from '@/services/cms-modules.service';
-import { GraduationCap, Megaphone, Building2, FileText, ArrowRight, Users, Microscope, Rocket, BookOpen, Award, FlaskConical, Briefcase, Sparkles, Landmark, Bell, Download, FileCheck, FolderDown, BellOff, Mail, Quote, CheckCircle2, Scroll, MapPin, PhoneCall, Map, Compass } from 'lucide-react';
+import { ArrowRight, Download, BellOff, FileText, FolderDown, Bell, Landmark, Mail, Quote, MapPin, PhoneCall, Map, Compass, Sparkles, GraduationCap, BookOpen, FileCheck } from 'lucide-react';
+import { resolveIcon } from '@/lib/icon-resolver';
 import { AnimatedCounter } from '@/components/common/AnimatedCounter';
 import { ProgrammesCarousel } from '@/components/common/ProgrammesCarousel';
 import { DepartmentsCarousel } from '@/components/common/DepartmentsCarousel';
@@ -48,12 +50,18 @@ function formatDate(dateStr: string) {
   }
 }
 
-
+const colorVariantMap: Record<string, { card: string; icon: string }> = {
+  Terracotta: { card: styles.gatewayCardTerracotta, icon: styles.gatewayIconTerracotta },
+  Emerald: { card: styles.gatewayCardEmerald, icon: styles.gatewayIconEmerald },
+  Sapphire: { card: styles.gatewayCardSapphire, icon: styles.gatewayIconSapphire },
+  Gold: { card: styles.gatewayCardGold, icon: styles.gatewayIconGold },
+};
 
 export default async function HomePage() {
-  const [settings, notices, upcomingEvents, departments, courses, galleryAlbums, faculty, downloads] =
+  const [settings, hpData, notices, upcomingEvents, departments, courses, galleryAlbums, faculty, downloads] =
     await Promise.all([
       siteSettingsService.getSettings(),
+      homepageConfigService.get(),
       noticesService.getPublished(6),
       eventsService.getUpcoming(),
       departmentsService.getPublished(),
@@ -66,9 +74,10 @@ export default async function HomePage() {
   const info = settings?.collegeInfo;
   const collegeName = info?.name || 'Jaysingpur College';
   const displayCollegeName = collegeName.replace(/\b\w/g, (c) => c.toUpperCase());
-  const tagline = info?.tagline || 'Empowering Minds, Building Futures';
-  const description = info?.description || 'A premier higher education institution dedicated to academic rigor, pioneering research, and holistic student growth.';
-  const estYear = info?.establishedYear || '2001';
+  const tagline = info?.tagline || hpData.hero.headline;
+  const description = info?.description || hpData.hero.subtitle;
+  const estYear = info?.establishedYear || '1972';
+  const naacGrade = info?.naacGrade || 'A';
   const principalName = info?.principalName || '';
   const principalTitle = info?.principalDesignation || 'Principal';
   const principalPhoto = info?.principalPhotoUrl || '';
@@ -79,12 +88,17 @@ export default async function HomePage() {
   const publishedFaculty = faculty.filter((f) => f.status === 'published' || !f.status);
   const recentDownloads = downloads.slice(0, 4);
 
+  const autoStatValues = [
+    estYear ? (new Date().getFullYear() - parseInt(estYear, 10)) : 25,
+    publishedCourses.length > 0 ? publishedCourses.length : 1,
+    departments.length > 0 ? departments.length : 1,
+    publishedFaculty.length > 0 ? publishedFaculty.length : 1,
+  ];
 
   return (
     <div className={styles.homePage}>
-      {/* 2. ULTRA-PREMIUM FULL-WIDTH PANORAMIC HERO SECTION */}
+      {/* HERO SECTION */}
       <section className={styles.heroFullBleed}>
-        {/* Ambient Animated RGB Glow Blobs */}
         <div className={styles.glowBlob1} />
         <div className={styles.glowBlob2} />
         <div className={styles.glowBlob3} />
@@ -93,21 +107,20 @@ export default async function HomePage() {
         
         <div className={`container ${styles.heroUnifiedContainer}`}>
           <div className={styles.heroGlassCard}>
-            {/* Centered Content */}
             <div className={styles.heroBadgePill}>
-              <span>🏛️</span> {collegeName.toUpperCase()} • EST. {estYear} • NAAC &apos;A&apos; GRADE
+              <span>🏛️</span> {collegeName.toUpperCase()} • EST. {estYear} • NAAC &apos;{naacGrade}&apos; GRADE
             </div>
             <h1 className={styles.heroHeadlineLightCentered}>
               <span className={styles.gradientText}>{tagline}</span>
             </h1>
             <p className={styles.heroSubtitleLightCentered}>{description}</p>
             <div className={styles.heroCtaGroupCentered}>
-              <Link href="/courses" className={styles.btnPrimaryTerracotta}>
-                <span>Explore Programmes</span>
+              <Link href={hpData.hero.cta1Href || '/courses'} className={styles.btnPrimaryTerracotta}>
+                <span>{hpData.hero.cta1Label || 'Explore Programmes'}</span>
                 <ArrowRight size={18} strokeWidth={2.2} className={styles.ctaArrowSvg} />
               </Link>
-              <Link href="/about" className={styles.btnGlassOutline}>
-                <span>About Our College</span>
+              <Link href={hpData.hero.cta2Href || '/about'} className={styles.btnGlassOutline}>
+                <span>{hpData.hero.cta2Label || 'About Our College'}</span>
                 <ArrowRight size={18} strokeWidth={2.2} className={styles.ctaArrowSvg} />
               </Link>
             </div>
@@ -115,131 +128,67 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 3. UNIFIED ULTRA-PREMIUM GLASSMORPHISM DECK */}
+      {/* GATEWAYS BAR */}
       <section className={styles.heroGatewaysBar}>
         <div className="container">
           <div className={styles.masterGlassDeck}>
             <div className={styles.gatewaysGrid}>
-              <Link href="/courses" className={`${styles.gatewayCardModern} ${styles.gatewayCardTerracotta}`}>
-                <div className={`${styles.gatewayIconBox} ${styles.gatewayIconTerracotta}`}>
-                  <GraduationCap size={26} strokeWidth={1.8} />
-                </div>
-                <div className={styles.gatewayTitleModern}>Academic Degrees</div>
-                <p className={styles.gatewaySubModern}>UG, PG & Doctoral Programmes across Science, Commerce & Arts</p>
-                <div className={styles.gatewayArrowBottom}>
-                  <span>Explore</span>
-                  <ArrowRight size={16} strokeWidth={2.2} />
-                </div>
-              </Link>
-              <Link href="/admissions" className={`${styles.gatewayCardModern} ${styles.gatewayCardEmerald}`}>
-                <div className={`${styles.gatewayIconBox} ${styles.gatewayIconEmerald}`}>
-                  <Megaphone size={26} strokeWidth={1.8} />
-                </div>
-                <div className={styles.gatewayTitleModern}>Admissions 2026</div>
-                <p className={styles.gatewaySubModern}>Online Application Portal, Prospectus & Fee Structure</p>
-                <div className={styles.gatewayArrowBottom}>
-                  <span>Apply Now</span>
-                  <ArrowRight size={16} strokeWidth={2.2} />
-                </div>
-              </Link>
-              <Link href="/departments" className={`${styles.gatewayCardModern} ${styles.gatewayCardSapphire}`}>
-                <div className={`${styles.gatewayIconBox} ${styles.gatewayIconSapphire}`}>
-                  <Building2 size={26} strokeWidth={1.8} />
-                </div>
-                <div className={styles.gatewayTitleModern}>Departments</div>
-                <p className={styles.gatewaySubModern}>Faculties of Science, Humanities, Commerce & Research Wings</p>
-                <div className={styles.gatewayArrowBottom}>
-                  <span>View All</span>
-                  <ArrowRight size={16} strokeWidth={2.2} />
-                </div>
-              </Link>
-              <Link href="/notices" className={`${styles.gatewayCardModern} ${styles.gatewayCardGold}`}>
-                <div className={`${styles.gatewayIconBox} ${styles.gatewayIconGold}`}>
-                  <FileText size={26} strokeWidth={1.8} />
-                </div>
-                <div className={styles.gatewayTitleModern}>Academic Bulletins</div>
-                <p className={styles.gatewaySubModern}>Official Circulars, Exam Timetables & University Updates</p>
-                <div className={styles.gatewayArrowBottom}>
-                  <span>Circulars</span>
-                  <ArrowRight size={16} strokeWidth={2.2} />
-                </div>
-              </Link>
+              {hpData.gatewayCards.map((card, idx) => {
+                const variant = colorVariantMap[card.colorVariant] || colorVariantMap.Terracotta;
+                return (
+                  <Link key={idx} href={card.href} className={`${styles.gatewayCardModern} ${variant.card}`}>
+                    <div className={`${styles.gatewayIconBox} ${variant.icon}`}>
+                      {resolveIcon(card.iconKey, 26, 1.8)}
+                    </div>
+                    <div className={styles.gatewayTitleModern}>{card.title}</div>
+                    <p className={styles.gatewaySubModern}>{card.subtitle}</p>
+                    <div className={styles.gatewayArrowBottom}>
+                      <span>{card.ctaLabel}</span>
+                      <ArrowRight size={16} strokeWidth={2.2} />
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. DYNAMIC STATS STRIP (#FFFFFF Surface) */}
+      {/* STATS STRIP */}
       <section className={styles.statsBar} aria-label="Key Highlights">
         <div className={`container ${styles.statsRow}`}>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>
-              <AnimatedCounter end={estYear ? (new Date().getFullYear() - parseInt(estYear, 10)) : 25} suffix="+" />
-            </span>
-            <span className={styles.statLbl}>Years of Excellence</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>
-              <AnimatedCounter end={publishedCourses.length > 0 ? publishedCourses.length : 1} suffix="+" />
-            </span>
-            <span className={styles.statLbl}>Academic Programmes</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>
-              <AnimatedCounter end={departments.length > 0 ? departments.length : 1} suffix="" />
-            </span>
-            <span className={styles.statLbl}>Departments</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>
-              <AnimatedCounter end={publishedFaculty.length > 0 ? publishedFaculty.length : 1} suffix="+" />
-            </span>
-            <span className={styles.statLbl}>Faculty Members</span>
-          </div>
+          {hpData.stats.map((stat, idx) => (
+            <div key={idx} className={styles.stat}>
+              <span className={styles.statNum}>
+                <AnimatedCounter
+                  end={stat.valueType === 'manual' && stat.manualValue != null ? stat.manualValue : autoStatValues[idx] ?? 0}
+                  suffix={stat.suffix || ''}
+                />
+              </span>
+              <span className={styles.statLbl}>{stat.label}</span>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* 4. FEATURE STRIP (#EFE7DA Warm Sand) */}
+      {/* FEATURE STRIP */}
       <section className={styles.featureStrip} aria-label="Key Pillars">
         <div className={`container ${styles.featureRow}`}>
-          {[
-            {
-              icon: <GraduationCap size={24} />,
-              title: 'Academic Excellence',
-              sub: 'Rigorous curriculum aligned with industry standards',
-              colorClass: styles.iconTerracotta,
-            },
-            {
-              icon: <Users size={24} />,
-              title: 'Experienced Faculty',
-              sub: 'Distinguished educators and active researchers',
-              colorClass: styles.iconEmerald,
-            },
-            {
-              icon: <Microscope size={24} />,
-              title: 'Modern Infrastructure',
-              sub: 'Tech labs, digital classrooms, and central archive',
-              colorClass: styles.iconSapphire,
-            },
-            {
-              icon: <Rocket size={24} />,
-              title: 'Student Success',
-              sub: 'Dedicated placement cell and career guidance',
-              colorClass: styles.iconGold,
-            },
-          ].map((f) => (
+          {hpData.featurePillars.map((f) => (
             <div key={f.title} className={styles.featureItem}>
-              <div className={`${styles.featureIcon} ${f.colorClass}`}>{f.icon}</div>
+              <div className={`${styles.featureIcon} ${(styles as Record<string, string>)[f.colorClass] || ''}`}>
+                {resolveIcon(f.iconKey, 24)}
+              </div>
               <div>
                 <strong className={styles.featureName}>{f.title}</strong>
-                <p className={styles.featureSub}>{f.sub}</p>
+                <p className={styles.featureSub}>{f.subtitle}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 5. WHY CHOOSE US (#EFE7DA Sand Background with White Cards) */}
+      {/* WHY CHOOSE US */}
       <section className={styles.secAlt} aria-label="Why Choose Us">
         <div className="container">
           <div className={styles.secHead}>
@@ -248,60 +197,23 @@ export default async function HomePage() {
             <p className={styles.secSub}>Pillars of academic leadership, modern learning, and student success.</p>
           </div>
           <div className={styles.whyGrid}>
-            {[
-              {
-                icon: <BookOpen size={26} />,
-                title: 'Academic Excellence',
-                desc: 'Comprehensive undergraduate, postgraduate, and diploma courses across diverse faculties.',
-                colorClass: styles.whyTerracotta,
-              },
-              {
-                icon: <Award size={26} />,
-                title: 'Expert Faculty',
-                desc: 'Accomplished mentors fostering scientific inquiry, critical thinking, and innovation.',
-                colorClass: styles.whyEmerald,
-              },
-              {
-                icon: <FlaskConical size={26} />,
-                title: 'Modern Laboratories',
-                desc: 'State-of-the-art facilities for computer science, physical sciences, and practical research.',
-                colorClass: styles.whySapphire,
-              },
-              {
-                icon: <Briefcase size={26} />,
-                title: 'Placement Support',
-                desc: 'Proactive career guidance cell driving campus hiring drives with leading recruiters.',
-                colorClass: styles.whyPurple,
-              },
-              {
-                icon: <Sparkles size={26} />,
-                title: 'Holistic Development',
-                desc: 'Active NSS, NCC, sports, cultural societies, and community development initiatives.',
-                colorClass: styles.whyGold,
-              },
-              {
-                icon: <Landmark size={26} />,
-                title: 'Vibrant Campus Life',
-                desc: 'Engaging student clubs, seminars, annual youth festivals, and academic symposiums.',
-                colorClass: styles.whyCrimson,
-              },
-            ].map((item) => (
-              <div key={item.title} className={`${styles.whyCard} ${item.colorClass}`}>
-                <div className={styles.whyIcon}>{item.icon}</div>
+            {hpData.whyChooseUs.map((item) => (
+              <div key={item.title} className={`${styles.whyCard} ${(styles as Record<string, string>)[item.colorClass] || ''}`}>
+                <div className={styles.whyIcon}>{resolveIcon(item.iconKey, 26)}</div>
                 <h3 className={styles.whyCardTitle}>{item.title}</h3>
-                <p className={styles.whyCardDesc}>{item.desc}</p>
+                <p className={styles.whyCardDesc}>{item.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 6. PROGRAMMES SECTION (#F7F2E9 Warm Ivory Background) */}
+      {/* PROGRAMMES SECTION */}
       {publishedCourses.length > 0 && (
         <ProgrammesCarousel courses={publishedCourses} />
       )}
 
-      {/* 7. LATEST NOTICES & DOWNLOADS (#EFE7DA Sand Background) */}
+      {/* LATEST NOTICES & DOWNLOADS */}
       <section className={styles.secAlt} aria-label="Notices and Downloads">
         <div className="container">
           <div className={styles.noticeDownloadGrid}>
@@ -388,10 +300,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 8. QUICK ACCESS LINKS (#F7F2E9 Warm Ivory Background) */}
-      <QuickLinksCarousel />
+      {/* QUICK ACCESS LINKS */}
+      <QuickLinksCarousel quickLinks={hpData.quickLinks} />
 
-      {/* 9. ABOUT / EDITORIAL (#FFFFFF White Surface Background) */}
+      {/* ABOUT / EDITORIAL */}
       <section className={styles.secWhite} aria-label="About and Leadership Message">
         <div className="container">
           <div className={styles.aboutRow}>
@@ -425,7 +337,7 @@ export default async function HomePage() {
                 <p className={styles.aboutDesc}>{description}</p>
               )}
               <Link href="/about" className={styles.btnPrimaryTerracotta}>
-                <span>Read More About Us</span>
+                <span>{hpData.aboutCtaLabel || 'Read More About Us'}</span>
                 <ArrowRight size={16} />
               </Link>
             </div>
@@ -433,69 +345,44 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 10. DEPARTMENTS (#EFE7DA Sand Background) */}
+      {/* DEPARTMENTS */}
       {departments.length > 0 && (
         <DepartmentsCarousel departments={departments} />
       )}
 
-      {/* 11. EVENTS (#F7F2E9 Warm Ivory Background) */}
+      {/* EVENTS */}
       <EventsCarousel events={upcomingEvents} />
 
-      {/* 12. GALLERY (#EFE7DA Sand Background) */}
+      {/* GALLERY */}
       {galleryAlbums.length > 0 && (
         <GalleryCarousel albums={galleryAlbums} collegeName={collegeName} />
       )}
 
-      {/* 13. ACCREDITATION STRIP (#FFFFFF Surface) */}
+      {/* ACCREDITATION STRIP */}
       <section className={styles.accredBar} aria-label="Accreditation & Recognition">
         <div className={`container ${styles.accredRow}`}>
-          <div className={styles.accredItem}>
-            <div className={styles.accredIcon}>
-              <Landmark size={22} />
+          {hpData.accreditations.map((item, idx) => (
+            <div key={idx} className={styles.accredItem}>
+              <div className={styles.accredIcon}>
+                {resolveIcon(item.iconKey, 22)}
+              </div>
+              <div>
+                <strong>{idx === 3 ? `${item.title} ${estYear}` : item.title}</strong>
+                <p>{item.subtitle}</p>
+              </div>
             </div>
-            <div>
-              <strong>Affiliated Institution</strong>
-              <p>University Recognition</p>
-            </div>
-          </div>
-          <div className={styles.accredItem}>
-            <div className={styles.accredIcon}>
-              <CheckCircle2 size={22} />
-            </div>
-            <div>
-              <strong>UGC Recognized</strong>
-              <p>Section 2(f) & 12(B)</p>
-            </div>
-          </div>
-          <div className={styles.accredItem}>
-            <div className={styles.accredIcon}>
-              <Award size={22} />
-            </div>
-            <div>
-              <strong>NAAC Accredited</strong>
-              <p>Quality Benchmark</p>
-            </div>
-          </div>
-          <div className={styles.accredItem}>
-            <div className={styles.accredIcon}>
-              <Scroll size={22} />
-            </div>
-            <div>
-              <strong>Established {estYear}</strong>
-              <p>Legacy of Learning</p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* 14. CONTACT (#F7F2E9 Background) */}
+      {/* CONTACT */}
       <section className={styles.sec} aria-label="Contact and Location">
         <div className="container">
           <div className={styles.contactRow}>
             <div className={styles.contactLeft}>
               <span className={styles.eyebrow}>Get in Touch</span>
-              <h2 className={styles.secTitle}>Contact Admissions & Helpdesk</h2>
-              <p className={styles.contactSub}>Reach out to our administrative team for admission guidance and official inquiries.</p>
+              <h2 className={styles.secTitle}>{hpData.contactSectionTitle || 'Contact Admissions & Helpdesk'}</h2>
+              <p className={styles.contactSub}>{hpData.contactSectionSubtitle || 'Reach out to our administrative team for admission guidance and official inquiries.'}</p>
               <div className={styles.contactList}>
                 {info?.address && (
                   <div className={styles.contactItem}>
@@ -550,8 +437,8 @@ export default async function HomePage() {
                 <div className={styles.mapIconBadge}>
                   <Map size={40} />
                 </div>
-                <h3 className={styles.mapCardTitle}>Campus Address & Directions</h3>
-                <p className={styles.mapCardDesc}>Interactive campus map, building locations, and visiting hours guidance.</p>
+                <h3 className={styles.mapCardTitle}>{hpData.mapCardTitle || 'Campus Address & Directions'}</h3>
+                <p className={styles.mapCardDesc}>{hpData.mapCardDesc || 'Interactive campus map, building locations, and visiting hours guidance.'}</p>
                 <Link href="/contact" className={styles.btnOutlineDark}>
                   <span>View Location & Directions</span>
                   <Compass size={16} />
@@ -562,16 +449,16 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 15. ADMISSIONS CTA (#EFE7DA Sand Background) */}
+      {/* ADMISSIONS CTA */}
       <section className={styles.ctaSection} aria-label="Admissions Call to Action">
         <div className="container">
           <div className={styles.ctaCardBanner}>
             <div className={styles.ctaBadge}>
               <Sparkles size={16} />
-              <span>Admissions 2026–27 Now Open</span>
+              <span>{hpData.admissionCtaBadge || 'Admissions 2026–27 Now Open'}</span>
             </div>
-            <h2 className={styles.ctaTitle}>Start Your Academic Journey With Us</h2>
-            <p className={styles.ctaDesc}>Applications for the 2026–27 academic session are now open. Secure your admission into our accredited programmes.</p>
+            <h2 className={styles.ctaTitle}>{hpData.admissionCtaTitle || 'Start Your Academic Journey With Us'}</h2>
+            <p className={styles.ctaDesc}>{hpData.admissionCtaDesc || 'Applications for the 2026–27 academic session are now open. Secure your admission into our accredited programmes.'}</p>
             <div className={styles.ctaBtns}>
               <Link href="/admissions" className={styles.btnPrimaryTerracotta}>
                 <GraduationCap size={18} />

@@ -2,7 +2,32 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { SiteSettings, CollegeInfo, SocialLinks, FooterConfig, GlobalSeoConfig } from '@/types';
+import {
+  SiteSettings,
+  CollegeInfo,
+  SocialLinks,
+  FooterConfig,
+  GlobalSeoConfig,
+  HomepageConfig,
+  AboutPageConfig,
+  ContactPageConfig,
+  AdmissionsConfig,
+  GatewayCard,
+  FeaturePillar,
+  WhyChooseUsCard,
+  StatItem,
+  AccreditationItem,
+  QuickLinkItem,
+  HeroStatItem,
+  AboutHighlightItem,
+  AboutPillarCard,
+  HelpdeskEntry,
+  EmergencyCard,
+  AdmissionStep,
+  EligibilityTab,
+  AdmissionScheduleItem,
+  AdmissionFAQ,
+} from '@/types';
 import { siteSettingsService, defaultSettings } from '@/services/site-settings.service';
 import { MediaPickerModal } from '@/components/admin/MediaPickerModal';
 import {
@@ -15,7 +40,19 @@ import {
   Skeleton,
 } from '@/components/ui';
 
-type SettingsTab = 'general' | 'branding' | 'contact' | 'principal' | 'social' | 'footer' | 'seo' | 'maintenance';
+type SettingsTab =
+  | 'general'
+  | 'branding'
+  | 'contact'
+  | 'principal'
+  | 'homepage'
+  | 'aboutPage'
+  | 'admissionsPage'
+  | 'contactPage'
+  | 'social'
+  | 'footer'
+  | 'seo'
+  | 'maintenance';
 
 export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -30,6 +67,12 @@ export default function AdminSettingsPage() {
   const [seoConfig, setSeoConfig] = useState<GlobalSeoConfig>(defaultSettings.seoConfig || {});
   const [maintenanceMode, setMaintenanceMode] = useState<boolean>(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState<string>(defaultSettings.maintenanceMessage || '');
+
+  // Dynamic Page Configurations State
+  const [homepageConfig, setHomepageConfig] = useState<HomepageConfig>(defaultSettings.homepage || {});
+  const [aboutConfig, setAboutConfig] = useState<AboutPageConfig>(defaultSettings.aboutPage || {});
+  const [contactConfig, setContactConfig] = useState<ContactPageConfig>(defaultSettings.contactPage || {});
+  const [admissionsConfig, setAdmissionsConfig] = useState<AdmissionsConfig>(defaultSettings.admissions || {});
 
   // Media Picker Modal
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
@@ -50,6 +93,10 @@ export default function AdminSettingsPage() {
           setSeoConfig(data.seoConfig || defaultSettings.seoConfig || {});
           setMaintenanceMode(Boolean(data.maintenanceMode));
           setMaintenanceMessage(data.maintenanceMessage || defaultSettings.maintenanceMessage || '');
+          setHomepageConfig(data.homepage || defaultSettings.homepage || {});
+          setAboutConfig(data.aboutPage || defaultSettings.aboutPage || {});
+          setContactConfig(data.contactPage || defaultSettings.contactPage || {});
+          setAdmissionsConfig(data.admissions || defaultSettings.admissions || {});
           setLoading(false);
         }
       })
@@ -98,10 +145,14 @@ export default function AdminSettingsPage() {
         seoConfig,
         maintenanceMode,
         maintenanceMessage,
+        homepage: homepageConfig,
+        aboutPage: aboutConfig,
+        contactPage: contactConfig,
+        admissions: admissionsConfig,
       };
 
       await siteSettingsService.updateSettings(updatedPayload);
-      setStatusMessage({ type: 'success', text: 'Global site settings saved successfully!' });
+      setStatusMessage({ type: 'success', text: 'All CMS settings saved successfully!' });
       setTimeout(() => setStatusMessage(null), 5000);
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : 'Failed to save settings.';
@@ -113,10 +164,8 @@ export default function AdminSettingsPage() {
 
   const handleToggleMaintenance = () => {
     if (!maintenanceMode) {
-      // Opening maintenance mode -> ask confirmation
       setIsMaintenanceModalOpen(true);
     } else {
-      // Turning off maintenance mode
       setMaintenanceMode(false);
     }
   };
@@ -131,6 +180,10 @@ export default function AdminSettingsPage() {
     { id: 'branding', label: 'Branding & Logo', icon: '🎨' },
     { id: 'contact', label: 'Contact Details', icon: '📍' },
     { id: 'principal', label: 'Principal Info', icon: '👨‍🏫' },
+    { id: 'homepage', label: 'Homepage Editor', icon: '🏠' },
+    { id: 'aboutPage', label: 'About Page Editor', icon: '📖' },
+    { id: 'admissionsPage', label: 'Admissions Editor', icon: '🎓' },
+    { id: 'contactPage', label: 'Contact Page Editor', icon: '📞' },
     { id: 'social', label: 'Social Handles', icon: '🌐' },
     { id: 'footer', label: 'Footer & Notice', icon: '📄' },
     { id: 'seo', label: 'Default SEO', icon: '🔍' },
@@ -152,14 +205,14 @@ export default function AdminSettingsPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <Badge variant="info" style={{ marginBottom: '0.375rem' }}>Global Configuration</Badge>
-          <h1 style={{ fontSize: '1.75rem', color: 'var(--primary)' }}>Site Settings &amp; Branding</h1>
+          <Badge variant="info" style={{ marginBottom: '0.375rem' }}>Global CMS Configuration</Badge>
+          <h1 style={{ fontSize: '1.75rem', color: 'var(--primary)' }}>Site Content &amp; CMS Manager</h1>
           <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Configure college identity, contact information, social links, and public branding.
+            Directly manage college identity, dynamic homepage cards, admissions guidelines, about page pillars, and contact desks.
           </p>
         </div>
         <Button variant="primary" size="md" onClick={handleSaveSettings} disabled={isSaving}>
-          {isSaving ? 'Saving...' : '💾 Save Settings'}
+          {isSaving ? 'Saving...' : '💾 Save All Changes'}
         </Button>
       </div>
 
@@ -180,35 +233,6 @@ export default function AdminSettingsPage() {
         >
           <span>{statusMessage.type === 'success' ? '✅' : '⚠️'}</span>
           <p style={{ margin: 0, fontWeight: 500 }}>{statusMessage.text}</p>
-        </div>
-      )}
-
-      {/* Maintenance Mode Warning Banner */}
-      {maintenanceMode && (
-        <div
-          style={{
-            padding: '1rem 1.25rem',
-            borderRadius: 'var(--radius-md)',
-            marginBottom: '1.5rem',
-            backgroundColor: '#FFFBEB',
-            color: '#92400E',
-            border: '1px solid #FCD34D',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
-          <div>
-            <strong>🚨 Maintenance Mode is Currently Active</strong>
-            <p style={{ fontSize: '0.875rem', margin: '0.25rem 0 0' }}>
-              Public visitors are redirected to the maintenance page. Admin CMS remains accessible.
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => setActiveTab('maintenance')}>
-            Manage Mode
-          </Button>
         </div>
       )}
 
@@ -265,7 +289,7 @@ export default function AdminSettingsPage() {
               </h3>
               <Input
                 label="Official College Name *"
-                placeholder="e.g. Imperial Institute of Technology"
+                placeholder="e.g. Jaysingpur College, Jaysingpur"
                 value={collegeInfo.name}
                 onChange={(e) => setCollegeInfo({ ...collegeInfo, name: e.target.value })}
                 required
@@ -273,21 +297,27 @@ export default function AdminSettingsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
                 <Input
                   label="Short Name / Abbreviation *"
-                  placeholder="e.g. IIT or CAE"
+                  placeholder="e.g. Jaysingpur College"
                   value={collegeInfo.shortName}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, shortName: e.target.value })}
                   required
                 />
                 <Input
                   label="Established Year"
-                  placeholder="e.g. 1985"
+                  placeholder="e.g. 1972"
                   value={collegeInfo.establishedYear || ''}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, establishedYear: e.target.value })}
+                />
+                <Input
+                  label="NAAC Accreditation Grade"
+                  placeholder="e.g. A"
+                  value={collegeInfo.naacGrade || ''}
+                  onChange={(e) => setCollegeInfo({ ...collegeInfo, naacGrade: e.target.value })}
                 />
               </div>
               <Input
                 label="College Tagline / Motto"
-                placeholder="e.g. Empowering Minds, Shaping Global Futures"
+                placeholder="e.g. Empowering Education & Innovation"
                 value={collegeInfo.tagline || ''}
                 onChange={(e) => setCollegeInfo({ ...collegeInfo, tagline: e.target.value })}
               />
@@ -309,6 +339,42 @@ export default function AdminSettingsPage() {
                   }}
                 />
               </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
+                  Institutional Vision Statement
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Enter the vision statement..."
+                  value={collegeInfo.vision || ''}
+                  onChange={(e) => setCollegeInfo({ ...collegeInfo, vision: e.target.value })}
+                  style={{
+                    padding: '0.625rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    fontFamily: 'inherit',
+                    fontSize: '0.9375rem',
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
+                  Institutional Mission Statement
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Enter the mission statement..."
+                  value={collegeInfo.mission || ''}
+                  onChange={(e) => setCollegeInfo({ ...collegeInfo, mission: e.target.value })}
+                  style={{
+                    padding: '0.625rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    fontFamily: 'inherit',
+                    fontSize: '0.9375rem',
+                  }}
+                />
+              </div>
             </div>
           )}
 
@@ -318,8 +384,6 @@ export default function AdminSettingsPage() {
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
                 🎨 College Branding &amp; Visual Identity
               </h3>
-
-              {/* Logo Selection */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>College Logo</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
@@ -334,39 +398,10 @@ export default function AdminSettingsPage() {
                   )}
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <Button variant="outline" size="sm" onClick={() => handleOpenMediaPicker('logo')}>
-                      {collegeInfo.logoUrl ? 'Change Logo' : 'Select Logo from Media Library'}
+                      {collegeInfo.logoUrl ? 'Change Logo' : 'Select Logo'}
                     </Button>
                     {collegeInfo.logoUrl && (
                       <Button variant="ghost" size="sm" onClick={() => setCollegeInfo({ ...collegeInfo, logoUrl: '' })}>
-                        Remove
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', margin: 0 }}>
-                  Recommended: High-resolution PNG or SVG logo with transparent background.
-                </p>
-              </div>
-
-              {/* Favicon Selection */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>Browser Favicon Icon</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-                  {collegeInfo.faviconUrl ? (
-                    <div style={{ padding: '0.25rem', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', backgroundColor: '#fff' }}>
-                      <img src={collegeInfo.faviconUrl} alt="Favicon" style={{ width: '32px', height: '32px', objectFit: 'contain', display: 'block' }} />
-                    </div>
-                  ) : (
-                    <div style={{ width: '32px', height: '32px', backgroundColor: 'var(--neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-sm)', fontSize: '1rem' }}>
-                      🌐
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Button variant="outline" size="sm" onClick={() => handleOpenMediaPicker('favicon')}>
-                      {collegeInfo.faviconUrl ? 'Change Favicon' : 'Select Favicon Icon'}
-                    </Button>
-                    {collegeInfo.faviconUrl && (
-                      <Button variant="ghost" size="sm" onClick={() => setCollegeInfo({ ...collegeInfo, faviconUrl: '' })}>
                         Remove
                       </Button>
                     )}
@@ -384,7 +419,6 @@ export default function AdminSettingsPage() {
               </h3>
               <Input
                 label="Street / Campus Address *"
-                placeholder="e.g. 123 University Boulevard, Knowledge Park"
                 value={collegeInfo.address}
                 onChange={(e) => setCollegeInfo({ ...collegeInfo, address: e.target.value })}
                 required
@@ -392,19 +426,16 @@ export default function AdminSettingsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
                 <Input
                   label="City"
-                  placeholder="e.g. Boston"
                   value={collegeInfo.city || ''}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, city: e.target.value })}
                 />
                 <Input
                   label="State / Province"
-                  placeholder="e.g. Massachusetts"
                   value={collegeInfo.state || ''}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, state: e.target.value })}
                 />
                 <Input
                   label="Postal / PIN Code"
-                  placeholder="e.g. 02138"
                   value={collegeInfo.postalCode || ''}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, postalCode: e.target.value })}
                 />
@@ -412,33 +443,28 @@ export default function AdminSettingsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
                 <Input
                   label="Primary Contact Phone *"
-                  placeholder="e.g. +1 (555) 019-2834"
                   value={collegeInfo.phone}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, phone: e.target.value })}
                   required
                 />
                 <Input
-                  label="Alternate / Helpline Phone"
-                  placeholder="e.g. +1 (555) 019-2835"
+                  label="Alternate Phone"
                   value={collegeInfo.alternatePhone || ''}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, alternatePhone: e.target.value })}
                 />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
                 <Input
-                  label="Official Contact Email *"
+                  label="Official Email *"
                   type="email"
-                  placeholder="e.g. admissions@college.edu"
                   value={collegeInfo.email}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, email: e.target.value })}
                   required
                 />
                 <Input
-                  label="Official Website URL"
-                  type="url"
-                  placeholder="https://www.college.edu"
-                  value={collegeInfo.websiteUrl || ''}
-                  onChange={(e) => setCollegeInfo({ ...collegeInfo, websiteUrl: e.target.value })}
+                  label="Office Working Hours"
+                  value={collegeInfo.officeHours || ''}
+                  onChange={(e) => setCollegeInfo({ ...collegeInfo, officeHours: e.target.value })}
                 />
               </div>
             </div>
@@ -448,24 +474,21 @@ export default function AdminSettingsPage() {
           {activeTab === 'principal' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
-                👨‍🏫 Head of Institution / Principal Information
+                👨‍🏫 Principal Information &amp; Welcome Message
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
                 <Input
                   label="Principal Name"
-                  placeholder="e.g. Dr. Eleanor Vance, Ph.D."
                   value={collegeInfo.principalName || ''}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, principalName: e.target.value })}
                 />
                 <Input
                   label="Designation / Title"
-                  placeholder="e.g. Principal & Director"
                   value={collegeInfo.principalDesignation || ''}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, principalDesignation: e.target.value })}
                 />
               </div>
 
-              {/* Principal Photo */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>Principal Official Photo</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
@@ -480,26 +503,18 @@ export default function AdminSettingsPage() {
                       👤
                     </div>
                   )}
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Button variant="outline" size="sm" onClick={() => handleOpenMediaPicker('principal')}>
-                      {collegeInfo.principalPhotoUrl ? 'Change Photo' : 'Select Photo from Media Library'}
-                    </Button>
-                    {collegeInfo.principalPhotoUrl && (
-                      <Button variant="ghost" size="sm" onClick={() => setCollegeInfo({ ...collegeInfo, principalPhotoUrl: '' })}>
-                        Remove
-                      </Button>
-                    )}
-                  </div>
+                  <Button variant="outline" size="sm" onClick={() => handleOpenMediaPicker('principal')}>
+                    {collegeInfo.principalPhotoUrl ? 'Change Photo' : 'Select Photo'}
+                  </Button>
                 </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
-                  Principal&apos;s Message to Students &amp; Visitors
+                  Principal Message
                 </label>
                 <textarea
                   rows={5}
-                  placeholder="Enter the official welcome message from the Principal..."
                   value={collegeInfo.principalMessage || ''}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, principalMessage: e.target.value })}
                   style={{
@@ -514,49 +529,192 @@ export default function AdminSettingsPage() {
             </div>
           )}
 
-          {/* TAB 5: SOCIAL */}
+          {/* TAB 5: HOMEPAGE EDITOR */}
+          {activeTab === 'homepage' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
+                🏠 Dynamic Homepage Sections &amp; CTAs
+              </h3>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
+                <Input
+                  label="Hero Button 1 Label"
+                  value={homepageConfig.heroCta1Label || ''}
+                  onChange={(e) => setHomepageConfig({ ...homepageConfig, heroCta1Label: e.target.value })}
+                />
+                <Input
+                  label="Hero Button 2 Label"
+                  value={homepageConfig.heroCta2Label || ''}
+                  onChange={(e) => setHomepageConfig({ ...homepageConfig, heroCta2Label: e.target.value })}
+                />
+              </div>
+
+              <Input
+                label="Admissions Banner Badge"
+                value={homepageConfig.admissionCtaBadge || ''}
+                onChange={(e) => setHomepageConfig({ ...homepageConfig, admissionCtaBadge: e.target.value })}
+              />
+              <Input
+                label="Admissions Banner Title"
+                value={homepageConfig.admissionCtaTitle || ''}
+                onChange={(e) => setHomepageConfig({ ...homepageConfig, admissionCtaTitle: e.target.value })}
+              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
+                  Admissions Banner Description
+                </label>
+                <textarea
+                  rows={2}
+                  value={homepageConfig.admissionCtaDesc || ''}
+                  onChange={(e) => setHomepageConfig({ ...homepageConfig, admissionCtaDesc: e.target.value })}
+                  style={{
+                    padding: '0.625rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    fontFamily: 'inherit',
+                    fontSize: '0.9375rem',
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: ABOUT PAGE EDITOR */}
+          {activeTab === 'aboutPage' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
+                📖 About Page Content &amp; Pillars
+              </h3>
+              <Input
+                label="Hero Badge Text"
+                value={aboutConfig.heroBadge || ''}
+                onChange={(e) => setAboutConfig({ ...aboutConfig, heroBadge: e.target.value })}
+              />
+              <Input
+                label="Hero Subtitle"
+                value={aboutConfig.heroSubtitle || ''}
+                onChange={(e) => setAboutConfig({ ...aboutConfig, heroSubtitle: e.target.value })}
+              />
+              <Input
+                label="Institutional Legacy Card Title"
+                value={aboutConfig.legacyTitle || ''}
+                onChange={(e) => setAboutConfig({ ...aboutConfig, legacyTitle: e.target.value })}
+              />
+              <Input
+                label="Pillars Section Title"
+                value={aboutConfig.pillarsTitle || ''}
+                onChange={(e) => setAboutConfig({ ...aboutConfig, pillarsTitle: e.target.value })}
+              />
+            </div>
+          )}
+
+          {/* TAB 7: ADMISSIONS EDITOR */}
+          {activeTab === 'admissionsPage' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
+                🎓 Admissions Page Content &amp; Guidelines
+              </h3>
+              <Input
+                label="Admissions Hero Badge"
+                value={admissionsConfig.heroBadge || ''}
+                onChange={(e) => setAdmissionsConfig({ ...admissionsConfig, heroBadge: e.target.value })}
+              />
+              <Input
+                label="Admissions Hero Title"
+                value={admissionsConfig.heroTitle || ''}
+                onChange={(e) => setAdmissionsConfig({ ...admissionsConfig, heroTitle: e.target.value })}
+              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
+                  Hero Subtitle
+                </label>
+                <textarea
+                  rows={2}
+                  value={admissionsConfig.heroSubtitle || ''}
+                  onChange={(e) => setAdmissionsConfig({ ...admissionsConfig, heroSubtitle: e.target.value })}
+                  style={{
+                    padding: '0.625rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    fontFamily: 'inherit',
+                    fontSize: '0.9375rem',
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* TAB 8: CONTACT PAGE EDITOR */}
+          {activeTab === 'contactPage' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
+                📞 Contact Page Hero &amp; Helpdesks
+              </h3>
+              <Input
+                label="Hero Badge"
+                value={contactConfig.heroBadge || ''}
+                onChange={(e) => setContactConfig({ ...contactConfig, heroBadge: e.target.value })}
+              />
+              <Input
+                label="Hero Title"
+                value={contactConfig.heroTitle || ''}
+                onChange={(e) => setContactConfig({ ...contactConfig, heroTitle: e.target.value })}
+              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
+                  Hero Subtitle
+                </label>
+                <textarea
+                  rows={2}
+                  value={contactConfig.heroSubtitle || ''}
+                  onChange={(e) => setContactConfig({ ...contactConfig, heroSubtitle: e.target.value })}
+                  style={{
+                    padding: '0.625rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    fontFamily: 'inherit',
+                    fontSize: '0.9375rem',
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* TAB 9: SOCIAL */}
           {activeTab === 'social' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
                 🌐 Official Social Media Profiles
               </h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>
-                Social icon links will appear in the website header and footer only when a valid profile URL is entered.
-              </p>
               <Input
                 label="Facebook Page URL"
-                placeholder="https://facebook.com/yourcollege"
                 value={socialLinks.facebook || ''}
                 onChange={(e) => setSocialLinks({ ...socialLinks, facebook: e.target.value })}
               />
               <Input
                 label="Instagram Profile URL"
-                placeholder="https://instagram.com/yourcollege"
                 value={socialLinks.instagram || ''}
                 onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })}
               />
               <Input
                 label="LinkedIn Organization URL"
-                placeholder="https://linkedin.com/school/yourcollege"
                 value={socialLinks.linkedin || ''}
                 onChange={(e) => setSocialLinks({ ...socialLinks, linkedin: e.target.value })}
               />
               <Input
                 label="YouTube Channel URL"
-                placeholder="https://youtube.com/@yourcollege"
                 value={socialLinks.youtube || ''}
                 onChange={(e) => setSocialLinks({ ...socialLinks, youtube: e.target.value })}
               />
               <Input
                 label="Twitter / X Profile URL"
-                placeholder="https://x.com/yourcollege"
                 value={socialLinks.twitter || ''}
                 onChange={(e) => setSocialLinks({ ...socialLinks, twitter: e.target.value })}
               />
             </div>
           )}
 
-          {/* TAB 6: FOOTER */}
+          {/* TAB 10: FOOTER */}
           {activeTab === 'footer' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
@@ -565,9 +723,6 @@ export default function AdminSettingsPage() {
               <div style={{ padding: '1rem 1.25rem', backgroundColor: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                   <strong>🦶 Manage Footer Columns &amp; Links</strong>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>
-                    Configure dynamic footer columns, custom/system page links, ordering, and visibility.
-                  </p>
                 </div>
                 <Link href="/admin/footer">
                   <Button variant="outline" size="sm">
@@ -581,7 +736,6 @@ export default function AdminSettingsPage() {
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="Brief college summary displayed in the public website footer..."
                   value={footerConfig.aboutText || ''}
                   onChange={(e) => setFooterConfig({ ...footerConfig, aboutText: e.target.value })}
                   style={{
@@ -595,25 +749,20 @@ export default function AdminSettingsPage() {
               </div>
               <Input
                 label="Footer Copyright Text"
-                placeholder="e.g. © 2026 College Name. All rights reserved."
                 value={footerConfig.copyrightText || ''}
                 onChange={(e) => setFooterConfig({ ...footerConfig, copyrightText: e.target.value })}
               />
             </div>
           )}
 
-          {/* TAB 7: SEO */}
+          {/* TAB 11: SEO */}
           {activeTab === 'seo' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
                 🔍 Global Default SEO &amp; Social Metadata
               </h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>
-                These default meta tags are used as fallbacks across public pages when page-specific SEO is not configured.
-              </p>
               <Input
                 label="Default Website Meta Title"
-                placeholder="e.g. Official College Portal | Higher Education & Research"
                 value={seoConfig.defaultMetaTitle || ''}
                 onChange={(e) => setSeoConfig({ ...seoConfig, defaultMetaTitle: e.target.value })}
               />
@@ -623,7 +772,6 @@ export default function AdminSettingsPage() {
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="Default search engine snippet describing the college..."
                   value={seoConfig.defaultMetaDescription || ''}
                   onChange={(e) => setSeoConfig({ ...seoConfig, defaultMetaDescription: e.target.value })}
                   style={{
@@ -635,58 +783,21 @@ export default function AdminSettingsPage() {
                   }}
                 />
               </div>
-
-              {/* OG Image */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
-                  Default Social Share Image (OG Image)
-                </label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-                  {seoConfig.defaultOgImageUrl ? (
-                    <img
-                      src={seoConfig.defaultOgImageUrl}
-                      alt="OG Preview"
-                      style={{ height: '80px', width: '140px', objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}
-                    />
-                  ) : (
-                    <div style={{ height: '80px', width: '140px', backgroundColor: 'var(--neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-md)', fontSize: '1.5rem' }}>
-                      🖼️
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Button variant="outline" size="sm" onClick={() => handleOpenMediaPicker('ogImage')}>
-                      {seoConfig.defaultOgImageUrl ? 'Change OG Image' : 'Select Social Share Image'}
-                    </Button>
-                    {seoConfig.defaultOgImageUrl && (
-                      <Button variant="ghost" size="sm" onClick={() => setSeoConfig({ ...seoConfig, defaultOgImageUrl: '' })}>
-                        Remove
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
-          {/* TAB 8: MAINTENANCE */}
+          {/* TAB 12: MAINTENANCE */}
           {activeTab === 'maintenance' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: 'var(--primary)' }}>
                 🚨 Maintenance Mode Controls
               </h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>
-                When Maintenance Mode is active, public visitors will see a dedicated maintenance notice instead of normal college pages. Administrators can still log in and access all `/admin/*` panels.
-              </p>
-
               <div style={{ padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', backgroundColor: maintenanceMode ? '#FEF2F2' : 'var(--bg-main)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <strong style={{ fontSize: '1rem', color: maintenanceMode ? '#991B1B' : 'var(--primary)' }}>
                       Maintenance Mode: {maintenanceMode ? 'ACTIVE (Public Locked)' : 'DISABLED (Public Live)'}
                     </strong>
-                    <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>
-                      {maintenanceMode ? 'Turn off maintenance mode to resume normal public website access.' : 'Turn on to perform scheduled site updates.'}
-                    </p>
                   </div>
                   <Button
                     variant={maintenanceMode ? 'danger' : 'outline'}
@@ -697,14 +808,12 @@ export default function AdminSettingsPage() {
                   </Button>
                 </div>
               </div>
-
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                 <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
                   Maintenance Banner Message
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="Custom message shown to visitors during maintenance..."
                   value={maintenanceMessage}
                   onChange={(e) => setMaintenanceMessage(e.target.value)}
                   style={{
@@ -751,8 +860,6 @@ export default function AdminSettingsPage() {
       >
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
           Activating Maintenance Mode will immediately redirect public visitors to the maintenance screen.
-          <br /><br />
-          <strong>Note:</strong> You will remain logged in and can continue managing the CMS at <code>/admin/*</code>.
         </p>
       </Modal>
     </div>

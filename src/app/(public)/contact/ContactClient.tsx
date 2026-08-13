@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import {
   Sparkles,
   MapPin,
@@ -10,48 +9,42 @@ import {
   Clock,
   Compass,
   Building2,
-  ShieldCheck,
-  Award,
   Globe,
   Share2,
   ExternalLink,
   ArrowRight,
-  HelpCircle,
-  AlertTriangle,
-  HeartHandshake,
 } from 'lucide-react';
+import { resolveIcon } from '@/lib/icon-resolver';
 import { ContactForm } from '@/components/public/ContactForm';
 import { InteractiveDotGrid } from '@/components/common/InteractiveDotGrid';
+import { ContactPageConfigData } from '@/types/enterprise-cms';
+import { CollegeInfo } from '@/types';
 import styles from '../inner.module.css';
 import homeStyles from '../home.module.css';
 
 interface ContactClientProps {
-  collegeInfo: {
-    name?: string;
-    address?: string;
-    city?: string;
-    state?: string;
-    postalCode?: string;
-    phone?: string;
-    alternatePhone?: string;
-    email?: string;
-    websiteUrl?: string;
-  };
+  collegeInfo: Partial<CollegeInfo>;
   socialLinks: Record<string, any>;
+  contactData: ContactPageConfigData;
 }
 
-export function ContactClient({ collegeInfo, socialLinks }: ContactClientProps) {
+export function ContactClient({ collegeInfo, socialLinks, contactData }: ContactClientProps) {
   const addressString = [
-    collegeInfo.address || 'Campus Address, University District pune',
-    collegeInfo.city || 'Pune',
-    collegeInfo.state || 'MH',
+    collegeInfo.address || contactData.info.campusAddress,
+    collegeInfo.city,
+    collegeInfo.state,
     collegeInfo.postalCode,
   ]
     .filter(Boolean)
     .join(', ');
 
-  const phoneDisplay = collegeInfo.phone || '+91 8669301878';
-  const emailDisplay = collegeInfo.email || 'sagarulagadde1008@gmail.com';
+  const phoneDisplay = collegeInfo.phone || contactData.info.helplinePhone;
+  const emailDisplay = collegeInfo.email || contactData.info.officialEmail;
+  const officeHours = collegeInfo.officeHours || contactData.info.officeHours;
+  const officeHoursClosed = collegeInfo.officeHoursClosed || contactData.info.officeHoursClosed;
+
+  const helpdesks = contactData.helpdesks || [];
+  const emergencyCards = contactData.emergencyCards || [];
 
   return (
     <div className={styles.pageContainer}>
@@ -63,17 +56,15 @@ export function ContactClient({ collegeInfo, socialLinks }: ContactClientProps) 
             <div className={styles.innerHeroGlassCard}>
               <div className={styles.heroBadge}>
                 <Sparkles size={16} />
-                <span>Admissions & Helpdesk Office</span>
+                <span>{contactData.hero.badgeText}</span>
               </div>
-              <h1 className={styles.heroTitle}>Contact Us & Campus Location</h1>
-              <p className={styles.heroSubtitle}>
-                Reach out to our administrative team, academic departments, or campus helpdesk. We are here to assist your educational journey.
-              </p>
+              <h1 className={styles.heroTitle}>{contactData.hero.title}</h1>
+              <p className={styles.heroSubtitle}>{contactData.hero.subtitle}</p>
               <div className={styles.heroStatsRow}>
                 <div className={styles.heroStatItem}>
                   <MapPin size={20} className={styles.statIcon} />
                   <div>
-                    <strong>Pune, Maharashtra</strong>
+                    <strong>{collegeInfo.city ? `${collegeInfo.city}, ${collegeInfo.state || ''}` : 'Campus Location'}</strong>
                     <span>Main Campus Location</span>
                   </div>
                 </div>
@@ -168,28 +159,24 @@ export function ContactClient({ collegeInfo, socialLinks }: ContactClientProps) 
                   </div>
                   <div>
                     <span className={styles.detailLabel}>Office Working Hours</span>
-                    <strong className={styles.detailValue}>Monday – Saturday: 9:00 AM – 5:00 PM</strong>
-                    <span className={styles.detailSub}>Closed on Sundays and Official Public Holidays</span>
+                    <strong className={styles.detailValue}>{officeHours}</strong>
+                    <span className={styles.detailSub}>{officeHoursClosed}</span>
                   </div>
                 </div>
               </div>
 
               {/* DEPARTMENTAL DIRECTORY DIRECT CONTACTS */}
-              <div className={styles.deptDirectoryBox}>
-                <h3>Departmental Helpdesks</h3>
-                <div className={styles.deptRow}>
-                  <span>Admissions & Counseling:</span>
-                  <a href={`mailto:${emailDisplay}`}>admissions@college.edu</a>
+              {helpdesks.length > 0 && (
+                <div className={styles.deptDirectoryBox}>
+                  <h3>Departmental Helpdesks</h3>
+                  {helpdesks.map((hd, idx) => (
+                    <div key={idx} className={styles.deptRow}>
+                      <span>{hd.label}</span>
+                      <a href={`mailto:${hd.email}`}>{hd.email}</a>
+                    </div>
+                  ))}
                 </div>
-                <div className={styles.deptRow}>
-                  <span>Examinations & Results:</span>
-                  <a href={`mailto:${emailDisplay}`}>exams@college.edu</a>
-                </div>
-                <div className={styles.deptRow}>
-                  <span>Placement & Career Cell:</span>
-                  <a href={`mailto:${emailDisplay}`}>placement@college.edu</a>
-                </div>
-              </div>
+              )}
 
               {/* SOCIAL LINKS */}
               {Object.values(socialLinks).some(Boolean) && (
@@ -212,7 +199,7 @@ export function ContactClient({ collegeInfo, socialLinks }: ContactClientProps) 
                       </a>
                     )}
                     {socialLinks.youtube && (
-                      <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" title="YouTube">
+                      <a href={socialLinks.youtube} target="_blank" rel="noreferrer" title="YouTube">
                         <Globe size={18} />
                       </a>
                     )}
@@ -275,38 +262,24 @@ export function ContactClient({ collegeInfo, socialLinks }: ContactClientProps) 
       </section>
 
       {/* 4. EMERGENCY & STUDENT HELPLINE STRIP */}
-      <section className={styles.emergencySection}>
-        <div className="container">
-          <div className={styles.emergencyGrid}>
-            <div className={styles.emergencyCard}>
-              <div className={styles.emergencyIcon}>
-                <ShieldCheck size={22} />
-              </div>
-              <h3>Anti-Ragging Helpline</h3>
-              <p>24/7 National Anti-Ragging Cell helpline for zero-tolerance campus safety.</p>
-              <strong>Toll-Free: 1800-180-5522</strong>
-            </div>
-
-            <div className={styles.emergencyCard}>
-              <div className={styles.emergencyIcon}>
-                <HeartHandshake size={22} />
-              </div>
-              <h3>Women Empowerment Cell</h3>
-              <p>Dedicated grievance redressal cell for female students and staff.</p>
-              <strong>Desk Email: women@college.edu</strong>
-            </div>
-
-            <div className={styles.emergencyCard}>
-              <div className={styles.emergencyIcon}>
-                <HelpCircle size={22} />
-              </div>
-              <h3>Student Grievance Officer</h3>
-              <p>Direct assistance for academic evaluation & administrative queries.</p>
-              <strong>Desk: Admin Block Room 104</strong>
+      {emergencyCards.length > 0 && (
+        <section className={styles.emergencySection}>
+          <div className="container">
+            <div className={styles.emergencyGrid}>
+              {emergencyCards.map((card, idx) => (
+                <div key={idx} className={styles.emergencyCard}>
+                  <div className={styles.emergencyIcon}>
+                    {resolveIcon(card.iconKey, 22)}
+                  </div>
+                  <h3>{card.title}</h3>
+                  <p>{card.description}</p>
+                  <strong>{card.contactInfo}</strong>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

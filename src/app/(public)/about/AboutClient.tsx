@@ -4,54 +4,38 @@ import React from 'react';
 import Link from 'next/link';
 import {
   Sparkles,
-  Award,
-  GraduationCap,
-  Microscope,
-  Building2,
   CheckCircle2,
-  Target,
-  Compass,
   UserCheck,
   Quote,
-  ShieldCheck,
-  Users,
-  BookOpen,
   ArrowRight,
-  Landmark,
+  GraduationCap,
+  Compass,
+  Building2,
+  Target,
 } from 'lucide-react';
+import { resolveIcon } from '@/lib/icon-resolver';
+import { AboutPageConfigData } from '@/types/enterprise-cms';
+import { CollegeInfo } from '@/types';
 import { InteractiveDotGrid } from '@/components/common/InteractiveDotGrid';
 import styles from '../inner.module.css';
 import homeStyles from '../home.module.css';
 
 interface AboutClientProps {
-  collegeInfo: {
-    name?: string;
-    establishedYear?: string | number;
-    address?: string;
-    city?: string;
-    state?: string;
-    postalCode?: string;
-    description?: string;
-    principalName?: string;
-    principalDesignation?: string;
-    principalPhotoUrl?: string;
-    principalMessage?: string;
-    logoUrl?: string;
-  };
+  collegeInfo: Partial<CollegeInfo>;
+  aboutData: AboutPageConfigData;
 }
 
-export function AboutClient({ collegeInfo }: AboutClientProps) {
+export function AboutClient({ collegeInfo, aboutData }: AboutClientProps) {
   const collegeName = collegeInfo.name || 'Jaysingpur College';
   const estYear = collegeInfo.establishedYear || '1972';
-  const fullAddress = [collegeInfo.address || 'Campus Address, University District pune', collegeInfo.city || 'Pune', collegeInfo.state || 'MH']
-    .filter(Boolean)
-    .join(', ');
 
-  const principalName = collegeInfo.principalName || 'Dr. Sagar Ulagadde';
-  const principalRole = collegeInfo.principalDesignation || 'Principal & Administrative Officer';
-  const principalMessage =
-    collegeInfo.principalMessage ||
-    'Welcome to our esteemed institution. We are committed to fostering academic rigor, ethical values, and research innovation to empower our students for a globally connected world.';
+  const principalName = collegeInfo.principalName || aboutData.principalDesk.name;
+  const principalRole = collegeInfo.principalDesignation || aboutData.principalDesk.designation;
+  const principalPhoto = collegeInfo.principalPhotoUrl || aboutData.principalDesk.photoUrl;
+  const principalMessage = collegeInfo.principalMessage || aboutData.principalDesk.message;
+
+  const vision = collegeInfo.vision || aboutData.visionMission.vision;
+  const mission = collegeInfo.mission || aboutData.visionMission.mission;
 
   return (
     <div className={styles.pageContainer}>
@@ -63,34 +47,20 @@ export function AboutClient({ collegeInfo }: AboutClientProps) {
             <div className={styles.innerHeroGlassCard}>
               <div className={styles.heroBadge}>
                 <Sparkles size={16} />
-                <span>Established Institution of Academic Excellence</span>
+                <span>{aboutData.hero.badgeText}</span>
               </div>
-              <h1 className={styles.heroTitle}>About {collegeName}</h1>
-              <p className={styles.heroSubtitle}>
-                Established in {estYear}, our institution stands as a beacon of academic distinction, research innovation, and holistic student empowerment.
-              </p>
+              <h1 className={styles.heroTitle}>{aboutData.hero.title}</h1>
+              <p className={styles.heroSubtitle}>{aboutData.hero.subtitle}</p>
               <div className={styles.heroStatsRow}>
-                <div className={styles.heroStatItem}>
-                  <Award size={20} className={styles.statIcon} />
-                  <div>
-                    <strong>NAAC Accredited</strong>
-                    <span>UGC 2(f) & 12(B) Recognized</span>
+                {aboutData.heroStats.map((stat, idx) => (
+                  <div key={idx} className={styles.heroStatItem}>
+                    {resolveIcon(stat.iconKey, 20, 1.8, styles.statIcon)}
+                    <div>
+                      <strong>{stat.label}</strong>
+                      {stat.sublabel && <span>{stat.sublabel}</span>}
+                    </div>
                   </div>
-                </div>
-                <div className={styles.heroStatItem}>
-                  <GraduationCap size={20} className={styles.statIcon} />
-                  <div>
-                    <strong>50,000+ Alumni</strong>
-                    <span>Global Professional Network</span>
-                  </div>
-                </div>
-                <div className={styles.heroStatItem}>
-                  <Landmark size={20} className={styles.statIcon} />
-                  <div>
-                    <strong>Est. {estYear}</strong>
-                    <span>50+ Years of Legacy</span>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -105,25 +75,18 @@ export function AboutClient({ collegeInfo }: AboutClientProps) {
             <div className={styles.docBox} style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <div className={styles.boxHeader}>
                 <Building2 size={24} className={styles.boxIcon} />
-                <h3>Institutional Legacy & Heritage</h3>
+                <h3>{aboutData.legacyOverview.title}</h3>
               </div>
               <p className={styles.boxDesc} style={{ fontSize: '0.96875rem', lineHeight: 1.7, color: '#24221F', fontWeight: 500 }}>
-                {collegeInfo.description ||
-                  `${collegeName} is a premier higher education institution dedicated to empowering students through multi-disciplinary academic programmes in Science, Technology, Commerce, and Humanities.`}
+                {collegeInfo.description || aboutData.legacyOverview.description}
               </p>
               <ul className={styles.checklist} style={{ marginTop: 'auto', paddingTop: '20px' }}>
-                <li>
-                  <CheckCircle2 size={16} className={styles.checkIcon} />
-                  <span>Affiliated to State Public University with UGC Accreditation.</span>
-                </li>
-                <li>
-                  <CheckCircle2 size={16} className={styles.checkIcon} />
-                  <span>State-of-the-art computing laboratories and digital library archives.</span>
-                </li>
-                <li>
-                  <CheckCircle2 size={16} className={styles.checkIcon} />
-                  <span>Proactive Industry Internship & Campus Placement Division.</span>
-                </li>
+                {aboutData.legacyOverview.highlights.map((item, idx) => (
+                  <li key={idx}>
+                    <CheckCircle2 size={16} className={styles.checkIcon} />
+                    <span>{item}</span>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -137,14 +100,14 @@ export function AboutClient({ collegeInfo }: AboutClientProps) {
               <div style={{ marginBottom: '24px' }}>
                 <span className={styles.detailLabel} style={{ color: 'var(--color-accent)' }}>OUR VISION</span>
                 <p style={{ fontSize: '0.9375rem', color: '#68705A', lineHeight: 1.65, marginTop: '4px' }}>
-                  To be a center of academic distinction, nurturing scientific inquiry, technological innovation, research excellence, and ethical leadership in every discipline.
+                  {vision}
                 </p>
               </div>
 
               <div style={{ marginTop: 'auto' }}>
                 <span className={styles.detailLabel} style={{ color: 'var(--color-accent)' }}>OUR MISSION</span>
                 <p style={{ fontSize: '0.9375rem', color: '#68705A', lineHeight: 1.65, marginTop: '4px' }}>
-                  Providing accessible, high-quality higher education tailored to modern societal demands, fostering critical thinking, character building, and career preparedness.
+                  {mission}
                 </p>
               </div>
             </div>
@@ -166,8 +129,8 @@ export function AboutClient({ collegeInfo }: AboutClientProps) {
 
             <div style={{ display: 'flex', gap: '28px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
               <div className={styles.hodAvatar} style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#F4EBE6', color: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {collegeInfo.principalPhotoUrl ? (
-                  <img src={collegeInfo.principalPhotoUrl} alt={principalName} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                {principalPhoto ? (
+                  <img src={principalPhoto} alt={principalName} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                 ) : (
                   <UserCheck size={36} />
                 )}
@@ -194,41 +157,19 @@ export function AboutClient({ collegeInfo }: AboutClientProps) {
         <div className="container">
           <div className={styles.sectionHeaderCenter}>
             <span className={styles.eyebrow}>Institutional Core</span>
-            <h2 className={styles.sectionTitle}>Pillars of Academic Distinction</h2>
+            <h2 className={styles.sectionTitle}>{aboutData.pillarsTitle}</h2>
           </div>
 
           <div className={styles.highlightsGrid}>
-            <div className={styles.highlightCard}>
-              <div className={styles.highlightIcon}>
-                <BookOpen size={24} />
+            {aboutData.pillars.map((pillar, idx) => (
+              <div key={idx} className={styles.highlightCard}>
+                <div className={styles.highlightIcon}>
+                  {resolveIcon(pillar.iconKey, 24)}
+                </div>
+                <h3>{pillar.title}</h3>
+                <p>{pillar.description}</p>
               </div>
-              <h3>NEP Aligned Syllabus</h3>
-              <p>Choice-based credit systems and outcome-based curriculum designed for modern careers.</p>
-            </div>
-
-            <div className={styles.highlightCard}>
-              <div className={styles.highlightIcon}>
-                <Microscope size={24} />
-              </div>
-              <h3>Research & Innovation</h3>
-              <p>Dedicated research labs, funded faculty projects, and national symposium publications.</p>
-            </div>
-
-            <div className={styles.highlightCard}>
-              <div className={styles.highlightIcon}>
-                <ShieldCheck size={24} />
-              </div>
-              <h3>Inclusive & Safe Campus</h3>
-              <p>Zero-tolerance anti-ragging policy, women empowerment cell, and student counseling.</p>
-            </div>
-
-            <div className={styles.highlightCard}>
-              <div className={styles.highlightIcon}>
-                <Users size={24} />
-              </div>
-              <h3>Global Alumni Network</h3>
-              <p>Active mentorship and campus recruitment by leading industrial and technology recruiters.</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -241,8 +182,8 @@ export function AboutClient({ collegeInfo }: AboutClientProps) {
               <Sparkles size={16} />
               <span>Start Your Journey</span>
             </div>
-            <h2>Become Part of Our Academic Heritage</h2>
-            <p>Applications for the 2026–27 academic session are now open across all departments.</p>
+            <h2>{aboutData.ctaBannerTitle}</h2>
+            <p>{aboutData.ctaBannerDesc}</p>
             <div className={styles.ctaBtns}>
               <Link href="/admissions" className={homeStyles.btnPrimaryTerracotta}>
                 <GraduationCap size={18} />

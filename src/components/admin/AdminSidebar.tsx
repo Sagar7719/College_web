@@ -20,6 +20,10 @@ const adminNavGroups: NavGroup[] = [
     label: 'Website Builder',
     items: [
       { label: 'Pages (CMS Pages)', href: '/admin/pages', icon: '📄' },
+      { label: 'Homepage Editor', href: '/admin/homepage', icon: '🏠' },
+      { label: 'About Page Editor', href: '/admin/about-page', icon: '📖' },
+      { label: 'Admissions Editor', href: '/admin/admissions-config', icon: '🎓' },
+      { label: 'Contact Page Editor', href: '/admin/contact-page', icon: '📞' },
       { label: 'Navigation Menu', href: '/admin/navigation', icon: '🧭' },
       { label: 'Footer Links', href: '/admin/footer', icon: '🦶' },
       { label: 'SEO Settings', href: '/admin/seo', icon: '🔎' },
