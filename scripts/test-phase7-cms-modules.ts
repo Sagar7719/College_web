@@ -3,7 +3,6 @@ import {
   Course,
   Faculty,
   Notice,
-  Announcement,
   NewsItem,
   EventItem,
 } from '../src/types';
@@ -91,16 +90,7 @@ async function runPhase7ModulesE2ETest() {
     };
     log(`✓ Notice Posted: "${notice.title}" Category: ${notice.category} Urgent: ${notice.isUrgent}`);
 
-    // 28-32: ANNOUNCEMENTS MODULE
-    log('Steps 28-32: Testing Announcements Marquee Ticker CMS Workflow');
-    const anc: Announcement = {
-      id: 'anc_admissions_open',
-      text: 'Admissions Open 2026-2027. Apply online now!',
-      linkUrl: '/admissions',
-      active: true,
-      createdAt: new Date().toISOString(),
-    };
-    log(`✓ Announcement Ticker Created: "${anc.text}" Active: ${anc.active}`);
+
 
     // 33-38: NEWS MODULE
     log('Steps 33-38: Testing News & Press Releases CMS Workflow');

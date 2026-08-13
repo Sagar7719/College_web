@@ -2,7 +2,6 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { pagesService } from '@/services/pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
-import { PageSectionRenderer } from '@/components/page-builder';
 import { AboutClient } from './AboutClient';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -40,11 +39,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const cmsPage = await pagesService.getPageBySlug('about');
-  if (cmsPage && cmsPage.status === 'published' && cmsPage.sections?.length > 0) {
-    return <PageSectionRenderer sections={cmsPage.sections} />;
-  }
-
   const settings = await siteSettingsService.getSettings();
   const collegeInfo = settings.collegeInfo || {};
 

@@ -116,89 +116,171 @@
    ════════════════════════════════════════════════════════════ */
 .heroFullBleed {
   position: relative;
-  min-height: 660px;
+  min-height: 100vh;
   width: 100%;
   display: flex;
   align-items: center;
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  justify-content: center;
+  background-color: #080504;
+  background-image: radial-gradient(circle at 50% 50%, #1c110b 0%, #080504 100%);
   overflow: hidden;
-  padding: 140px 0 150px;
+  padding: 240px 0 140px;
 }
 
 .heroFullOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(20, 18, 15, 0.94) 0%,
-    rgba(20, 18, 15, 0.85) 45%,
-    rgba(20, 18, 15, 0.3) 80%,
-    rgba(20, 18, 15, 0.05) 100%
-  );
+  background-image: 
+    linear-gradient(rgba(222, 212, 197, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(222, 212, 197, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: center;
   z-index: 1;
+  pointer-events: none;
 }
 
-.heroFullContentGrid {
+/* Ambient Pulsing RGB Glow Blobs in the Background (Larger for Centered Layout) */
+.glowBlob1,
+.glowBlob2,
+.glowBlob3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(140px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.glowBlob1 {
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(184, 92, 58, 0.18) 0%, rgba(184, 92, 58, 0) 70%);
+  top: -10%;
+  left: 15%;
+  animation: floatBlob1 25s ease-in-out infinite alternate;
+}
+
+.glowBlob2 {
+  width: 750px;
+  height: 750px;
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.15) 0%, rgba(234, 179, 8, 0) 70%);
+  bottom: -20%;
+  right: 18%;
+  animation: floatBlob2 30s ease-in-out infinite alternate;
+}
+
+.glowBlob3 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.12) 0%, rgba(244, 63, 94, 0) 70%);
+  top: 30%;
+  left: 38%;
+  animation: floatBlob3 22s ease-in-out infinite alternate;
+}
+
+@keyframes floatBlob1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, 40px) scale(1.15); }
+  100% { transform: translate(-30px, 70px) scale(0.9); }
+}
+
+@keyframes floatBlob2 {
+  0% { transform: translate(0, 0) scale(1.15); }
+  50% { transform: translate(-70px, -50px) scale(0.9); }
+  100% { transform: translate(40px, 40px) scale(1.05); }
+}
+
+@keyframes floatBlob3 {
+  0% { transform: translate(0, 0) scale(0.9); }
+  50% { transform: translate(-40px, 50px) scale(1.15); }
+  100% { transform: translate(50px, -30px) scale(0.95); }
+}
+
+.heroUnifiedContainer {
   position: relative;
   z-index: 2;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 48px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
+  width: calc(100% - 48px);
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-@media (min-width: 992px) {
-  .heroFullContentGrid {
-    grid-template-columns: 1.15fr 0.85fr;
-  }
+.heroGlassCard {
+  width: 100%;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: none;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: visible;
 }
 
-.heroLeftBlock {
-  max-width: 650px;
+.heroGlassCard:hover {
+  transform: translateY(-4px);
 }
 
 .heroBadgePill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 16px;
-  background-color: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  gap: 10px;
+  padding: 8px 22px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 100px;
-  color: var(--color-accent-soft);
-  font-size: 0.75rem;
+  color: #ffd2c2;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin-bottom: 18px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
-.heroHeadlineLight {
-  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
-  font-size: clamp(2.25rem, 3.8vw, 3.25rem);
+.heroHeadlineLightCentered {
+  font-family: var(--font-display) !important;
+  font-size: clamp(3rem, 6vw, 4.75rem);
   font-weight: 800;
   color: #FFFFFF;
-  line-height: 1.06;
-  letter-spacing: -0.03em;
-  margin-bottom: 14px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  margin-bottom: 26px;
 }
 
-.heroSubtitleLight {
-  font-size: 1.0625rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.9);
-  max-width: 580px;
-  margin-bottom: 24px;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+.gradientText {
+  font-family: var(--font-display) !important;
+  background: linear-gradient(135deg, #FFFFFF 20%, #ffd2c2 65%, #ffae91 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  display: inline-block;
 }
 
-.heroCtaGroup {
+.heroSubtitleLightCentered {
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 820px;
+  margin-bottom: 48px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.heroCtaGroupCentered {
   display: flex;
-  gap: 16px;
+  gap: 20px;
+  justify-content: center;
   flex-wrap: wrap;
 }
 
@@ -206,18 +288,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  height: 52px;
-  padding: 0 28px;
-  background-color: var(--color-accent);
+  gap: 12px;
+  height: 58px;
+  padding: 0 38px;
+  background: linear-gradient(135deg, #C85A32 0%, #A04220 100%);
   color: #FFFFFF !important;
   font-weight: 700;
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-accent);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 8px 24px rgba(184, 92, 58, 0.35);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 12px 32px rgba(200, 90, 50, 0.42);
 }
 
 .btnPrimaryTerracotta *,
@@ -226,30 +308,30 @@
 }
 
 .btnPrimaryTerracotta:hover {
-  background-color: var(--color-accent-hover) !important;
-  border-color: var(--color-accent-hover) !important;
+  background: linear-gradient(135deg, #DB6A40 0%, #B44B27 100%) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
   color: #FFFFFF !important;
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px rgba(184, 92, 58, 0.5);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 18px 42px rgba(200, 90, 50, 0.6);
 }
 
 .btnGlassOutline {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  height: 52px;
-  padding: 0 28px;
-  background-color: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  gap: 12px;
+  height: 58px;
+  padding: 0 38px;
+  background-color: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   color: #FFFFFF !important;
-  font-weight: 600;
-  font-size: 0.9375rem;
+  font-weight: 700;
+  font-size: 1.0625rem;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btnGlassOutline *,
@@ -258,11 +340,11 @@
 }
 
 .btnGlassOutline:hover {
-  background-color: rgba(255, 255, 255, 0.28) !important;
-  border-color: #FFFFFF !important;
-  color: #FFFFFF !important;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  color: #FFD2C2 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
 }
 
 .ctaArrowSvg {
@@ -275,44 +357,44 @@
   transform: translateX(4px);
 }
 
-/* Responsive Overrides for Hero Section on Mobile & Tablet */
+/* Responsive Overrides for Unified Hero Section */
 @media (max-width: 768px) {
   .heroFullBleed {
-    min-height: 520px;
-    padding: 60px 0 60px;
-    background-position: 80% center; /* Focuses on students on right */
+    min-height: auto;
+    padding: 120px 0 80px;
   }
 
-  .heroFullOverlay {
-    background: linear-gradient(
-      180deg,
-      rgba(20, 18, 15, 0.90) 0%,
-      rgba(20, 18, 15, 0.75) 55%,
-      rgba(20, 18, 15, 0.40) 100%
-    );
+  .glowBlob1,
+  .glowBlob2,
+  .glowBlob3 {
+    filter: blur(80px);
+    opacity: 0.12;
   }
+
+  .glowBlob1 { width: 300px; height: 300px; }
+  .glowBlob2 { width: 350px; height: 350px; }
+  .glowBlob3 { width: 250px; height: 250px; }
 
   .heroBadgePill {
     font-size: 0.6875rem;
     padding: 6px 14px;
-    margin-bottom: 16px;
-    white-space: normal;
-    text-align: left;
+    margin-bottom: 20px;
     line-height: 1.4;
   }
 
-  .heroHeadlineLight {
+  .heroHeadlineLightCentered {
     font-size: clamp(2rem, 7.5vw, 3rem);
     margin-bottom: 16px;
+    line-height: 1.15;
   }
 
-  .heroSubtitleLight {
+  .heroSubtitleLightCentered {
     font-size: 1rem;
     line-height: 1.55;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
   }
 
-  .heroCtaGroup {
+  .heroCtaGroupCentered {
     flex-direction: column;
     gap: 12px;
     width: 100%;
@@ -386,7 +468,7 @@
 }
 
 .dateNum {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.5rem;
   font-weight: 800;
   line-height: 1;
@@ -405,7 +487,7 @@
 }
 
 .dateTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.0625rem;
   font-weight: 700;
   color: #FFFFFF;
@@ -444,130 +526,85 @@
 .heroGatewaysBar {
   position: relative;
   z-index: 20;
-  margin-top: -72px; /* Overlap over Hero Background */
-  padding: 0 0 32px;
+  margin-top: -36px; /* Exactly 25% Overlap over Hero Section */
+  padding: 0 0 36px;
   background: transparent;
   border-bottom: none;
 }
 
 @media (max-width: 768px) {
   .heroGatewaysBar {
-    margin-top: -44px;
+    margin-top: -22px;
     padding: 0 0 24px;
   }
 }
 
 .masterGlassDeck {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  border-radius: 20px;
-  padding: 16px 20px;
-  box-shadow: 0 20px 50px -10px rgba(20, 18, 15, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  background: #FFFFFF;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+  border-radius: 26px;
+  padding: 24px 26px;
+  box-shadow: 0 20px 50px -10px rgba(20, 18, 15, 0.08);
 }
 
 .gatewaysGrid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  gap: 16px;
+  gap: 20px;
 }
 
 @media (min-width: 640px) {
   .gatewaysGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
 }
 
 @media (min-width: 1024px) {
   .gatewaysGrid {
     grid-template-columns: repeat(4, 1fr);
-    gap: 0;
+    gap: 20px;
   }
 }
 
 .gatewayCardModern {
-  background: transparent;
-  border: none;
-  border-radius: 16px;
-  padding: 16px 14px;
+  background: #FAFAF8;
+  border: 1px solid rgba(222, 212, 197, 0.65);
+  border-radius: 12px; /* Small Vertically Rectangular Shape */
+  padding: 24px 18px 20px;
+  min-height: 235px; /* Compact Vertical Rectangular Proportions */
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   position: relative;
-}
-
-@media (min-width: 1024px) {
-  .gatewayCardModern {
-    border-right: 1px solid rgba(222, 212, 197, 0.6);
-  }
-  .gatewayCardModern:last-child {
-    border-right: none;
-  }
+  overflow: hidden;
+  box-shadow: 0 6px 18px -4px rgba(24, 22, 19, 0.04);
 }
 
 .gatewayCardModern:hover {
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 12px 28px rgba(184, 92, 58, 0.14);
-  transform: translateY(-4px);
+  background: #FFFFFF;
+  transform: translateY(-6px) scale(1.015);
 }
 
-.gatewayTopRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-/* CENTERED CIRCULAR ICON BADGE (NO BORDER, SOLID OPAQUE SURFACE) */
 .gatewayIconBox {
-  width: 48px;
-  height: 48px;
-  border: none !important;
-  border-radius: 50% !important; /* Perfect Circular Badge */
-  background-color: #F4EBE6; /* Solid opaque warm terracotta tint — NO SPLIT LINES */
-  color: var(--color-accent);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px !important;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 14px;
   flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(184, 92, 58, 0.12);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.gatewayCardModern:hover .gatewayIconBox {
-  transform: scale(1.1) translateY(-2px);
-  background-color: var(--color-accent) !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 8px 24px rgba(184, 92, 58, 0.38);
-}
-
-.gatewayArrowSvg {
-  color: var(--color-text-secondary);
-  opacity: 0.4;
-  transition: all 0.3s ease;
-}
-
-.gatewayCardModern:hover .gatewayArrowSvg {
-  opacity: 1;
-  color: var(--color-accent);
-  transform: translateX(4px);
-}
-
-.gatewayCardModern:hover .gatewayArrow {
-  opacity: 1;
-  color: var(--color-accent);
-  transform: translateX(4px);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .gatewayTitleModern {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-display) !important;
   font-size: 1.0625rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #24221F;
   margin-bottom: 6px;
   line-height: 1.3;
@@ -575,10 +612,142 @@
 }
 
 .gatewaySubModern {
-  font-size: 0.8125rem;
-  color: #68705A;
+  font-size: 0.78125rem;
+  color: #635C52;
   line-height: 1.45;
-  font-weight: 400;
+  font-weight: 500;
+  margin-bottom: 14px;
+  max-width: 240px;
+  margin-left: auto;
+  margin-right: auto;
+  flex: 1;
+}
+
+.gatewayArrowBottom {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #706A61;
+  transition: all 0.3s ease;
+  margin-top: auto;
+}
+
+.gatewayArrowBottom svg {
+  transition: transform 0.3s ease;
+}
+
+.gatewayCardModern:hover .gatewayArrowBottom svg {
+  transform: translateX(4px);
+}
+
+/* ==============================================================================
+   4 UNIQUE THEME VARIANTS FOR VERTICAL CUBOID GATEWAY CARDS
+   ============================================================================== */
+
+/* Card 1: Burnt Terracotta (Academic Degrees) */
+.gatewayCardTerracotta {
+  border-color: rgba(200, 90, 50, 0.22) !important;
+}
+.gatewayIconTerracotta {
+  background: rgba(200, 90, 50, 0.1) !important;
+  color: rgb(200, 90, 50) !important;
+  border: 1px solid rgba(200, 90, 50, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(200, 90, 50, 0.08) !important;
+}
+.gatewayCardTerracotta:hover {
+  background: #FFFFFF !important;
+  border-color: rgb(200, 90, 50) !important;
+  box-shadow: 0 20px 40px -10px rgba(200, 90, 50, 0.28) !important;
+}
+.gatewayCardTerracotta:hover .gatewayIconTerracotta {
+  background: linear-gradient(135deg, #C85A32 0%, #A04220 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  box-shadow: 0 10px 25px rgba(200, 90, 50, 0.45) !important;
+  transform: scale(1.12) rotate(4deg) !important;
+}
+.gatewayCardTerracotta:hover .gatewayArrowBottom {
+  color: rgb(200, 90, 50) !important;
+}
+
+/* Card 2: Emerald Forest (Admissions 2026) */
+.gatewayCardEmerald {
+  border-color: rgba(21, 128, 61, 0.22) !important;
+}
+.gatewayIconEmerald {
+  background: rgba(21, 128, 61, 0.1) !important;
+  color: rgb(21, 128, 61) !important;
+  border: 1px solid rgba(21, 128, 61, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(21, 128, 61, 0.08) !important;
+}
+.gatewayCardEmerald:hover {
+  background: #FFFFFF !important;
+  border-color: rgb(21, 128, 61) !important;
+  box-shadow: 0 20px 40px -10px rgba(21, 128, 61, 0.28) !important;
+}
+.gatewayCardEmerald:hover .gatewayIconEmerald {
+  background: linear-gradient(135deg, #15803D 0%, #0F622F 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  box-shadow: 0 10px 25px rgba(21, 128, 61, 0.45) !important;
+  transform: scale(1.12) rotate(4deg) !important;
+}
+.gatewayCardEmerald:hover .gatewayArrowBottom {
+  color: rgb(21, 128, 61) !important;
+}
+
+/* Card 3: Sapphire Tech Blue (Departments) */
+.gatewayCardSapphire {
+  border-color: rgba(37, 99, 235, 0.22) !important;
+}
+.gatewayIconSapphire {
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: rgb(37, 99, 235) !important;
+  border: 1px solid rgba(37, 99, 235, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08) !important;
+}
+.gatewayCardSapphire:hover {
+  background: #FFFFFF !important;
+  border-color: rgb(37, 99, 235) !important;
+  box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.28) !important;
+}
+.gatewayCardSapphire:hover .gatewayIconSapphire {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45) !important;
+  transform: scale(1.12) rotate(4deg) !important;
+}
+.gatewayCardSapphire:hover .gatewayArrowBottom {
+  color: rgb(37, 99, 235) !important;
+}
+
+/* Card 4: Royal Amber Gold (Academic Bulletins) */
+.gatewayCardGold {
+  border-color: rgba(217, 119, 6, 0.22) !important;
+}
+.gatewayIconGold {
+  background: rgba(217, 119, 6, 0.1) !important;
+  color: rgb(217, 119, 6) !important;
+  border: 1px solid rgba(217, 119, 6, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.08) !important;
+}
+.gatewayCardGold:hover {
+  background: #FFFFFF !important;
+  border-color: rgb(217, 119, 6) !important;
+  box-shadow: 0 20px 40px -10px rgba(217, 119, 6, 0.28) !important;
+}
+.gatewayCardGold:hover .gatewayIconGold {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  box-shadow: 0 10px 25px rgba(217, 119, 6, 0.45) !important;
+  transform: scale(1.12) rotate(4deg) !important;
+}
+.gatewayCardGold:hover .gatewayArrowBottom {
+  color: rgb(217, 119, 6) !important;
 }
 
 /* Quick Gateway Strip */
@@ -624,7 +793,7 @@
 }
 
 .gatewayTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 700;
   color: var(--color-text-primary);
@@ -647,7 +816,7 @@
 }
 
 .heroCardIcon { font-size: 3.5rem; margin-bottom: 20px; color: var(--color-accent); }
-.heroCardTitle { font-family: 'Manrope', sans-serif; font-size: 1.375rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px; }
+.heroCardTitle { font-family: var(--font-sans); font-size: 1.375rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px; }
 .heroCardSub { font-size: 0.875rem; color: var(--color-accent); font-weight: 600; margin-bottom: 12px; }
 .heroCardDesc { font-size: 0.9375rem; color: var(--color-text-secondary); line-height: 1.55; }
 
@@ -701,7 +870,7 @@
 
 .statNum {
   display: block;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(2.25rem, 3.5vw, 3rem);
   font-weight: 800;
   color: var(--color-accent);
@@ -777,22 +946,62 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #F4EBE6;
-  border-radius: 14px;
-  color: var(--color-accent);
+  border-radius: 16px;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.featureItem:hover .featureIcon {
-  background-color: var(--color-accent) !important;
-  color: #FFFFFF !important;
-  transform: scale(1.08) rotate(4deg);
-  box-shadow: 0 8px 20px rgba(184, 92, 58, 0.3);
+/* --- Feature Pillars RGB Themes --- */
+.iconTerracotta {
+  background: rgba(200, 90, 50, 0.1) !important;
+  color: rgb(200, 90, 50) !important;
+  border: 1px solid rgba(200, 90, 50, 0.2) !important;
+}
+.featureItem:hover .iconTerracotta {
+  background: rgb(200, 90, 50) !important;
+  color: rgb(255, 255, 255) !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(200, 90, 50, 0.4);
+}
+
+.iconEmerald {
+  background: rgba(21, 128, 61, 0.1) !important;
+  color: rgb(21, 128, 61) !important;
+  border: 1px solid rgba(21, 128, 61, 0.2) !important;
+}
+.featureItem:hover .iconEmerald {
+  background: rgb(21, 128, 61) !important;
+  color: rgb(255, 255, 255) !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(21, 128, 61, 0.4);
+}
+
+.iconSapphire {
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: rgb(37, 99, 235) !important;
+  border: 1px solid rgba(37, 99, 235, 0.2) !important;
+}
+.featureItem:hover .iconSapphire {
+  background: rgb(37, 99, 235) !important;
+  color: rgb(255, 255, 255) !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+}
+
+.iconGold {
+  background: rgba(217, 119, 6, 0.1) !important;
+  color: rgb(217, 119, 6) !important;
+  border: 1px solid rgba(217, 119, 6, 0.2) !important;
+}
+.featureItem:hover .iconGold {
+  background: rgb(217, 119, 6) !important;
+  color: rgb(255, 255, 255) !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(217, 119, 6, 0.4);
 }
 
 .featureName {
   display: block;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.0625rem;
   font-weight: 800;
   color: #24221F;
@@ -901,11 +1110,11 @@
 }
 
 .secTitle {
-  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+  font-family: var(--font-display) !important;
   font-size: clamp(2rem, 3.2vw, 2.75rem); /* 32px-44px */
   font-weight: 700;
   color: var(--color-text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   line-height: 1.15;
 }
 
@@ -975,23 +1184,117 @@
   justify-content: center;
   width: 56px;
   height: 56px;
-  background-color: #F4EBE6;
   border-radius: 16px;
-  color: var(--color-accent);
   margin-bottom: 22px;
   flex-shrink: 0;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.whyCard:hover .whyIcon {
-  background-color: var(--color-accent) !important;
-  color: #FFFFFF !important;
+/* --- Why Choose Us RGB Themes --- */
+.whyTerracotta .whyIcon {
+  background: rgba(200, 90, 50, 0.1) !important;
+  color: rgb(200, 90, 50) !important;
+  border: 1px solid rgba(200, 90, 50, 0.2) !important;
+}
+.whyTerracotta:hover {
+  border-color: rgb(200, 90, 50) !important;
+  box-shadow: 0 20px 44px rgba(200, 90, 50, 0.18) !important;
+  transform: translateY(-6px);
+}
+.whyTerracotta:hover .whyIcon {
+  background: rgb(200, 90, 50) !important;
+  color: rgb(255, 255, 255) !important;
   transform: scale(1.1) rotate(4deg);
-  box-shadow: 0 8px 24px rgba(184, 92, 58, 0.35);
+  box-shadow: 0 8px 24px rgba(200, 90, 50, 0.45);
+}
+
+.whyEmerald .whyIcon {
+  background: rgba(21, 128, 61, 0.1) !important;
+  color: rgb(21, 128, 61) !important;
+  border: 1px solid rgba(21, 128, 61, 0.2) !important;
+}
+.whyEmerald:hover {
+  border-color: rgb(21, 128, 61) !important;
+  box-shadow: 0 20px 44px rgba(21, 128, 61, 0.18) !important;
+  transform: translateY(-6px);
+}
+.whyEmerald:hover .whyIcon {
+  background: rgb(21, 128, 61) !important;
+  color: rgb(255, 255, 255) !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(21, 128, 61, 0.45);
+}
+
+.whySapphire .whyIcon {
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: rgb(37, 99, 235) !important;
+  border: 1px solid rgba(37, 99, 235, 0.2) !important;
+}
+.whySapphire:hover {
+  border-color: rgb(37, 99, 235) !important;
+  box-shadow: 0 20px 44px rgba(37, 99, 235, 0.18) !important;
+  transform: translateY(-6px);
+}
+.whySapphire:hover .whyIcon {
+  background: rgb(37, 99, 235) !important;
+  color: rgb(255, 255, 255) !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
+}
+
+.whyPurple .whyIcon {
+  background: rgba(147, 51, 234, 0.1) !important;
+  color: rgb(147, 51, 234) !important;
+  border: 1px solid rgba(147, 51, 234, 0.2) !important;
+}
+.whyPurple:hover {
+  border-color: rgb(147, 51, 234) !important;
+  box-shadow: 0 20px 44px rgba(147, 51, 234, 0.18) !important;
+  transform: translateY(-6px);
+}
+.whyPurple:hover .whyIcon {
+  background: rgb(147, 51, 234) !important;
+  color: rgb(255, 255, 255) !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(147, 51, 234, 0.45);
+}
+
+.whyGold .whyIcon {
+  background: rgba(217, 119, 6, 0.1) !important;
+  color: rgb(217, 119, 6) !important;
+  border: 1px solid rgba(217, 119, 6, 0.2) !important;
+}
+.whyGold:hover {
+  border-color: rgb(217, 119, 6) !important;
+  box-shadow: 0 20px 44px rgba(217, 119, 6, 0.18) !important;
+  transform: translateY(-6px);
+}
+.whyGold:hover .whyIcon {
+  background: rgb(217, 119, 6) !important;
+  color: rgb(255, 255, 255) !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(217, 119, 6, 0.45);
+}
+
+.whyCrimson .whyIcon {
+  background: rgba(220, 38, 38, 0.1) !important;
+  color: rgb(220, 38, 38) !important;
+  border: 1px solid rgba(220, 38, 38, 0.2) !important;
+}
+.whyCrimson:hover {
+  border-color: rgb(220, 38, 38) !important;
+  box-shadow: 0 20px 44px rgba(220, 38, 38, 0.18) !important;
+  transform: translateY(-6px);
+}
+.whyCrimson:hover .whyIcon {
+  background: rgb(220, 38, 38) !important;
+  color: rgb(255, 255, 255) !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.45);
 }
 
 .whyCardTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.25rem;
   font-weight: 800;
   color: #24221F;
@@ -1096,20 +1399,37 @@
 
 .progCard {
   background-color: #FFFFFF;
-  border: 1px solid rgba(222, 212, 197, 0.7);
+  border: 1px solid rgba(200, 90, 50, 0.18);
   border-radius: 20px;
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 20px rgba(20, 18, 15, 0.03);
+  box-shadow: 0 4px 20px rgba(20, 18, 15, 0.04);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
+  overflow: hidden;
+}
+
+.progCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #C85A32 0%, #D97706 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
 
 .progCard:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 20px 44px rgba(184, 92, 58, 0.12);
+  border-color: #C85A32;
+  box-shadow: 0 20px 48px -10px rgba(200, 90, 50, 0.22);
   transform: translateY(-6px);
+}
+
+.progCard:hover::before {
+  opacity: 1;
 }
 
 .progTop {
@@ -1142,7 +1462,7 @@
 }
 
 .progName {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.25rem;
   font-weight: 800;
   color: #24221F;
@@ -1221,17 +1541,19 @@
 
 .ndColumn {
   background-color: #FFFFFF;
-  border: 1px solid rgba(222, 212, 197, 0.7);
+  border: 1px solid rgba(200, 90, 50, 0.18);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(20, 18, 15, 0.03);
+  box-shadow: 0 4px 20px rgba(20, 18, 15, 0.04);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
 }
 
 .ndColumn:hover {
-  box-shadow: 0 12px 32px rgba(20, 18, 15, 0.08);
+  border-color: #C85A32;
+  box-shadow: 0 20px 48px -10px rgba(200, 90, 50, 0.16);
+  transform: translateY(-4px);
 }
 
 .ndHeader {
@@ -1244,7 +1566,7 @@
 }
 
 .ndTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.15rem;
   font-weight: 800;
   color: #24221F;
@@ -1288,7 +1610,7 @@
   gap: 16px;
   padding: 18px 24px;
   border-bottom: 1px solid rgba(222, 212, 197, 0.4);
-  transition: background-color 0.25s ease, transform 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ndItem:last-child {
@@ -1296,7 +1618,8 @@
 }
 
 .ndItem:hover {
-  background-color: #F4EBE6;
+  background-color: rgba(200, 90, 50, 0.04);
+  transform: translateX(6px);
 }
 
 .ndUrgent {
@@ -1408,7 +1731,7 @@
 
 .ndEmptyTitle {
   display: block;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.0625rem;
   font-weight: 800;
   color: #24221F;
@@ -1457,7 +1780,7 @@
 }
 
 .linkCardMarquee {
-  flex: 0 0 260px;
+  flex: 0 0 270px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1471,10 +1794,189 @@
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.linkCardMarquee:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 14px 32px rgba(184, 92, 58, 0.12);
-  transform: translateY(-4px);
+/* --- Important Links & Portals RGB Themes --- */
+/* 1. Academic Programmes (Terracotta) */
+.qlTerracotta .linkIcon {
+  background: rgba(200, 90, 50, 0.1) !important;
+  color: rgb(200, 90, 50) !important;
+  border: 1px solid rgba(200, 90, 50, 0.22) !important;
+}
+.qlTerracotta:hover {
+  border-color: rgb(200, 90, 50) !important;
+  box-shadow: 0 16px 36px -8px rgba(200, 90, 50, 0.25) !important;
+  transform: translateY(-5px);
+}
+.qlTerracotta:hover .linkIcon {
+  background: linear-gradient(135deg, #C85A32 0%, #A04220 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 22px rgba(200, 90, 50, 0.45);
+}
+.qlTerracotta:hover .linkCardArrow {
+  color: rgb(200, 90, 50) !important;
+  opacity: 1;
+}
+
+/* 2. Notices & Circulars (Emerald) */
+.qlEmerald .linkIcon {
+  background: rgba(21, 128, 61, 0.1) !important;
+  color: rgb(21, 128, 61) !important;
+  border: 1px solid rgba(21, 128, 61, 0.22) !important;
+}
+.qlEmerald:hover {
+  border-color: rgb(21, 128, 61) !important;
+  box-shadow: 0 16px 36px -8px rgba(21, 128, 61, 0.25) !important;
+  transform: translateY(-5px);
+}
+.qlEmerald:hover .linkIcon {
+  background: linear-gradient(135deg, #15803D 0%, #0F622F 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 22px rgba(21, 128, 61, 0.45);
+}
+.qlEmerald:hover .linkCardArrow {
+  color: rgb(21, 128, 61) !important;
+  opacity: 1;
+}
+
+/* 3. Downloads Center (Sapphire) */
+.qlSapphire .linkIcon {
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: rgb(37, 99, 235) !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
+}
+.qlSapphire:hover {
+  border-color: rgb(37, 99, 235) !important;
+  box-shadow: 0 16px 36px -8px rgba(37, 99, 235, 0.25) !important;
+  transform: translateY(-5px);
+}
+.qlSapphire:hover .linkIcon {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.45);
+}
+.qlSapphire:hover .linkCardArrow {
+  color: rgb(37, 99, 235) !important;
+  opacity: 1;
+}
+
+/* 4. Admissions 2026 (Gold) */
+.qlGold .linkIcon {
+  background: rgba(217, 119, 6, 0.1) !important;
+  color: rgb(217, 119, 6) !important;
+  border: 1px solid rgba(217, 119, 6, 0.22) !important;
+}
+.qlGold:hover {
+  border-color: rgb(217, 119, 6) !important;
+  box-shadow: 0 16px 36px -8px rgba(217, 119, 6, 0.25) !important;
+  transform: translateY(-5px);
+}
+.qlGold:hover .linkIcon {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 22px rgba(217, 119, 6, 0.45);
+}
+.qlGold:hover .linkCardArrow {
+  color: rgb(217, 119, 6) !important;
+  opacity: 1;
+}
+
+/* 5. Faculty Directory (Purple) */
+.qlPurple .linkIcon {
+  background: rgba(147, 51, 234, 0.1) !important;
+  color: rgb(147, 51, 234) !important;
+  border: 1px solid rgba(147, 51, 234, 0.22) !important;
+}
+.qlPurple:hover {
+  border-color: rgb(147, 51, 234) !important;
+  box-shadow: 0 16px 36px -8px rgba(147, 51, 234, 0.25) !important;
+  transform: translateY(-5px);
+}
+.qlPurple:hover .linkIcon {
+  background: linear-gradient(135deg, #9333EA 0%, #7E22CE 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 22px rgba(147, 51, 234, 0.45);
+}
+.qlPurple:hover .linkCardArrow {
+  color: rgb(147, 51, 234) !important;
+  opacity: 1;
+}
+
+/* 6. Events & Seminars (Crimson) */
+.qlCrimson .linkIcon {
+  background: rgba(220, 38, 38, 0.1) !important;
+  color: rgb(220, 38, 38) !important;
+  border: 1px solid rgba(220, 38, 38, 0.22) !important;
+}
+.qlCrimson:hover {
+  border-color: rgb(220, 38, 38) !important;
+  box-shadow: 0 16px 36px -8px rgba(220, 38, 38, 0.25) !important;
+  transform: translateY(-5px);
+}
+.qlCrimson:hover .linkIcon {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 22px rgba(220, 38, 38, 0.45);
+}
+.qlCrimson:hover .linkCardArrow {
+  color: rgb(220, 38, 38) !important;
+  opacity: 1;
+}
+
+/* 7. Campus Gallery (Teal) */
+.qlTeal .linkIcon {
+  background: rgba(13, 148, 136, 0.1) !important;
+  color: rgb(13, 148, 136) !important;
+  border: 1px solid rgba(13, 148, 136, 0.22) !important;
+}
+.qlTeal:hover {
+  border-color: rgb(13, 148, 136) !important;
+  box-shadow: 0 16px 36px -8px rgba(13, 148, 136, 0.25) !important;
+  transform: translateY(-5px);
+}
+.qlTeal:hover .linkIcon {
+  background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 22px rgba(13, 148, 136, 0.45);
+}
+.qlTeal:hover .linkCardArrow {
+  color: rgb(13, 148, 136) !important;
+  opacity: 1;
+}
+
+/* 8. Contact & Helpline (Indigo) */
+.qlIndigo .linkIcon {
+  background: rgba(79, 70, 229, 0.1) !important;
+  color: rgb(79, 70, 229) !important;
+  border: 1px solid rgba(79, 70, 229, 0.22) !important;
+}
+.qlIndigo:hover {
+  border-color: rgb(79, 70, 229) !important;
+  box-shadow: 0 16px 36px -8px rgba(79, 70, 229, 0.25) !important;
+  transform: translateY(-5px);
+}
+.qlIndigo:hover .linkIcon {
+  background: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 22px rgba(79, 70, 229, 0.45);
+}
+.qlIndigo:hover .linkCardArrow {
+  color: rgb(79, 70, 229) !important;
+  opacity: 1;
 }
 
 .linksGrid {
@@ -1502,16 +2004,16 @@
   gap: 14px;
   padding: 20px 22px;
   background-color: #FFFFFF;
-  border: 1px solid rgba(222, 212, 197, 0.7);
+  border: 1px solid rgba(200, 90, 50, 0.18);
   border-radius: 16px;
   text-decoration: none;
-  box-shadow: 0 4px 16px rgba(20, 18, 15, 0.03);
+  box-shadow: 0 4px 16px rgba(20, 18, 15, 0.04);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .linkCard:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 14px 32px rgba(184, 92, 58, 0.12);
+  border-color: #C85A32;
+  box-shadow: 0 16px 36px -8px rgba(200, 90, 50, 0.2);
   transform: translateY(-4px);
 }
 
@@ -1526,9 +2028,10 @@
   flex-shrink: 0;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
-  background-color: #F4EBE6;
-  color: var(--color-accent);
+  border-radius: 14px;
+  background: rgba(200, 90, 50, 0.1);
+  color: rgb(200, 90, 50);
+  border: 1px solid rgba(200, 90, 50, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1536,13 +2039,15 @@
 }
 
 .linkCard:hover .linkIcon {
-  background-color: var(--color-accent) !important;
+  background: rgb(200, 90, 50) !important;
   color: #FFFFFF !important;
-  transform: scale(1.08) rotate(4deg);
+  border-color: transparent !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(200, 90, 50, 0.4);
 }
 
 .linkLabel {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.96875rem;
   font-weight: 800;
   color: #24221F;
@@ -1632,7 +2137,7 @@
 }
 
 .aboutFallbackTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.25rem;
   font-weight: 800;
   color: #24221F;
@@ -1671,7 +2176,7 @@
 }
 
 .aboutQuote {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-serif);
   font-size: 1.15rem;
   font-style: italic;
   color: #383530;
@@ -1680,7 +2185,7 @@
 }
 
 .aboutAuthor {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.96875rem;
   color: #24221F;
   margin: 0;
@@ -1729,20 +2234,37 @@
 
 .deptCard {
   background-color: #FFFFFF;
-  border: 1px solid rgba(222, 212, 197, 0.7);
+  border: 1px solid rgba(37, 99, 235, 0.18);
   border-radius: 20px;
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 20px rgba(20, 18, 15, 0.03);
+  box-shadow: 0 4px 20px rgba(20, 18, 15, 0.04);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
+  overflow: hidden;
+}
+
+.deptCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2563EB 0%, #1D4ED8 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
 
 .deptCard:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 20px 44px rgba(184, 92, 58, 0.12);
+  border-color: #2563EB;
+  box-shadow: 0 20px 48px -10px rgba(37, 99, 235, 0.22);
   transform: translateY(-6px);
+}
+
+.deptCard:hover::before {
+  opacity: 1;
 }
 
 .deptTop {
@@ -1755,8 +2277,8 @@
 .deptBadge {
   font-size: 0.75rem;
   font-weight: 800;
-  color: var(--color-accent);
-  background-color: #F4EBE6;
+  color: #2563EB;
+  background-color: rgba(37, 99, 235, 0.1);
   padding: 4px 12px;
   border-radius: 100px;
   letter-spacing: 0.04em;
@@ -1764,18 +2286,28 @@
 }
 
 .deptIconBadge {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background-color: #F4EBE6;
-  color: var(--color-accent);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2563EB;
+  border: 1px solid rgba(37, 99, 235, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.deptCard:hover .deptIconBadge {
+  background-color: #2563EB !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  transform: scale(1.1) rotate(4deg);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
 }
 
 .deptName {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.25rem;
   font-weight: 800;
   color: #24221F;
@@ -1900,20 +2432,38 @@
 
 .evCard {
   background-color: #FFFFFF;
-  border: 1px solid rgba(222, 212, 197, 0.7);
+  border: 1px solid rgba(217, 119, 6, 0.18);
   border-radius: 20px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
-  box-shadow: 0 4px 20px rgba(20, 18, 15, 0.03);
+  box-shadow: 0 4px 20px rgba(20, 18, 15, 0.04);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.evCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #D97706 0%, #B45309 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 2;
 }
 
 .evCard:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 20px 44px rgba(184, 92, 58, 0.12);
+  border-color: #D97706;
+  box-shadow: 0 20px 48px -10px rgba(217, 119, 6, 0.22);
   transform: translateY(-6px);
+}
+
+.evCard:hover::before {
+  opacity: 1;
 }
 
 .evBanner {
@@ -1961,7 +2511,7 @@
 }
 
 .evDay {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--color-accent);
@@ -1999,7 +2549,7 @@
 }
 
 .evTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.1875rem;
   font-weight: 800;
   color: #24221F;
@@ -2105,14 +2655,14 @@
   aspect-ratio: 4 / 3;
   background-color: #F7F2E9;
   text-decoration: none;
-  border: 1px solid rgba(222, 212, 197, 0.7);
+  border: 1px solid rgba(220, 38, 38, 0.18);
   box-shadow: 0 4px 20px rgba(20, 18, 15, 0.04);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .galCard:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 20px 44px rgba(184, 92, 58, 0.16);
+  border-color: #DC2626;
+  box-shadow: 0 20px 48px -10px rgba(220, 38, 38, 0.25);
   transform: translateY(-6px);
 }
 
@@ -2154,12 +2704,13 @@
 }
 
 .galLabel {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-display) !important;
   font-size: 1.0625rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #FFFFFF;
   line-height: 1.3;
   margin-bottom: 4px;
+  letter-spacing: -0.02em;
 }
 
 .galCat {
@@ -2230,7 +2781,7 @@
 }
 
 .accredItem strong {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.96875rem;
   font-weight: 800;
   color: #24221F;
@@ -2309,7 +2860,7 @@
 
 .contactItem strong {
   display: block;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.9375rem;
   font-weight: 800;
   color: #24221F;
@@ -2397,7 +2948,7 @@
 }
 
 .mapCardTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.3125rem;
   font-weight: 800;
   color: #24221F;
@@ -2435,6 +2986,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ctaCardBanner:hover {
+  transform: translateY(-5px);
+  border-color: var(--color-accent);
+  box-shadow: 0 30px 64px rgba(184, 92, 58, 0.12);
 }
 
 .ctaBadge {
@@ -2453,7 +3011,7 @@
 }
 
 .ctaTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(2.125rem, 4vw, 2.875rem);
   font-weight: 800;
   color: #24221F;

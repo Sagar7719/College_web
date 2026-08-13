@@ -20,6 +20,7 @@ import {
   Info,
 } from 'lucide-react';
 import { Notice } from '@/types';
+import { InteractiveDotGrid } from '@/components/common/InteractiveDotGrid';
 import styles from '../inner.module.css';
 import homeStyles from '../home.module.css';
 
@@ -133,36 +134,39 @@ export function NoticesClient({ initialNotices }: NoticesClientProps) {
     <div className={styles.pageContainer}>
       {/* 1. HERO BANNER */}
       <section className={styles.heroBanner}>
+        <InteractiveDotGrid />
         <div className="container">
           <div className={styles.heroContent}>
-            <div className={styles.heroBadge}>
-              <Sparkles size={16} />
-              <span>Official Bulletin & Administrative Circulars Desk</span>
-            </div>
-            <h1 className={styles.heroTitle}>College Notices & Circulars</h1>
-            <p className={styles.heroSubtitle}>
-              Stay informed with real-time academic circulars, examination timetables, admissions notices, and administrative announcements.
-            </p>
-            <div className={styles.heroStatsRow}>
-              <div className={styles.heroStatItem}>
-                <FileText size={20} className={styles.statIcon} />
-                <div>
-                  <strong>{noticesList.length} Active Circulars</strong>
-                  <span>Official Announcements</span>
-                </div>
+            <div className={styles.innerHeroGlassCard}>
+              <div className={styles.heroBadge}>
+                <Sparkles size={16} />
+                <span>Official Bulletin & Administrative Circulars Desk</span>
               </div>
-              <div className={styles.heroStatItem}>
-                <AlertCircle size={20} className={styles.statIcon} style={{ color: '#E29578' }} />
-                <div>
-                  <strong>{noticesList.filter((n) => n.isUrgent).length} Urgent Alerts</strong>
-                  <span>Immediate Action Required</span>
+              <h1 className={styles.heroTitle}>College Notices & Circulars</h1>
+              <p className={styles.heroSubtitle}>
+                Stay informed with real-time academic circulars, examination timetables, admissions notices, and administrative announcements.
+              </p>
+              <div className={styles.heroStatsRow}>
+                <div className={styles.heroStatItem}>
+                  <FileText size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>{noticesList.length} Active Circulars</strong>
+                    <span>Official Announcements</span>
+                  </div>
                 </div>
-              </div>
-              <div className={styles.heroStatItem}>
-                <ShieldCheck size={20} className={styles.statIcon} />
-                <div>
-                  <strong>Verified PDFs</strong>
-                  <span>Digitally Signed Documents</span>
+                <div className={styles.heroStatItem}>
+                  <AlertCircle size={20} className={styles.statIcon} style={{ color: '#E29578' }} />
+                  <div>
+                    <strong>{noticesList.filter((n) => n.isUrgent).length} Urgent Alerts</strong>
+                    <span>Immediate Action Required</span>
+                  </div>
+                </div>
+                <div className={styles.heroStatItem}>
+                  <ShieldCheck size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>Verified PDFs</strong>
+                    <span>Digitally Signed Documents</span>
+                  </div>
                 </div>
               </div>
             </div>

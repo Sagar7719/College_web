@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import {
@@ -15,6 +17,7 @@ import {
   DocumentDownloadsSection,
   GallerySection,
   SpacerSection,
+  DocumentItem,
 } from '@/types';
 import { galleryService, downloadsService } from '@/services/cms-modules.service';
 import { Button, Card, CardBody, Badge } from '@/components/ui';
@@ -188,13 +191,33 @@ export const NoticeListBlock: React.FC<{ section: NoticeListSection }> = ({ sect
 );
 
 // 12. Document Downloads Embed Block — fetches live from Downloads CMS
-export async function DocumentDownloadsBlock({ section }: { section: DocumentDownloadsSection }) {
-  let docs = await downloadsService.getPublished().catch(() => []);
+export function DocumentDownloadsBlock({ section }: { section: DocumentDownloadsSection }) {
+  const [docs, setDocs] = React.useState<DocumentItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  // Apply optional category filter from section config
-  if (section.categoryFilter) {
-    docs = docs.filter((d) => d.category === section.categoryFilter);
-  }
+  React.useEffect(() => {
+    let active = true;
+    downloadsService.getPublished()
+      .then((data) => {
+        if (active) {
+          let filtered = data;
+          if (section.categoryFilter) {
+            filtered = data.filter((d) => d.category === section.categoryFilter);
+          }
+          setDocs(filtered);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.warn("Failed to load documents:", err);
+        if (active) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [section.categoryFilter]);
 
   return (
     <div className={styles.embedBlockContainer}>
@@ -205,7 +228,11 @@ export async function DocumentDownloadsBlock({ section }: { section: DocumentDow
         </Link>
       </div>
 
-      {docs.length === 0 ? (
+      {loading ? (
+        <p className="small-text" style={{ color: 'var(--color-text-muted)' }}>
+          Loading downloads...
+        </p>
+      ) : docs.length === 0 ? (
         <p className="small-text" style={{ color: 'var(--color-text-muted)' }}>
           {section.categoryFilter
             ? `No published documents in the "${section.categoryFilter}" category.`
@@ -250,28 +277,47 @@ export async function DocumentDownloadsBlock({ section }: { section: DocumentDow
 }
 
 // 13. Gallery Embed Block — fetches album images from Gallery CMS
-export async function GalleryBlock({ section }: { section: GallerySection }) {
-  // Try to fetch from Gallery CMS by albumId
-  let images: { id: string; url: string; altText?: string; caption?: string }[] = [];
-  let albumTitle: string | undefined;
+export function GalleryBlock({ section }: { section: GallerySection }) {
+  const [images, setImages] = React.useState<{ id: string; url: string; altText?: string; caption?: string }[]>([]);
+  const [albumTitle, setAlbumTitle] = React.useState<string | undefined>();
+  const [loading, setLoading] = React.useState(true);
 
-  if (section.albumId) {
-    try {
-      const albums = await galleryService.getPublished();
-      const album = albums.find((a) => a.id === section.albumId || a.slug === section.albumId);
-      if (album) {
-        images = album.images || [];
-        albumTitle = album.title;
+  React.useEffect(() => {
+    let active = true;
+    const fetchGallery = async () => {
+      let loadedImages: { id: string; url: string; altText?: string; caption?: string }[] = [];
+      let title: string | undefined;
+
+      if (section.albumId) {
+        try {
+          const albums = await galleryService.getPublished();
+          const album = albums.find((a) => a.id === section.albumId || a.slug === section.albumId);
+          if (album) {
+            loadedImages = album.images || [];
+            title = album.title;
+          }
+        } catch (err) {
+          console.warn("Failed to load gallery album:", err);
+        }
       }
-    } catch {
-      // Fall through to static URLs
-    }
-  }
 
-  // Fallback to static imageUrls if album not found or not configured
-  if (images.length === 0 && section.imageUrls && section.imageUrls.length > 0) {
-    images = section.imageUrls.map((url, i) => ({ id: `static_${i}`, url }));
-  }
+      if (loadedImages.length === 0 && section.imageUrls && section.imageUrls.length > 0) {
+        loadedImages = section.imageUrls.map((url, i) => ({ id: `static_${i}`, url }));
+      }
+
+      if (active) {
+        setImages(loadedImages);
+        setAlbumTitle(title);
+        setLoading(false);
+      }
+    };
+
+    fetchGallery();
+
+    return () => {
+      active = false;
+    };
+  }, [section.albumId, section.imageUrls]);
 
   return (
     <div style={{ marginBottom: '3rem' }}>
@@ -279,7 +325,9 @@ export async function GalleryBlock({ section }: { section: GallerySection }) {
         <h3 style={{ marginBottom: '1rem' }}>{section.title || albumTitle}</h3>
       )}
 
-      {images.length === 0 ? (
+      {loading ? (
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Loading gallery...</p>
+      ) : images.length === 0 ? (
         <div style={{
           padding: '2rem', backgroundColor: 'var(--bg-light)',
           borderRadius: 'var(--radius-lg)', textAlign: 'center',

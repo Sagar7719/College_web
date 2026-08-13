@@ -7,6 +7,8 @@ import { Page, NavigationItem, ToastMessage } from '@/types';
 import { pagesService } from '@/services/pages.service';
 import { navigationService, getNavPositionForPage } from '@/services/navigation.service';
 import { isSystemPageCheck } from '@/constants/system-pages';
+import { PageSectionRenderer } from '@/components/page-builder';
+import { Pencil, Eye, Trash2, Globe, FileText, Sparkles, ExternalLink, X, Search, Filter } from 'lucide-react';
 import {
   Card,
   CardBody,
@@ -25,6 +27,7 @@ import {
   Skeleton,
   Toast,
 } from '@/components/ui';
+import styles from '@/components/admin/admin.module.css';
 
 export default function AdminPagesListScreen() {
   const router = useRouter();
@@ -36,6 +39,9 @@ export default function AdminPagesListScreen() {
 
   // Toast notification state
   const [toast, setToast] = useState<ToastMessage | null>(null);
+
+  // In-place Preview modal state
+  const [previewPage, setPreviewPage] = useState<Page | null>(null);
 
   // Delete confirmation modal state
   const [deleteTargetPage, setDeleteTargetPage] = useState<Page | null>(null);
@@ -87,60 +93,7 @@ export default function AdminPagesListScreen() {
     return matchesSearch && matchesStatus;
   });
 
-  // Action 1: Toggle Publish / Unpublish
-  const handleTogglePublish = async (page: Page) => {
-    const nextStatus = page.status === 'published' ? 'draft' : 'published';
-    await pagesService.updatePageStatus(page.id, nextStatus);
-
-    // Sync to dynamic navigation
-    await navigationService.syncPageToNavigation(
-      page.id,
-      page.title,
-      page.slug,
-      nextStatus === 'published' ? page.showInNavigation : false,
-      page.navigationOrder || 0,
-      page.isSystemPage,
-      page.systemKey
-    );
-
-    loadPages();
-  };
-
-  // Action 2: Toggle Show / Hide in Navigation
-  const handleToggleNavigationVisibility = async (page: Page) => {
-    const nextShowNav = !page.showInNavigation;
-    await pagesService.savePage({
-      ...page,
-      showInNavigation: nextShowNav,
-    });
-
-    await navigationService.syncPageToNavigation(
-      page.id,
-      page.title,
-      page.slug,
-      page.status === 'published' ? nextShowNav : false,
-      page.navigationOrder || 0,
-      page.isSystemPage,
-      page.systemKey
-    );
-
-    loadPages();
-  };
-
-  // Action 3: Archive Page (Custom pages only)
-  const handleArchivePage = async (page: Page) => {
-    if (isSystemPageCheck(page)) {
-      alert('System pages cannot be archived.');
-      return;
-    }
-    if (confirm(`Archive page "${page.title}"? It will no longer appear on the public website or navbar.`)) {
-      await pagesService.updatePageStatus(page.id, 'archived');
-      await navigationService.removePageFromNavigation(page.id);
-      loadPages();
-    }
-  };
-
-  // Action 4: Open Delete Confirmation Modal
+  // Action: Open Delete Confirmation Modal
   const handleOpenDeleteModal = (page: Page) => {
     if (isSystemPageCheck(page)) {
       alert('Required institutional system pages cannot be permanently deleted.');
@@ -157,19 +110,19 @@ export default function AdminPagesListScreen() {
     setDeleteError('');
   };
 
-  // Action 4 (confirmed): Execute Permanent Delete
+  // Action: Execute Permanent Hard Delete
   const handleConfirmDelete = async () => {
     if (!deleteTargetPage) return;
     setIsDeleting(true);
     setDeleteError('');
 
     try {
-      // Step 1: Remove the page's navigation item permanently from Firestore
+      // Step 1: Remove navigation reference from Firestore
       const navItemId = `nav_cms_${deleteTargetPage.id}`;
       await navigationService.deleteNavigationItem(navItemId).catch(() => {});
       await navigationService.removePageNavigationCompletely(deleteTargetPage.id).catch(() => {});
 
-      // Step 2: Permanently delete the CMS page document from Firestore.
+      // Step 2: Permanently delete page document from Firestore
       await pagesService.deletePage(deleteTargetPage.id);
 
       // Step 3: Update local state immediately
@@ -178,7 +131,7 @@ export default function AdminPagesListScreen() {
 
       showToast(
         'Page Permanently Deleted',
-        `"${deleteTargetPage.title}" has been permanently deleted.`,
+        `"${deleteTargetPage.title}" has been permanently deleted from the database.`,
         'success'
       );
     } catch (err: unknown) {
@@ -195,8 +148,8 @@ export default function AdminPagesListScreen() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <Badge variant="info" style={{ marginBottom: '0.375rem' }}>CMS Page Builder</Badge>
-          <h1 style={{ fontSize: '1.75rem', color: 'var(--primary)' }}>Website Pages</h1>
-          <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+          <h1 className={styles.headerTitle} style={{ fontSize: '2.15rem' }}>Website Pages</h1>
+          <p style={{ color: '#706A61', marginTop: '0.25rem', fontSize: '0.9375rem' }}>
             Manage institutional system pages and dynamic custom pages for your college website.
           </p>
         </div>
@@ -207,45 +160,51 @@ export default function AdminPagesListScreen() {
         </Link>
       </div>
 
-      {/* Filter and Search Bar */}
-      <Card variant="bordered" style={{ marginBottom: '1.5rem' }}>
-        <CardBody style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <div style={{ flex: 1, minWidth: '240px' }}>
-            <Input
-              label="Search Pages"
-              placeholder="Search by page title or URL slug..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div style={{ width: '180px' }}>
-            <Select
-              label="Filter by Status"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              options={[
-                { label: 'All Statuses', value: 'all' },
-                { label: 'Published Only', value: 'published' },
-                { label: 'Drafts Only', value: 'draft' },
-                { label: 'Archived Only', value: 'archived' },
-              ]}
-            />
-          </div>
-          {searchQuery && (
-            <Button variant="ghost" size="md" onClick={() => setSearchQuery('')}>
-              Clear Search
-            </Button>
-          )}
-        </CardBody>
-      </Card>
+      {/* Unified Single Search & Status Filter Box */}
+      <div className={styles.unifiedSearchBox}>
+        <Search size={18} className={styles.searchIcon} />
+        <input
+          type="text"
+          className={styles.searchInput}
+          placeholder="Search pages by title or URL slug..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+
+        <div className={styles.searchDivider} />
+
+        <div className={styles.filterSelectGroup}>
+          <Filter size={16} className={styles.filterIcon} />
+          <select
+            className={styles.filterSelect}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All Statuses</option>
+            <option value="published">Published Only</option>
+            <option value="draft">Drafts Only</option>
+            <option value="archived">Archived Only</option>
+          </select>
+        </div>
+
+        {searchQuery && (
+          <button
+            type="button"
+            className={styles.clearSearchBtn}
+            onClick={() => setSearchQuery('')}
+          >
+            Clear
+          </button>
+        )}
+      </div>
 
       {/* Loading Skeleton */}
       {loading ? (
-        <Card variant="bordered">
-          <CardBody style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <Skeleton height="2rem" />
-            <Skeleton height="2rem" />
-            <Skeleton height="2rem" />
+        <Card variant="bordered" style={{ borderRadius: '16px' }}>
+          <CardBody style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem' }}>
+            <Skeleton height="2.5rem" />
+            <Skeleton height="2.5rem" />
+            <Skeleton height="2.5rem" />
           </CardBody>
         </Card>
       ) : filteredPages.length === 0 ? (
@@ -260,7 +219,7 @@ export default function AdminPagesListScreen() {
           onAction={!searchQuery ? () => router.push('/admin/pages/create') : undefined}
         />
       ) : (
-        <Card variant="bordered">
+        <Card variant="bordered" style={{ borderRadius: '16px', border: '1px solid rgba(222, 212, 197, 0.7)', overflow: 'hidden' }}>
           <CardBody style={{ padding: 0 }}>
             <Table responsive>
               <TableHeader>
@@ -268,23 +227,24 @@ export default function AdminPagesListScreen() {
                   <TableHead>Page Title &amp; Slug</TableHead>
                   <TableHead>Type &amp; Status</TableHead>
                   <TableHead>Navbar Visibility</TableHead>
-                  <TableHead>Last Updated</TableHead>
                   <TableHead style={{ textAlign: 'right' }}>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredPages.map((page) => {
-                  const isPub = page.status === 'published';
                   const isSystem = isSystemPageCheck(page);
 
                   return (
                     <TableRow key={page.id}>
+                      {/* Page Title & Slug */}
                       <TableCell>
-                        <strong style={{ color: 'var(--primary)', display: 'block' }}>{page.title}</strong>
-                        <span className="tiny-text" style={{ color: 'var(--text-muted)' }}>
+                        <strong style={{ color: '#24221F', display: 'block', fontSize: '1rem', fontWeight: 700 }}>{page.title}</strong>
+                        <span style={{ fontSize: '0.8125rem', color: '#706A61', fontFamily: 'monospace' }}>
                           /{page.slug}
                         </span>
                       </TableCell>
+
+                      {/* Type & Status */}
                       <TableCell>
                         <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center', flexWrap: 'wrap' }}>
                           {isSystem ? (
@@ -305,6 +265,8 @@ export default function AdminPagesListScreen() {
                           </Badge>
                         </div>
                       </TableCell>
+
+                      {/* Navbar Visibility */}
                       <TableCell>
                         {(() => {
                           const posInfo = getNavPositionForPage(page, navItems);
@@ -315,67 +277,43 @@ export default function AdminPagesListScreen() {
                           );
                         })()}
                       </TableCell>
-                      <TableCell className="small-text">
-                        {page.updatedAt ? page.updatedAt.slice(0, 10) : 'Recently'}
-                      </TableCell>
+
+                      {/* Clean 3 Icon Actions Group */}
                       <TableCell style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.375rem', flexWrap: 'wrap' }}>
-                          <Link href={`/admin/pages/${page.id}/edit`}>
-                            <Button variant="outline" size="sm">Edit ✏️</Button>
+                        <div className={styles.iconActionGroup}>
+                          {/* 1. Edit Icon Button */}
+                          <Link
+                            href={`/admin/pages/${page.id}/edit`}
+                            className={`${styles.iconActionBtn} ${styles.iconActionBtnEdit}`}
+                            title="Edit Page"
+                          >
+                            <Pencil size={16} />
                           </Link>
-                          <Link href={`/admin/pages/${page.id}/preview`} target="_blank">
-                            <Button variant="ghost" size="sm">Preview 👁️</Button>
-                          </Link>
-                          <Button
-                            variant={isPub ? 'outline' : 'primary'}
-                            size="sm"
-                            onClick={() => handleTogglePublish(page)}
-                          >
-                            {isPub ? 'Unpublish' : 'Publish'}
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => handleToggleNavigationVisibility(page)}
-                          >
-                            {page.showInNavigation ? 'Hide Nav' : 'Show Nav'}
-                          </Button>
 
-                          {/* Archive Action — disabled for system pages */}
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            disabled={isSystem}
-                            title={isSystem ? 'System pages cannot be archived.' : 'Archive page'}
-                            onClick={() => !isSystem && handleArchivePage(page)}
-                            style={isSystem ? { opacity: 0.4, cursor: 'not-allowed' } : undefined}
+                          {/* 2. Preview Icon Button (Opens In-Place Modal Popup) */}
+                          <button
+                            type="button"
+                            className={`${styles.iconActionBtn} ${styles.iconActionBtnPreview}`}
+                            title="Preview Page (In-Place Modal)"
+                            onClick={() => setPreviewPage(page)}
                           >
-                            Archive
-                          </Button>
+                            <Eye size={16} />
+                          </button>
 
-                          {/* Permanent Delete Action — disabled for system pages */}
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            disabled={isSystem}
+                          {/* 3. Delete Icon Button (Triggers Delete Confirmation Modal) */}
+                          <button
+                            type="button"
+                            className={`${styles.iconActionBtn} ${styles.iconActionBtnDanger}`}
                             title={
                               isSystem
-                                ? 'Required institutional system page cannot be permanently deleted.'
-                                : `Permanently delete "${page.title}"`
+                                ? 'Required institutional system page cannot be deleted.'
+                                : `Delete "${page.title}"`
                             }
+                            disabled={isSystem}
                             onClick={() => !isSystem && handleOpenDeleteModal(page)}
-                            style={
-                              isSystem
-                                ? { opacity: 0.4, cursor: 'not-allowed' }
-                                : {
-                                    background: 'var(--semantic-error, #dc2626)',
-                                    borderColor: 'var(--semantic-error, #dc2626)',
-                                  }
-                            }
-                            aria-label={`Permanently delete ${page.title}`}
                           >
-                            🗑️ Delete
-                          </Button>
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -387,11 +325,56 @@ export default function AdminPagesListScreen() {
         </Card>
       )}
 
-      {/* ─── Delete Confirmation Modal ─────────────────────────────────── */}
+      {/* ─── 1. IN-PLACE PREVIEW MODAL POPUP ───────────────────────────── */}
+      <Modal
+        isOpen={Boolean(previewPage)}
+        onClose={() => setPreviewPage(null)}
+        title={`Preview: ${previewPage?.title}`}
+        size="lg"
+        footer={
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+            <Button variant="secondary" onClick={() => setPreviewPage(null)}>
+              Close Preview
+            </Button>
+            {previewPage && (
+              <Link href={`/admin/pages/${previewPage.id}/edit`}>
+                <Button variant="primary">
+                  Edit Page ✏️
+                </Button>
+              </Link>
+            )}
+          </div>
+        }
+      >
+        {previewPage && (
+          <div>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', alignItems: 'center', flexWrap: 'wrap', paddingBottom: '0.875rem', borderBottom: '1px solid rgba(222, 212, 197, 0.6)' }}>
+              <Badge variant="info">URL Slug: /{previewPage.slug}</Badge>
+              <Badge variant={previewPage.status === 'published' ? 'success' : 'warning'}>
+                STATUS: {previewPage.status.toUpperCase()}
+              </Badge>
+            </div>
+
+            {previewPage.sections && previewPage.sections.length > 0 ? (
+              <div style={{ maxHeight: '65vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                <PageSectionRenderer sections={previewPage.sections} />
+              </div>
+            ) : (
+              <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: '#706A61', background: '#FAF8F5', borderRadius: '12px' }}>
+                <FileText size={42} style={{ color: '#C85A32', marginBottom: '0.75rem', opacity: 0.8 }} />
+                <h4 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#24221F', margin: '0 0 0.5rem' }}>No Sections Built Yet</h4>
+                <p style={{ fontSize: '0.875rem', margin: 0 }}>Click "Edit Page" to add hero sections, text blocks, cards, or custom widgets using the drag-and-drop Page Builder.</p>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+
+      {/* ─── 2. HARD DELETE CONFIRMATION MODAL POPUP ──────────────────── */}
       <Modal
         isOpen={Boolean(deleteTargetPage)}
         onClose={handleCloseDeleteModal}
-        title="⚠️ Delete This Custom Page Permanently?"
+        title="⚠️ Permanently Delete Page?"
         description="This action cannot be undone."
         size="sm"
         footer={
@@ -408,33 +391,33 @@ export default function AdminPagesListScreen() {
               isLoading={isDeleting}
               onClick={handleConfirmDelete}
               style={{
-                background: 'var(--semantic-error, #dc2626)',
-                borderColor: 'var(--semantic-error, #dc2626)',
+                background: '#DC2626',
+                borderColor: '#DC2626',
               }}
             >
-              Delete Permanently
+              Confirm Permanent Delete
             </Button>
           </>
         }
       >
         {deleteTargetPage && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+            <p style={{ color: '#706A61', lineHeight: 1.6, margin: 0 }}>
               Are you sure you want to permanently delete custom page:
             </p>
 
             <div
               style={{
-                background: 'var(--semantic-error-bg, rgba(220,38,38,0.07))',
-                border: '1px solid var(--semantic-error, #dc2626)',
-                borderRadius: 'var(--radius-md)',
+                background: 'rgba(220, 38, 38, 0.06)',
+                border: '1px solid #DC2626',
+                borderRadius: '12px',
                 padding: '0.875rem 1rem',
               }}
             >
-              <strong style={{ color: 'var(--semantic-error, #dc2626)', display: 'block', marginBottom: '0.2rem' }}>
+              <strong style={{ color: '#DC2626', display: 'block', marginBottom: '0.2rem', fontSize: '1rem' }}>
                 {deleteTargetPage.title}
               </strong>
-              <span style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
+              <span style={{ fontSize: '0.8125rem', color: '#706A61', fontFamily: 'monospace' }}>
                 /{deleteTargetPage.slug}
               </span>
             </div>
@@ -442,29 +425,28 @@ export default function AdminPagesListScreen() {
             <ul
               style={{
                 fontSize: '0.8125rem',
-                color: 'var(--text-secondary)',
-                lineHeight: 1.75,
+                color: '#706A61',
+                lineHeight: 1.7,
                 paddingLeft: '1.25rem',
                 margin: 0,
               }}
             >
-              <li>The page document will be removed from Firestore.</li>
-              <li>Its navigation reference will be removed.</li>
-              <li>The public URL will return 404 immediately.</li>
-              <li><strong>Media Library assets are NOT deleted.</strong></li>
+              <li>The page document will be deleted permanently from Firestore.</li>
+              <li>Its dynamic navigation item will be unlinked.</li>
+              <li>The public URL will immediately return a 404 Not Found error.</li>
             </ul>
 
             {deleteError && (
               <div
                 role="alert"
                 style={{
-                  background: 'var(--semantic-error-bg, rgba(220,38,38,0.07))',
-                  color: 'var(--semantic-error, #dc2626)',
-                  border: '1px solid var(--semantic-error, #dc2626)',
-                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(220, 38, 38, 0.08)',
+                  color: '#DC2626',
+                  border: '1px solid #DC2626',
+                  borderRadius: '10px',
                   padding: '0.75rem 1rem',
                   fontSize: '0.875rem',
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 ⚠️ {deleteError}
@@ -474,7 +456,7 @@ export default function AdminPagesListScreen() {
         )}
       </Modal>
 
-      {/* ─── Toast Notification ─────────────────────────────────────────── */}
+      {/* Toast Alert Notification */}
       <Toast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );

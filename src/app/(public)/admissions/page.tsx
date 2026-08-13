@@ -39,10 +39,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AdmissionsPage() {
-  const cmsPage = await pagesService.getPageBySlug('admissions');
-  if (cmsPage && cmsPage.status === 'published' && cmsPage.sections?.length > 0) {
-    return <PageSectionRenderer sections={cmsPage.sections} />;
-  }
-
   return <AdmissionsClient />;
 }

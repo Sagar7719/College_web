@@ -86,19 +86,17 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30);
+      setIsScrolled(window.scrollY > 20);
     };
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const collegeInfo = settings?.collegeInfo || defaultSettings.collegeInfo;
-  const rawName = collegeInfo.name || 'Jaysingpur College, Jaysingpur';
-  const collegeName = rawName.toLowerCase().includes('jaysingpur college jaysingpur')
-    ? 'Jaysingpur College, Jaysingpur'
-    : rawName;
+  const collegeName = collegeInfo.name || 'Jaysingpur College, Jaysingpur';
   const tagline = collegeInfo.tagline || 'Empowering Education & Innovation';
-  const logoSrc = '/images/college_emblem.png';
+  const logoSrc = collegeInfo.logoUrl || '/images/college_emblem.png';
 
   const handleDropdownKeyDown = (e: React.KeyboardEvent, itemId: string) => {
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
@@ -110,15 +108,13 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
     }
   };
 
-  const navClassName = isHomePage
-    ? `${styles.unifiedHeaderNav} ${styles.heroTransparentNav} ${isScrolled ? styles.heroNavScrolled : ''}`
-    : styles.unifiedHeaderNav;
+  const navClassName = `${styles.unifiedHeaderNav} ${isScrolled ? styles.heroNavScrolled : styles.heroTransparentNav}`;
 
   return (
-    <header className={isHomePage ? styles.headerShellTransparent : styles.headerShell}>
+    <header className={styles.headerShellTransparent}>
       {/* UNIFIED BRAND & NAVBAR (Transparent Overlay on Home, Surface on Subpages) */}
       <nav className={navClassName} aria-label="Main Navigation">
-        <div className="container" ref={navRef}>
+        <div className={styles.headerContainer} ref={navRef}>
           <div className={styles.unifiedHeaderInner}>
             {/* Left: Official Emblem Logo + Enlarged Title Case College Name */}
             <Link href="/" className={styles.logoGroup} title={collegeName}>

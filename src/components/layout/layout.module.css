@@ -62,68 +62,115 @@
    UNIFIED MODERN SINGLE-LINE BRAND + NAVBAR (#FFFFFF Surface, Sticky)
    ============================================================================== */
 .headerShellTransparent {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  width: 100%;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.headerContainer {
+  width: 100%;
+  max-width: 100%;
+  padding-left: 48px;
+  padding-right: 48px;
+  margin: 0 auto;
+  pointer-events: auto;
 }
 
 .unifiedHeaderNav {
-  background-color: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
-  box-shadow: var(--shadow-sm);
-  padding: 12px 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
+  z-index: 1000;
+  pointer-events: auto;
+  background-color: rgba(12, 8, 6, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0);
+  box-shadow: 0 0 0 transparent;
+  padding: 22px 0 14px;
+  transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              backdrop-filter 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              -webkit-backdrop-filter 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              padding 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .heroTransparentNav {
-  background: linear-gradient(180deg, rgba(15, 13, 11, 0.85) 0%, rgba(15, 13, 11, 0.35) 70%, transparent 100%) !important;
-  border-bottom: none !important;
+  background-color: rgba(12, 8, 6, 0) !important;
+  backdrop-filter: blur(0px) !important;
+  -webkit-backdrop-filter: blur(0px) !important;
+  border-bottom-color: rgba(255, 255, 255, 0) !important;
+  padding: 22px 0 14px !important;
   box-shadow: none !important;
-  transition: all 0.35s ease;
 }
 
-.heroTransparentNav .collegeTitle {
+.heroNavScrolled {
+  background-color: rgba(6, 4, 3, 0.94) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 10px 0 10px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.heroTransparentNav .collegeTitle,
+.heroNavScrolled .collegeTitle {
   color: #FFFFFF !important;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
-.heroTransparentNav .collegeSubtitle {
-  color: rgba(255, 255, 255, 0.85) !important;
+.heroTransparentNav .collegeSubtitle,
+.heroNavScrolled .collegeSubtitle {
+  color: rgba(255, 255, 255, 0.75) !important;
 }
 
-.heroTransparentNav .navItemLink {
-  color: rgba(255, 255, 255, 0.95) !important;
+.heroTransparentNav .navItemLink,
+.heroNavScrolled .navItemLink {
+  color: rgba(255, 255, 255, 0.88) !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.heroTransparentNav .navItemLink:hover {
+.heroTransparentNav .navItemLink:hover,
+.heroNavScrolled .navItemLink:hover {
   color: #FFFFFF !important;
-  background-color: rgba(255, 255, 255, 0.15) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-bottom: 1px solid transparent !important;
 }
 
-.heroTransparentNav .navItemActive {
-  color: var(--color-accent-soft) !important;
-  border-bottom-color: var(--color-accent) !important;
+.heroTransparentNav .navItemActive,
+.heroNavScrolled .navItemActive {
+  color: #FFFFFF !important;
   background-color: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
 }
 
-.heroTransparentNav .mobileToggleBtn {
+.heroTransparentNav .mobileToggleBtn,
+.heroNavScrolled .mobileToggleBtn {
   color: #FFFFFF !important;
 }
 
-.heroNavScrolled {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(20, 18, 15, 0.94) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+@media (max-width: 768px) {
+  .headerContainer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .unifiedHeaderNav {
+    padding: 14px 0 8px !important;
+  }
+  .heroNavScrolled {
+    padding: 8px 0 !important;
+  }
 }
 
 .unifiedHeaderInner {
@@ -141,17 +188,23 @@
   gap: 12px;
   text-decoration: none;
   flex: 1;
+  flex-shrink: 0 !important;
   min-width: 0;
   max-width: calc(100% - 50px); /* Reserves width for mobile toggle without overlap */
 }
 
 .logoImage {
-  height: 58px;
+  height: 56px;
   width: auto;
   max-width: 180px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
+  transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.heroNavScrolled .logoImage {
+  height: 44px;
 }
 
 .logoBadge {
@@ -177,22 +230,30 @@
 }
 
 .collegeTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.35rem, 2.2vw, 1.95rem); /* Prominent Institute Title */
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-text-primary);
-  line-height: 1.2;
+  line-height: 1.15;
   letter-spacing: -0.025em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: font-size 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.heroNavScrolled .collegeTitle {
+  font-size: clamp(1.15rem, 1.8vw, 1.6rem);
 }
 
 .collegeSubtitle {
-  font-size: 0.8125rem; /* 13px Subtitle */
+  font-family: var(--font-sans);
+  font-size: 0.725rem; /* Compact premium subtitle */
   color: var(--color-text-secondary);
-  margin-top: 2px;
-  font-weight: 500;
+  margin-top: 4px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -284,10 +345,12 @@
   top: calc(100% + 4px);
   left: 0;
   min-width: 230px;
-  background-color: var(--color-surface);
+  background-color: rgba(12, 8, 6, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--color-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   list-style: none;
   padding: 8px 0;
   margin: 0;
@@ -298,7 +361,7 @@
 .dropdownItemLink {
   display: block;
   padding: 0.75rem 1.25rem;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
@@ -307,8 +370,8 @@
 
 .dropdownItemLink:hover,
 .dropdownItemActive {
-  background-color: var(--color-primary-bg);
-  color: var(--color-accent);
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
   font-weight: 600;
   padding-left: 1.5rem;
 }
@@ -346,7 +409,7 @@
 }
 
 /* Responsive Breakpoints */
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
   .navList {
     display: none;
   }
@@ -358,6 +421,16 @@
   }
   .collegeTitle {
     font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+  }
+}
+
+@media (min-width: 1281px) and (max-width: 1440px) {
+  .navItemLink {
+    padding: 8px 8px !important;
+    font-size: 0.84rem !important;
+  }
+  .unifiedHeaderInner {
+    gap: 8px !important;
   }
 }
 
@@ -411,8 +484,11 @@
   width: 100%;
   max-width: 320px;
   height: 100%;
-  background-color: var(--color-surface);
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+  background-color: rgba(12, 8, 6, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   z-index: 1001;
@@ -429,29 +505,29 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-primary-bg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  background-color: rgba(12, 8, 6, 0.98) !important;
 }
 
 .drawerTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: #FFFFFF !important;
 }
 
 .drawerCloseBtn {
   background: transparent;
   border: none;
   font-size: 1.25rem;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7) !important;
   cursor: pointer;
   padding: 4px;
   transition: color var(--transition-fast);
 }
 
 .drawerCloseBtn:hover {
-  color: var(--color-accent);
+  color: #FFFFFF !important;
 }
 
 .drawerBody {
@@ -473,20 +549,20 @@
   padding: 14px 24px;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: rgba(255, 255, 255, 0.85) !important;
   text-decoration: none;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
   transition: all var(--transition-fast);
 }
 
 .drawerNavLink:hover {
-  color: var(--color-accent);
-  background-color: var(--color-highlight);
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .drawerNavLinkActive {
-  color: var(--color-accent) !important;
-  background-color: var(--color-primary-bg) !important;
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
   font-weight: 700 !important;
   border-left: 4px solid var(--color-accent) !important;
 }
@@ -499,10 +575,10 @@
   padding: 14px 24px;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: rgba(255, 255, 255, 0.85) !important;
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
@@ -510,16 +586,16 @@
 }
 
 .drawerAccordionToggle:hover {
-  color: var(--color-accent);
-  background-color: var(--color-highlight);
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .drawerSubNavList {
   list-style: none;
   margin: 0;
   padding: 0;
-  background-color: var(--color-primary-bg);
-  border-bottom: 1px solid var(--color-border);
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .drawerSubNavLink {
@@ -527,21 +603,21 @@
   padding: 10px 24px 10px 36px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7) !important;
   text-decoration: none;
   transition: all var(--transition-fast);
 }
 
 .drawerSubNavLink:hover,
 .drawerSubNavLinkActive {
-  color: var(--color-accent);
+  color: #FFFFFF !important;
   font-weight: 600;
 }
 
 .drawerFooter {
   padding: 20px 24px;
-  border-top: 1px solid var(--color-border);
-  background-color: var(--color-primary-bg);
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+  background-color: rgba(12, 8, 6, 0.98) !important;
 }
 
 .drawerCtaBtn {
@@ -568,18 +644,34 @@
    ULTRA-PREMIUM EXECUTIVE FOOTER (#1A1816 Dark Charcoal / Warm Editorial Surface)
    ============================================================================== */
 .footer {
-  background-color: #1A1816;
-  color: #D5CDC0;
+  background-color: #060403;
+  background-image: 
+    radial-gradient(circle at 50% 0%, #160c07 0%, #060403 70%),
+    radial-gradient(circle at 85% 100%, rgba(200, 90, 50, 0.08) 0%, transparent 60%);
+  color: #E2D9CE;
   position: relative;
   overflow: hidden;
-  font-family: 'Inter', system-ui, sans-serif;
-  border-top: 1px solid rgba(222, 212, 197, 0.15);
+  font-family: var(--font-sans);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer::after {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(200, 90, 50, 0.1) 0%, transparent 70%);
+  bottom: -250px;
+  right: -120px;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .footerAccentBar {
   height: 3px;
   width: 100%;
-  background: linear-gradient(90deg, #B85C3A 0%, rgba(184, 92, 58, 0.3) 50%, transparent 100%);
+  background: linear-gradient(90deg, #C85A32 0%, #D97706 50%, transparent 100%);
 }
 
 .footerMain {
@@ -630,7 +722,7 @@
 }
 
 .footerBrandTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.25rem;
   font-weight: 800;
   color: #FFFFFF;
@@ -681,7 +773,7 @@
 }
 
 .footerColTitle {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 700;
   color: #FFFFFF;
@@ -760,7 +852,7 @@
 .footerBottom {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding: 22px 0;
-  background-color: #141210;
+  background-color: #030201;
 }
 
 .footerBottomInner {

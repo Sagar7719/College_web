@@ -17,7 +17,6 @@ import {
   Course,
   Faculty,
   Notice,
-  Announcement,
   NewsItem,
   EventItem,
   GalleryAlbum,
@@ -151,24 +150,6 @@ export const noticesService = {
     return id;
   },
   delete: (id: string) => deleteDoc(doc(db, 'notices', id)),
-};
-
-// 5. Announcements Ticker Service
-export const announcementsService = {
-  getActive: () => fetchDocs<Announcement>('announcements', [where('active', '==', true)]),
-  save: async (anc: Partial<Announcement> & { text: string }): Promise<string> => {
-    const id = anc.id || doc(collection(db, 'announcements')).id;
-    const payload: Announcement = {
-      id,
-      text: anc.text,
-      linkUrl: anc.linkUrl || '',
-      active: anc.active ?? true,
-      createdAt: anc.createdAt || new Date().toISOString(),
-    };
-    await setDoc(doc(db, 'announcements', id), sanitizeForFirestore(payload), { merge: true });
-    return id;
-  },
-  delete: (id: string) => deleteDoc(doc(db, 'announcements', id)),
 };
 
 // 6. News Service

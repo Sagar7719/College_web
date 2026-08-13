@@ -19,6 +19,7 @@ import {
   ArrowRight,
   Landmark,
 } from 'lucide-react';
+import { InteractiveDotGrid } from '@/components/common/InteractiveDotGrid';
 import styles from '../inner.module.css';
 import homeStyles from '../home.module.css';
 
@@ -56,36 +57,39 @@ export function AboutClient({ collegeInfo }: AboutClientProps) {
     <div className={styles.pageContainer}>
       {/* 1. HERO BANNER */}
       <section className={styles.heroBanner}>
+        <InteractiveDotGrid />
         <div className="container">
           <div className={styles.heroContent}>
-            <div className={styles.heroBadge}>
-              <Sparkles size={16} />
-              <span>Established Institution of Academic Excellence</span>
-            </div>
-            <h1 className={styles.heroTitle}>About {collegeName}</h1>
-            <p className={styles.heroSubtitle}>
-              Established in {estYear}, our institution stands as a beacon of academic distinction, research innovation, and holistic student empowerment.
-            </p>
-            <div className={styles.heroStatsRow}>
-              <div className={styles.heroStatItem}>
-                <Award size={20} className={styles.statIcon} />
-                <div>
-                  <strong>NAAC Accredited</strong>
-                  <span>UGC 2(f) & 12(B) Recognized</span>
-                </div>
+            <div className={styles.innerHeroGlassCard}>
+              <div className={styles.heroBadge}>
+                <Sparkles size={16} />
+                <span>Established Institution of Academic Excellence</span>
               </div>
-              <div className={styles.heroStatItem}>
-                <GraduationCap size={20} className={styles.statIcon} />
-                <div>
-                  <strong>50,000+ Alumni</strong>
-                  <span>Global Professional Network</span>
+              <h1 className={styles.heroTitle}>About {collegeName}</h1>
+              <p className={styles.heroSubtitle}>
+                Established in {estYear}, our institution stands as a beacon of academic distinction, research innovation, and holistic student empowerment.
+              </p>
+              <div className={styles.heroStatsRow}>
+                <div className={styles.heroStatItem}>
+                  <Award size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>NAAC Accredited</strong>
+                    <span>UGC 2(f) & 12(B) Recognized</span>
+                  </div>
                 </div>
-              </div>
-              <div className={styles.heroStatItem}>
-                <Landmark size={20} className={styles.statIcon} />
-                <div>
-                  <strong>Est. {estYear}</strong>
-                  <span>50+ Years of Legacy</span>
+                <div className={styles.heroStatItem}>
+                  <GraduationCap size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>50,000+ Alumni</strong>
+                    <span>Global Professional Network</span>
+                  </div>
+                </div>
+                <div className={styles.heroStatItem}>
+                  <Landmark size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>Est. {estYear}</strong>
+                    <span>50+ Years of Legacy</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -170,7 +174,7 @@ export function AboutClient({ collegeInfo }: AboutClientProps) {
               </div>
 
               <div style={{ flex: 1, minWidth: '260px' }}>
-                <h3 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '1.3rem', fontWeight: 800, color: '#24221F', margin: '0 0 4px 0' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.3rem', fontWeight: 800, color: '#24221F', margin: '0 0 4px 0' }}>
                   {principalName}
                 </h3>
                 <span style={{ fontSize: '0.84375rem', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>

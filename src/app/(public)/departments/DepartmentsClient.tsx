@@ -19,6 +19,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { Department } from '@/types';
+import { InteractiveDotGrid } from '@/components/common/InteractiveDotGrid';
 import styles from '../inner.module.css';
 import homeStyles from '../home.module.css';
 
@@ -113,36 +114,39 @@ export function DepartmentsClient({ initialDepartments }: DepartmentsClientProps
     <div className={styles.pageContainer}>
       {/* 1. EXECUTIVE HERO BANNER */}
       <section className={styles.heroBanner}>
+        <InteractiveDotGrid />
         <div className="container">
           <div className={styles.heroContent}>
-            <div className={styles.heroBadge}>
-              <Sparkles size={16} />
-              <span>Academic Divisions & Faculties</span>
-            </div>
-            <h1 className={styles.heroTitle}>Our Academic Departments</h1>
-            <p className={styles.heroSubtitle}>
-              Discover state-of-the-art faculties, research laboratories, distinguished mentors, and specialized degree paths designed for industry excellence.
-            </p>
-            <div className={styles.heroStatsRow}>
-              <div className={styles.heroStatItem}>
-                <Building2 size={20} className={styles.statIcon} />
-                <div>
-                  <strong>{departmentsList.length}+ Accredited</strong>
-                  <span>Academic Departments</span>
-                </div>
+            <div className={styles.innerHeroGlassCard}>
+              <div className={styles.heroBadge}>
+                <Sparkles size={16} />
+                <span>Academic Divisions & Faculties</span>
               </div>
-              <div className={styles.heroStatItem}>
-                <Microscope size={20} className={styles.statIcon} />
-                <div>
-                  <strong>Modern Labs</strong>
-                  <span>Tech & Research Centers</span>
+              <h1 className={styles.heroTitle}>Our Academic Departments</h1>
+              <p className={styles.heroSubtitle}>
+                Discover state-of-the-art faculties, research laboratories, distinguished mentors, and specialized degree paths designed for industry excellence.
+              </p>
+              <div className={styles.heroStatsRow}>
+                <div className={styles.heroStatItem}>
+                  <Building2 size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>{departmentsList.length}+ Accredited</strong>
+                    <span>Academic Departments</span>
+                  </div>
                 </div>
-              </div>
-              <div className={styles.heroStatItem}>
-                <GraduationCap size={20} className={styles.statIcon} />
-                <div>
-                  <strong>UG & PG Degrees</strong>
-                  <span>Industry Aligned</span>
+                <div className={styles.heroStatItem}>
+                  <Microscope size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>Modern Labs</strong>
+                    <span>Tech & Research Centers</span>
+                  </div>
+                </div>
+                <div className={styles.heroStatItem}>
+                  <GraduationCap size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>UG & PG Degrees</strong>
+                    <span>Industry Aligned</span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -21,6 +21,7 @@ import {
   HeartHandshake,
 } from 'lucide-react';
 import { ContactForm } from '@/components/public/ContactForm';
+import { InteractiveDotGrid } from '@/components/common/InteractiveDotGrid';
 import styles from '../inner.module.css';
 import homeStyles from '../home.module.css';
 
@@ -56,36 +57,39 @@ export function ContactClient({ collegeInfo, socialLinks }: ContactClientProps) 
     <div className={styles.pageContainer}>
       {/* 1. HERO BANNER */}
       <section className={styles.heroBanner}>
+        <InteractiveDotGrid />
         <div className="container">
           <div className={styles.heroContent}>
-            <div className={styles.heroBadge}>
-              <Sparkles size={16} />
-              <span>Admissions & Helpdesk Office</span>
-            </div>
-            <h1 className={styles.heroTitle}>Contact Us & Campus Location</h1>
-            <p className={styles.heroSubtitle}>
-              Reach out to our administrative team, academic departments, or campus helpdesk. We are here to assist your educational journey.
-            </p>
-            <div className={styles.heroStatsRow}>
-              <div className={styles.heroStatItem}>
-                <MapPin size={20} className={styles.statIcon} />
-                <div>
-                  <strong>Pune, Maharashtra</strong>
-                  <span>Main Campus Location</span>
-                </div>
+            <div className={styles.innerHeroGlassCard}>
+              <div className={styles.heroBadge}>
+                <Sparkles size={16} />
+                <span>Admissions & Helpdesk Office</span>
               </div>
-              <div className={styles.heroStatItem}>
-                <PhoneCall size={20} className={styles.statIcon} />
-                <div>
-                  <strong>{phoneDisplay}</strong>
-                  <span>Admission Helpline</span>
+              <h1 className={styles.heroTitle}>Contact Us & Campus Location</h1>
+              <p className={styles.heroSubtitle}>
+                Reach out to our administrative team, academic departments, or campus helpdesk. We are here to assist your educational journey.
+              </p>
+              <div className={styles.heroStatsRow}>
+                <div className={styles.heroStatItem}>
+                  <MapPin size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>Pune, Maharashtra</strong>
+                    <span>Main Campus Location</span>
+                  </div>
                 </div>
-              </div>
-              <div className={styles.heroStatItem}>
-                <Mail size={20} className={styles.statIcon} />
-                <div>
-                  <strong>{emailDisplay}</strong>
-                  <span>Official Inquiry Desk</span>
+                <div className={styles.heroStatItem}>
+                  <PhoneCall size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>{phoneDisplay}</strong>
+                    <span>Admission Helpline</span>
+                  </div>
+                </div>
+                <div className={styles.heroStatItem}>
+                  <Mail size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>{emailDisplay}</strong>
+                    <span>Official Inquiry Desk</span>
+                  </div>
                 </div>
               </div>
             </div>

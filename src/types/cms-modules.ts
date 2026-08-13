@@ -69,16 +69,6 @@ export interface Notice {
   updatedAt: string;
 }
 
-export interface Announcement {
-  id: string;
-  text: string;
-  linkUrl?: string;
-  active: boolean;
-  startDate?: string;
-  endDate?: string;
-  createdAt: string;
-}
-
 export interface NewsItem {
   id: string;
   title: string;

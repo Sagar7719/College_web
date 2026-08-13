@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { pagesService } from '@/services/pages.service';
 import { noticesService } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
-import { PageSectionRenderer } from '@/components/page-builder';
 import { NoticesClient } from './NoticesClient';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -40,11 +39,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function NoticesPage() {
-  const cmsPage = await pagesService.getPageBySlug('notices');
-  if (cmsPage && cmsPage.status === 'published' && cmsPage.sections?.length > 0) {
-    return <PageSectionRenderer sections={cmsPage.sections} />;
-  }
-
   const notices = await noticesService.getPublished(20);
 
   return <NoticesClient initialNotices={notices} />;

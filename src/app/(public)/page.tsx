@@ -8,19 +8,18 @@ import {
   eventsService,
   departmentsService,
   coursesService,
-  announcementsService,
   galleryService,
   facultyService,
   downloadsService,
 } from '@/services/cms-modules.service';
-import { PageSectionRenderer } from '@/components/page-builder';
-import { GraduationCap, Megaphone, Building2, FileText, ArrowRight, Users, Microscope, Rocket, BookOpen, Award, FlaskConical, Briefcase, Sparkles, Landmark, Bell, Download, FileCheck, FolderDown, BellOff, Pin, Calendar, Camera, Mail, ArrowUpRight, Quote, CheckCircle2, Scroll, MapPin, PhoneCall, Map, Compass } from 'lucide-react';
+import { GraduationCap, Megaphone, Building2, FileText, ArrowRight, Users, Microscope, Rocket, BookOpen, Award, FlaskConical, Briefcase, Sparkles, Landmark, Bell, Download, FileCheck, FolderDown, BellOff, Mail, Quote, CheckCircle2, Scroll, MapPin, PhoneCall, Map, Compass } from 'lucide-react';
 import { AnimatedCounter } from '@/components/common/AnimatedCounter';
 import { ProgrammesCarousel } from '@/components/common/ProgrammesCarousel';
 import { DepartmentsCarousel } from '@/components/common/DepartmentsCarousel';
 import { EventsCarousel } from '@/components/common/EventsCarousel';
 import { GalleryCarousel } from '@/components/common/GalleryCarousel';
 import { QuickLinksCarousel } from '@/components/common/QuickLinksCarousel';
+import { InteractiveDotGrid } from '@/components/common/InteractiveDotGrid';
 import styles from './home.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -49,30 +48,16 @@ function formatDate(dateStr: string) {
   }
 }
 
-function getEventDateParts(dateStr: string) {
-  if (!dateStr) return { month: 'TBD', day: '--' };
-  try {
-    const d = new Date(dateStr);
-    return { month: d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(), day: String(d.getDate()).padStart(2, '0') };
-  } catch {
-    return { month: 'TBD', day: '--' };
-  }
-}
+
 
 export default async function HomePage() {
-  const homePage = (await pagesService.getPageById('sys_page_home')) || (await pagesService.getPageBySlug(''));
-  if (homePage && homePage.status === 'published' && homePage.sections?.length > 0) {
-    return <PageSectionRenderer sections={homePage.sections} />;
-  }
-
-  const [settings, notices, upcomingEvents, departments, courses, announcements, galleryAlbums, faculty, downloads] =
+  const [settings, notices, upcomingEvents, departments, courses, galleryAlbums, faculty, downloads] =
     await Promise.all([
       siteSettingsService.getSettings(),
       noticesService.getPublished(6),
       eventsService.getUpcoming(),
       departmentsService.getPublished(),
       coursesService.getAll(),
-      announcementsService.getActive(),
       galleryService.getPublished(),
       facultyService.getAll(),
       downloadsService.getPublished(),
@@ -80,6 +65,7 @@ export default async function HomePage() {
 
   const info = settings?.collegeInfo;
   const collegeName = info?.name || 'Jaysingpur College';
+  const displayCollegeName = collegeName.replace(/\b\w/g, (c) => c.toUpperCase());
   const tagline = info?.tagline || 'Empowering Minds, Building Futures';
   const description = info?.description || 'A premier higher education institution dedicated to academic rigor, pioneering research, and holistic student growth.';
   const estYear = info?.establishedYear || '2001';
@@ -93,25 +79,29 @@ export default async function HomePage() {
   const publishedFaculty = faculty.filter((f) => f.status === 'published' || !f.status);
   const recentDownloads = downloads.slice(0, 4);
 
-  const heroMasterpieceImage = '/images/hero_masterpiece.png';
 
   return (
     <div className={styles.homePage}>
       {/* 2. ULTRA-PREMIUM FULL-WIDTH PANORAMIC HERO SECTION */}
-      <section
-        className={styles.heroFullBleed}
-        style={{ backgroundImage: `url('/images/fullwidth_hero_students.png')` }}
-      >
+      <section className={styles.heroFullBleed}>
+        {/* Ambient Animated RGB Glow Blobs */}
+        <div className={styles.glowBlob1} />
+        <div className={styles.glowBlob2} />
+        <div className={styles.glowBlob3} />
+        <InteractiveDotGrid />
         <div className={styles.heroFullOverlay} />
-        <div className={`container ${styles.heroFullContentGrid}`}>
-          {/* Left Text Column */}
-          <div className={styles.heroLeftBlock}>
+        
+        <div className={`container ${styles.heroUnifiedContainer}`}>
+          <div className={styles.heroGlassCard}>
+            {/* Centered Content */}
             <div className={styles.heroBadgePill}>
-              <span>🏛️</span> {collegeName.toUpperCase()} • EST. {estYear} • NAAC 'A' GRADE
+              <span>🏛️</span> {collegeName.toUpperCase()} • EST. {estYear} • NAAC &apos;A&apos; GRADE
             </div>
-            <h1 className={styles.heroHeadlineLight}>{tagline}</h1>
-            <p className={styles.heroSubtitleLight}>{description}</p>
-            <div className={styles.heroCtaGroup}>
+            <h1 className={styles.heroHeadlineLightCentered}>
+              <span className={styles.gradientText}>{tagline}</span>
+            </h1>
+            <p className={styles.heroSubtitleLightCentered}>{description}</p>
+            <div className={styles.heroCtaGroupCentered}>
               <Link href="/courses" className={styles.btnPrimaryTerracotta}>
                 <span>Explore Programmes</span>
                 <ArrowRight size={18} strokeWidth={2.2} className={styles.ctaArrowSvg} />
@@ -130,41 +120,45 @@ export default async function HomePage() {
         <div className="container">
           <div className={styles.masterGlassDeck}>
             <div className={styles.gatewaysGrid}>
-              <Link href="/courses" className={styles.gatewayCardModern}>
-                <div className={styles.gatewayIconBox}>
+              <Link href="/courses" className={`${styles.gatewayCardModern} ${styles.gatewayCardTerracotta}`}>
+                <div className={`${styles.gatewayIconBox} ${styles.gatewayIconTerracotta}`}>
                   <GraduationCap size={26} strokeWidth={1.8} />
                 </div>
                 <div className={styles.gatewayTitleModern}>Academic Degrees</div>
+                <p className={styles.gatewaySubModern}>UG, PG & Doctoral Programmes across Science, Commerce & Arts</p>
                 <div className={styles.gatewayArrowBottom}>
                   <span>Explore</span>
                   <ArrowRight size={16} strokeWidth={2.2} />
                 </div>
               </Link>
-              <Link href="/admissions" className={styles.gatewayCardModern}>
-                <div className={styles.gatewayIconBox}>
+              <Link href="/admissions" className={`${styles.gatewayCardModern} ${styles.gatewayCardEmerald}`}>
+                <div className={`${styles.gatewayIconBox} ${styles.gatewayIconEmerald}`}>
                   <Megaphone size={26} strokeWidth={1.8} />
                 </div>
                 <div className={styles.gatewayTitleModern}>Admissions 2026</div>
+                <p className={styles.gatewaySubModern}>Online Application Portal, Prospectus & Fee Structure</p>
                 <div className={styles.gatewayArrowBottom}>
                   <span>Apply Now</span>
                   <ArrowRight size={16} strokeWidth={2.2} />
                 </div>
               </Link>
-              <Link href="/departments" className={styles.gatewayCardModern}>
-                <div className={styles.gatewayIconBox}>
+              <Link href="/departments" className={`${styles.gatewayCardModern} ${styles.gatewayCardSapphire}`}>
+                <div className={`${styles.gatewayIconBox} ${styles.gatewayIconSapphire}`}>
                   <Building2 size={26} strokeWidth={1.8} />
                 </div>
                 <div className={styles.gatewayTitleModern}>Departments</div>
+                <p className={styles.gatewaySubModern}>Faculties of Science, Humanities, Commerce & Research Wings</p>
                 <div className={styles.gatewayArrowBottom}>
                   <span>View All</span>
                   <ArrowRight size={16} strokeWidth={2.2} />
                 </div>
               </Link>
-              <Link href="/notices" className={styles.gatewayCardModern}>
-                <div className={styles.gatewayIconBox}>
+              <Link href="/notices" className={`${styles.gatewayCardModern} ${styles.gatewayCardGold}`}>
+                <div className={`${styles.gatewayIconBox} ${styles.gatewayIconGold}`}>
                   <FileText size={26} strokeWidth={1.8} />
                 </div>
                 <div className={styles.gatewayTitleModern}>Academic Bulletins</div>
+                <p className={styles.gatewaySubModern}>Official Circulars, Exam Timetables & University Updates</p>
                 <div className={styles.gatewayArrowBottom}>
                   <span>Circulars</span>
                   <ArrowRight size={16} strokeWidth={2.2} />
@@ -213,25 +207,29 @@ export default async function HomePage() {
               icon: <GraduationCap size={24} />,
               title: 'Academic Excellence',
               sub: 'Rigorous curriculum aligned with industry standards',
+              colorClass: styles.iconTerracotta,
             },
             {
               icon: <Users size={24} />,
               title: 'Experienced Faculty',
               sub: 'Distinguished educators and active researchers',
+              colorClass: styles.iconEmerald,
             },
             {
               icon: <Microscope size={24} />,
               title: 'Modern Infrastructure',
               sub: 'Tech labs, digital classrooms, and central archive',
+              colorClass: styles.iconSapphire,
             },
             {
               icon: <Rocket size={24} />,
               title: 'Student Success',
               sub: 'Dedicated placement cell and career guidance',
+              colorClass: styles.iconGold,
             },
           ].map((f) => (
             <div key={f.title} className={styles.featureItem}>
-              <div className={styles.featureIcon}>{f.icon}</div>
+              <div className={`${styles.featureIcon} ${f.colorClass}`}>{f.icon}</div>
               <div>
                 <strong className={styles.featureName}>{f.title}</strong>
                 <p className={styles.featureSub}>{f.sub}</p>
@@ -246,7 +244,7 @@ export default async function HomePage() {
         <div className="container">
           <div className={styles.secHead}>
             <span className={styles.eyebrow}>Why Choose Us</span>
-            <h2 className={styles.secTitle}>Why {collegeName}?</h2>
+            <h2 className={styles.secTitle}>Why {displayCollegeName}?</h2>
             <p className={styles.secSub}>Pillars of academic leadership, modern learning, and student success.</p>
           </div>
           <div className={styles.whyGrid}>
@@ -255,34 +253,40 @@ export default async function HomePage() {
                 icon: <BookOpen size={26} />,
                 title: 'Academic Excellence',
                 desc: 'Comprehensive undergraduate, postgraduate, and diploma courses across diverse faculties.',
+                colorClass: styles.whyTerracotta,
               },
               {
                 icon: <Award size={26} />,
                 title: 'Expert Faculty',
                 desc: 'Accomplished mentors fostering scientific inquiry, critical thinking, and innovation.',
+                colorClass: styles.whyEmerald,
               },
               {
                 icon: <FlaskConical size={26} />,
                 title: 'Modern Laboratories',
                 desc: 'State-of-the-art facilities for computer science, physical sciences, and practical research.',
+                colorClass: styles.whySapphire,
               },
               {
                 icon: <Briefcase size={26} />,
                 title: 'Placement Support',
                 desc: 'Proactive career guidance cell driving campus hiring drives with leading recruiters.',
+                colorClass: styles.whyPurple,
               },
               {
                 icon: <Sparkles size={26} />,
                 title: 'Holistic Development',
                 desc: 'Active NSS, NCC, sports, cultural societies, and community development initiatives.',
+                colorClass: styles.whyGold,
               },
               {
                 icon: <Landmark size={26} />,
                 title: 'Vibrant Campus Life',
                 desc: 'Engaging student clubs, seminars, annual youth festivals, and academic symposiums.',
+                colorClass: styles.whyCrimson,
               },
             ].map((item) => (
-              <div key={item.title} className={styles.whyCard}>
+              <div key={item.title} className={`${styles.whyCard} ${item.colorClass}`}>
                 <div className={styles.whyIcon}>{item.icon}</div>
                 <h3 className={styles.whyCardTitle}>{item.title}</h3>
                 <p className={styles.whyCardDesc}>{item.desc}</p>
@@ -406,7 +410,7 @@ export default async function HomePage() {
             </div>
             <div className={styles.aboutText}>
               <span className={styles.eyebrow}>{principalMsg ? "Principal's Message" : 'About Our College'}</span>
-              <h2 className={styles.secTitle}>{principalMsg ? `Welcome to ${collegeName}` : `About ${collegeName}`}</h2>
+              <h2 className={styles.secTitle}>{principalMsg ? `Welcome to ${displayCollegeName}` : `About ${displayCollegeName}`}</h2>
               {principalMsg ? (
                 <div className={styles.quoteWrapper}>
                   <Quote size={28} className={styles.quoteIcon} />

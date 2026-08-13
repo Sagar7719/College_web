@@ -39,11 +39,12 @@ export const defaultFooterColumns: FooterColumn[] = [
 export const defaultSettings: SiteSettings = {
   id: SETTINGS_DOC_ID,
   collegeInfo: {
-    name: 'College Name',
-    shortName: 'College',
+    name: 'Jaysingpur College, Jaysingpur',
+    shortName: 'Jaysingpur College',
     tagline: 'Empowering Education & Innovation',
     description: 'Welcome to our official college portal providing quality higher education and holistic student development.',
-    establishedYear: '',
+    establishedYear: '2001',
+    logoUrl: '/images/college_emblem.png',
     address: 'Campus Address, University District',
     city: '',
     state: '',

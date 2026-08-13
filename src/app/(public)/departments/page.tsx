@@ -40,11 +40,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DepartmentsPage() {
-  const cmsPage = await pagesService.getPageBySlug('departments');
-  if (cmsPage && cmsPage.status === 'published' && cmsPage.sections?.length > 0) {
-    return <PageSectionRenderer sections={cmsPage.sections} />;
-  }
-
   const departments = await departmentsService.getPublished();
 
   return <DepartmentsClient initialDepartments={departments} />;

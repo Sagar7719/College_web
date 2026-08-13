@@ -12,7 +12,9 @@ import {
   downloadsService,
 } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
+import { navigationService } from '@/services/navigation.service';
 import { Card, CardBody, Button, Badge } from '@/components/ui';
+import DraggableNavbarPreview from '@/components/admin/DraggableNavbarPreview';
 import styles from '@/components/admin/admin.module.css';
 
 export default async function AdminDashboardPage() {
@@ -27,6 +29,7 @@ export default async function AdminDashboardPage() {
     gallery,
     downloads,
     settings,
+    navItems,
   ] = await Promise.all([
     pagesService.getAllPages().catch(() => []),
     departmentsService.getAll().catch(() => []),
@@ -38,6 +41,7 @@ export default async function AdminDashboardPage() {
     galleryService.getAll().catch(() => []),
     downloadsService.getAll().catch(() => []),
     siteSettingsService.getSettings().catch(() => null),
+    navigationService.getNavigationItems().catch(() => []),
   ]);
 
   const collegeName = settings?.collegeInfo?.name || 'College CMS';
@@ -45,21 +49,21 @@ export default async function AdminDashboardPage() {
   const isMaintenanceActive = Boolean(settings?.maintenanceMode);
 
   const metrics = [
-    { title: 'Dynamic Pages', count: pages.length, icon: '📄', href: '/admin/pages' },
-    { title: 'Departments', count: departments.length, icon: '🏛️', href: '/admin/departments' },
-    { title: 'Courses & Programs', count: courses.length, icon: '🎓', href: '/admin/courses' },
-    { title: 'Faculty Members', count: faculty.length, icon: '👨‍🏫', href: '/admin/faculty' },
-    { title: 'Notices & Circulars', count: notices.length, icon: '📌', href: '/admin/notices' },
-    { title: 'News Stories', count: news.length, icon: '📰', href: '/admin/news' },
-    { title: 'Campus Events', count: events.length, icon: '📅', href: '/admin/events' },
-    { title: 'Photo Albums', count: gallery.length, icon: '🖼️', href: '/admin/gallery' },
-    { title: 'Downloads', count: downloads.length, icon: '📥', href: '/admin/downloads' },
+    { title: 'Dynamic Pages', count: pages.length, icon: '📄', href: '/admin/pages', theme: styles.metricTerracotta },
+    { title: 'Departments', count: departments.length, icon: '🏛️', href: '/admin/departments', theme: styles.metricEmerald },
+    { title: 'Courses & Programs', count: courses.length, icon: '🎓', href: '/admin/courses', theme: styles.metricSapphire },
+    { title: 'Faculty Members', count: faculty.length, icon: '👨‍🏫', href: '/admin/faculty', theme: styles.metricPurple },
+    { title: 'Notices & Circulars', count: notices.length, icon: '📌', href: '/admin/notices', theme: styles.metricGold },
+    { title: 'News Stories', count: news.length, icon: '📰', href: '/admin/news', theme: styles.metricCrimson },
+    { title: 'Campus Events', count: events.length, icon: '📅', href: '/admin/events', theme: styles.metricTeal },
+    { title: 'Photo Albums', count: gallery.length, icon: '🖼️', href: '/admin/gallery', theme: styles.metricIndigo },
+    { title: 'Downloads Center', count: downloads.length, icon: '📥', href: '/admin/downloads', theme: styles.metricTerracotta },
   ];
 
   return (
     <div>
       {/* Welcome Banner */}
-      <div style={{ marginBottom: '2.5rem' }}>
+      <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
           <Badge variant="info">CMS Administration</Badge>
           {isSetupCompleted ? (
@@ -71,9 +75,9 @@ export default async function AdminDashboardPage() {
             <Badge variant="danger">🚨 Maintenance Mode Active</Badge>
           )}
         </div>
-        <h1 className={styles.headerTitle} style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{collegeName} Overview</h1>
-        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9375rem', margin: 0 }}>
-          Manage dynamic pages, dynamic navigation, academic departments, media, and site settings.
+        <h1 className={styles.headerTitle} style={{ fontSize: '2.15rem', marginBottom: '0.5rem' }}>{collegeName} Overview</h1>
+        <p style={{ color: '#706A61', fontSize: '0.9375rem', margin: 0 }}>
+          Manage dynamic pages, navigation, academic departments, notices, faculty, and site settings.
         </p>
       </div>
 
@@ -115,12 +119,12 @@ export default async function AdminDashboardPage() {
         </div>
       )}
 
-      {/* Summary Metrics Cards Grid */}
-      <div className={styles.metricsGrid}>
+      {/* 3D Squircle RGB Metrics Cards Grid */}
+      <div className={styles.metricsGrid} style={{ marginBottom: '2rem' }}>
         {metrics.map((m) => (
           <Link key={m.title} href={m.href} style={{ textDecoration: 'none' }}>
-            <div className={styles.metricCard}>
-              <div className={styles.metricIcon}>{m.icon}</div>
+            <div className={`${styles.metricCard} ${m.theme}`}>
+              <div className={styles.metricIconBox}>{m.icon}</div>
               <div>
                 <p className={styles.metricTitle}>{m.title}</p>
                 <p className={styles.metricValue}>{m.count}</p>
@@ -130,47 +134,21 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Quick Action & Draft Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
-        <Card variant="bordered">
-          <CardBody style={{ padding: '1.75rem' }}>
-            <h3 className={styles.headerTitle} style={{ marginBottom: '0.25rem', fontSize: '1.1875rem' }}>⚡ Quick Content Actions</h3>
-            <div className={styles.quickActionsFlex}>
-              <Link href="/admin/pages">
-                <Button variant="primary" size="sm">Create New Page 📄</Button>
-              </Link>
-              <Link href="/admin/notices">
-                <Button variant="secondary" size="sm">Post Notice 📌</Button>
-              </Link>
-              <Link href="/admin/gallery">
-                <Button variant="outline" size="sm">Upload Gallery 🖼️</Button>
-              </Link>
-              <Link href="/admin/navigation">
-                <Button variant="outline" size="sm">Manage Menu 🧭</Button>
-              </Link>
-              <Link href="/admin/settings">
-                <Button variant="ghost" size="sm">Settings ⚙️</Button>
-              </Link>
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card variant="bordered">
-          <CardBody style={{ padding: '1.75rem' }}>
-            <h3 className={styles.headerTitle} style={{ marginBottom: '0.5rem', fontSize: '1.1875rem' }}>📝 Content Overview</h3>
-            <p className="small-text" style={{ color: 'var(--color-text-muted)', lineHeight: 1.6, margin: 0 }}>
-              {pages.length > 0
-                ? `${pages.filter((p) => p.status === 'published').length} published page(s) currently active on the public website.`
-                : 'No dynamic pages configured yet. Click "Create New Page" to add website pages without coding.'}
-            </p>
-            <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
-              <Link href="/admin/settings" style={{ fontSize: '0.875rem', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 700 }}>
-                Configure College Settings &amp; Branding →
-              </Link>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+      {/* Live Website Header / Navbar Structure Preview Widget with Drag & Drop */}
+      <Card
+        variant="bordered"
+        style={{
+          borderRadius: '18px',
+          border: '1px solid rgba(222, 212, 197, 0.8)',
+          background: '#FFFFFF',
+          boxShadow: '0 8px 30px rgba(24, 22, 19, 0.04)',
+          overflow: 'hidden',
+        }}
+      >
+        <CardBody style={{ padding: '1.75rem' }}>
+          <DraggableNavbarPreview navItems={navItems} collegeName={collegeName} pages={pages} />
+        </CardBody>
+      </Card>
     </div>
   );
 }

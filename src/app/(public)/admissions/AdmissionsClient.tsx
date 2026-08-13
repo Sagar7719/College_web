@@ -22,6 +22,7 @@ import {
   Mail,
   FileCheck,
 } from 'lucide-react';
+import { InteractiveDotGrid } from '@/components/common/InteractiveDotGrid';
 import styles from '../inner.module.css';
 import homeStyles from '../home.module.css';
 
@@ -65,36 +66,39 @@ export function AdmissionsClient() {
     <div className={styles.pageContainer}>
       {/* 1. HERO BANNER */}
       <section className={styles.admissionsHeroBanner}>
+        <InteractiveDotGrid />
         <div className="container">
           <div className={styles.heroContent}>
-            <div className={styles.heroBadge}>
-              <Sparkles size={16} />
-              <span>Admissions Session 2026 – 2027 Now Open</span>
-            </div>
-            <h1 className={styles.heroTitle}>Admission Process & Guidelines</h1>
-            <p className={styles.heroSubtitle}>
-              Step-by-step guidance, merit eligibility criteria, fee structures, and document submission portal for prospective students.
-            </p>
-            <div className={styles.heroStatsRow}>
-              <div className={styles.heroStatItem}>
-                <GraduationCap size={20} className={styles.statIcon} />
-                <div>
-                  <strong>43+ Accredited</strong>
-                  <span>Degree Programmes</span>
-                </div>
+            <div className={styles.innerHeroGlassCard}>
+              <div className={styles.heroBadge}>
+                <Sparkles size={16} />
+                <span>Admissions Session 2026 – 2027 Now Open</span>
               </div>
-              <div className={styles.heroStatItem}>
-                <Award size={20} className={styles.statIcon} />
-                <div>
-                  <strong>NAAC Accredited</strong>
-                  <span>UGC 2(f) & 12(B) Recognized</span>
+              <h1 className={styles.heroTitle}>Admission Process & Guidelines</h1>
+              <p className={styles.heroSubtitle}>
+                Step-by-step guidance, merit eligibility criteria, fee structures, and document submission portal for prospective students.
+              </p>
+              <div className={styles.heroStatsRow}>
+                <div className={styles.heroStatItem}>
+                  <GraduationCap size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>43+ Accredited</strong>
+                    <span>Degree Programmes</span>
+                  </div>
                 </div>
-              </div>
-              <div className={styles.heroStatItem}>
-                <Clock size={20} className={styles.statIcon} />
-                <div>
-                  <strong>Deadline: Aug 31, 2026</strong>
-                  <span>Application Window Active</span>
+                <div className={styles.heroStatItem}>
+                  <Award size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>NAAC Accredited</strong>
+                    <span>UGC 2(f) & 12(B) Recognized</span>
+                  </div>
+                </div>
+                <div className={styles.heroStatItem}>
+                  <Clock size={20} className={styles.statIcon} />
+                  <div>
+                    <strong>Deadline: Aug 31, 2026</strong>
+                    <span>Application Window Active</span>
+                  </div>
                 </div>
               </div>
             </div>

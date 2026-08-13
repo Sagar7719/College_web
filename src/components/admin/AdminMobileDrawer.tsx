@@ -27,7 +27,6 @@ const adminDrawerNav = [
   { label: 'Downloads', href: '/admin/downloads', icon: '📥' },
   { label: 'Media Library', href: '/admin/media', icon: '📁' },
   { label: 'Site Settings', href: '/admin/settings', icon: '⚙️' },
-  { label: 'Maintenance Mode', href: '/admin/maintenance', icon: '🔧' },
 ];
 
 export const AdminMobileDrawer: React.FC<AdminMobileDrawerProps> = ({ isOpen, onClose }) => {

@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import styles from './admin.module.css';
 
 interface NavGroup {
@@ -18,7 +19,7 @@ const adminNavGroups: NavGroup[] = [
   {
     label: 'Website Builder',
     items: [
-      { label: 'Pages (Page Builder)', href: '/admin/pages', icon: '📄' },
+      { label: 'Pages (CMS Pages)', href: '/admin/pages', icon: '📄' },
       { label: 'Navigation Menu', href: '/admin/navigation', icon: '🧭' },
       { label: 'Footer Links', href: '/admin/footer', icon: '🦶' },
       { label: 'SEO Settings', href: '/admin/seo', icon: '🔎' },
@@ -36,7 +37,6 @@ const adminNavGroups: NavGroup[] = [
     label: 'Notices & Content',
     items: [
       { label: 'Notices & Circulars', href: '/admin/notices', icon: '📌' },
-      { label: 'Announcements Ticker', href: '/admin/announcements', icon: '📢' },
       { label: 'News & Press', href: '/admin/news', icon: '📰' },
       { label: 'Campus Events', href: '/admin/events', icon: '📅' },
       { label: 'Contact Messages', href: '/admin/contact-messages', icon: '✉️' },
@@ -45,7 +45,7 @@ const adminNavGroups: NavGroup[] = [
   {
     label: 'Media & Documents',
     items: [
-      { label: 'Photo Gallery Albums', href: '/admin/gallery', icon: '🖼️' },
+      { label: 'Photo Gallery', href: '/admin/gallery', icon: '🖼️' },
       { label: 'Document Downloads', href: '/admin/downloads', icon: '📥' },
       { label: 'Media Library', href: '/admin/media', icon: '📁' },
     ],
@@ -54,7 +54,6 @@ const adminNavGroups: NavGroup[] = [
     label: 'Configuration',
     items: [
       { label: 'Site Settings & Branding', href: '/admin/settings', icon: '⚙️' },
-      { label: 'Maintenance Mode', href: '/admin/maintenance', icon: '🔧' },
       { label: 'Admin Setup Wizard', href: '/admin/setup', icon: '🚀' },
     ],
   },
@@ -62,17 +61,21 @@ const adminNavGroups: NavGroup[] = [
 
 export const AdminSidebar: React.FC = () => {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const userInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'A';
 
   return (
     <aside className={styles.sidebar}>
+      {/* Executive Branding Header */}
       <div className={styles.sidebarHeader}>
-        <span style={{ fontSize: '1.5rem' }}>🎓</span>
+        <div className={styles.sidebarBrandBadge}>🎓</div>
         <div>
           <span className={styles.sidebarTitle}>College CMS</span>
-          <p style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.6)' }}>Admin Panel</p>
+          <span className={styles.sidebarSubTitle}>Enterprise Console</span>
         </div>
       </div>
 
+      {/* Navigation Body */}
       <div className={styles.sidebarBody}>
         {adminNavGroups.map((group, idx) => (
           <div key={idx} className={styles.navGroup}>
@@ -81,12 +84,12 @@ export const AdminSidebar: React.FC = () => {
               {group.items.map((item) => {
                 const isActive = pathname === item.href;
                 return (
-                  <li key={item.href}>
+                  <li key={item.href} className={styles.sidebarListItem}>
                     <Link
                       href={item.href}
                       className={`${styles.sidebarLink} ${isActive ? styles.sidebarLinkActive : ''}`}
                     >
-                      <span>{item.icon}</span>
+                      <span className={styles.sidebarLinkIcon}>{item.icon}</span>
                       <span>{item.label}</span>
                     </Link>
                   </li>
@@ -95,6 +98,18 @@ export const AdminSidebar: React.FC = () => {
             </ul>
           </div>
         ))}
+      </div>
+
+      {/* User Status Footer */}
+      <div className={styles.sidebarFooter}>
+        <div className={styles.sidebarUserAvatar}>{userInitial}</div>
+        <div className={styles.sidebarUserInfo}>
+          <div className={styles.sidebarUserName}>{user?.email || 'Administrator'}</div>
+          <div className={styles.sidebarUserStatus}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80' }}></span>
+            Active Session
+          </div>
+        </div>
       </div>
     </aside>
   );

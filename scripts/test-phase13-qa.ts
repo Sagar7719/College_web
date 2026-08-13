@@ -30,7 +30,6 @@ import {
   coursesService,
   facultyService,
   noticesService,
-  announcementsService,
   newsService,
   eventsService,
   galleryService,

@@ -16,14 +16,14 @@ import {
 import styles from '@/app/(public)/home.module.css';
 
 const QUICK_LINKS = [
-  { href: '/courses', icon: <BookOpen size={20} />, label: 'Academic Programmes' },
-  { href: '/notices', icon: <Pin size={20} />, label: 'Notices & Circulars' },
-  { href: '/downloads', icon: <FolderDown size={20} />, label: 'Downloads Center' },
-  { href: '/admissions', icon: <GraduationCap size={20} />, label: 'Admissions 2026' },
-  { href: '/faculty', icon: <Users size={20} />, label: 'Faculty Directory' },
-  { href: '/events', icon: <Calendar size={20} />, label: 'Events & Seminars' },
-  { href: '/gallery', icon: <Camera size={20} />, label: 'Campus Gallery' },
-  { href: '/contact', icon: <Mail size={20} />, label: 'Contact & Helpline' },
+  { href: '/courses', icon: <BookOpen size={20} />, label: 'Academic Programmes', theme: styles.qlTerracotta },
+  { href: '/notices', icon: <Pin size={20} />, label: 'Notices & Circulars', theme: styles.qlEmerald },
+  { href: '/downloads', icon: <FolderDown size={20} />, label: 'Downloads Center', theme: styles.qlSapphire },
+  { href: '/admissions', icon: <GraduationCap size={20} />, label: 'Admissions 2026', theme: styles.qlGold },
+  { href: '/faculty', icon: <Users size={20} />, label: 'Faculty Directory', theme: styles.qlPurple },
+  { href: '/events', icon: <Calendar size={20} />, label: 'Events & Seminars', theme: styles.qlCrimson },
+  { href: '/gallery', icon: <Camera size={20} />, label: 'Campus Gallery', theme: styles.qlTeal },
+  { href: '/contact', icon: <Mail size={20} />, label: 'Contact & Helpline', theme: styles.qlIndigo },
 ];
 
 export function QuickLinksCarousel() {
@@ -41,7 +41,7 @@ export function QuickLinksCarousel() {
         <div className={styles.marqueeOuterWrapper}>
           <div className={styles.marqueeTrack}>
             {duplicatedLinks.map((lk, idx) => (
-              <Link key={`${lk.href}-${idx}`} href={lk.href} className={styles.linkCardMarquee}>
+              <Link key={`${lk.href}-${idx}`} href={lk.href} className={`${styles.linkCardMarquee} ${lk.theme}`}>
                 <div className={styles.linkLeftGroup}>
                   <div className={styles.linkIcon}>{lk.icon}</div>
                   <span className={styles.linkLabel}>{lk.label}</span>

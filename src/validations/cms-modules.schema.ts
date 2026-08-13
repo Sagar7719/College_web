@@ -43,15 +43,6 @@ export const noticeSchema = z.object({
   status: z.enum(['draft', 'published', 'archived']),
 });
 
-export const announcementSchema = z.object({
-  title: z.string().min(2, 'Announcement title required').max(150),
-  content: z.string().min(2, 'Content required'),
-  priority: z.enum(['normal', 'urgent']),
-  targetUrl: z.string().optional(),
-  publishDate: z.string().min(1, 'Publish date required'),
-  status: z.enum(['draft', 'published', 'archived']),
-});
-
 export const newsSchema = z.object({
   title: z.string().min(2, 'News title required').max(150),
   slug: z.string().min(2, 'Slug required'),

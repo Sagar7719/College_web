@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { siteSettingsService } from '@/services/site-settings.service';
 import { getSiteUrl } from '@/lib/seo';
+import { Plus_Jakarta_Sans, Outfit, Lora } from 'next/font/google';
 import './globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -84,6 +85,23 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-plus-jakarta',
+  display: 'swap',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
+});
+
+const lora = Lora({
+  subsets: ['latin'],
+  variable: '--font-lora',
+  display: 'swap',
+});
 
 export default function RootLayout({
   children,
@@ -91,7 +109,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${plusJakartaSans.variable} ${outfit.variable} ${lora.variable}`}>
       <body>{children}</body>
     </html>
   );

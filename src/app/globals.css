@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
-
 :root {
   /* Upgraded 2026 Warm Editorial Palette - Light Mode Only */
   --color-primary-bg: #F7F2E9;       /* Warm Ivory */
@@ -108,6 +106,17 @@
   --semantic-warning: var(--color-warning);
   --semantic-warning-bg: var(--color-warning-bg);
   --semantic-warning-border: var(--color-warning-border);
+
+  /* Fonts System Variables configured via next/font/google */
+  --font-sans: var(--font-plus-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-outfit), 'Outfit', var(--font-sans);
+  --font-serif: var(--font-lora), 'Lora', Georgia, serif;
+
+  /* Glassmorphism System Variables */
+  --glass-bg: rgba(255, 255, 255, 0.035);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: rgba(0, 0, 0, 0.35);
+  --glass-blur: blur(16px);
 }
 
 /* Reset & Base Styles */
@@ -118,7 +127,7 @@
 }
 
 html {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   color: var(--color-text-primary);
   background-color: var(--color-primary-bg);
@@ -128,6 +137,7 @@ html {
 }
 
 body {
+  font-family: var(--font-sans);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -142,7 +152,7 @@ body {
 
 /* Editorial Typography System */
 h1, h2, h3, h4, .font-display {
-  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+  font-family: var(--font-display);
   color: var(--color-text-primary);
 }
 
@@ -180,7 +190,7 @@ p, .body-text, .body {
 }
 
 .display {
-  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(3rem, 5vw, 4.75rem); /* 48px-76px Hero Display */
   line-height: 1.02;
   font-weight: 700;

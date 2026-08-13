@@ -27,12 +27,13 @@
 }
 
 .heroTitle {
+  font-family: var(--font-display) !important;
   font-size: clamp(2rem, 3.8vw, 3.25rem);
   font-weight: 800;
   color: #FFFFFF;
   margin-bottom: var(--space-4);
-  letter-spacing: -0.025em;
-  line-height: 1.15;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
   max-width: 800px;
 }
 
