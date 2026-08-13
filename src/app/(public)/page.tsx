@@ -74,10 +74,11 @@ export default async function HomePage() {
   const info = settings?.collegeInfo;
   const collegeName = info?.name || 'Jaysingpur College';
   const displayCollegeName = collegeName.replace(/\b\w/g, (c) => c.toUpperCase());
-  const tagline = info?.tagline || hpData.hero.headline;
-  const description = info?.description || hpData.hero.subtitle;
   const estYear = info?.establishedYear || '1972';
   const naacGrade = info?.naacGrade || 'A';
+  const tagline = hpData.hero.headline || info?.tagline || 'Empowering Minds, Building Futures';
+  const description = hpData.hero.subtitle || info?.description || 'A premier higher education institution dedicated to academic rigor, pioneering research, and holistic student growth.';
+  const badgeText = hpData.hero.badgeText || `EST. ${estYear} • NAAC '${naacGrade}' GRADE`;
   const principalName = info?.principalName || '';
   const principalTitle = info?.principalDesignation || 'Principal';
   const principalPhoto = info?.principalPhotoUrl || '';
@@ -108,7 +109,7 @@ export default async function HomePage() {
         <div className={`container ${styles.heroUnifiedContainer}`}>
           <div className={styles.heroGlassCard}>
             <div className={styles.heroBadgePill}>
-              <span>🏛️</span> {collegeName.toUpperCase()} • EST. {estYear} • NAAC &apos;{naacGrade}&apos; GRADE
+              <span>🏛️</span> {badgeText}
             </div>
             <h1 className={styles.heroHeadlineLightCentered}>
               <span className={styles.gradientText}>{tagline}</span>
