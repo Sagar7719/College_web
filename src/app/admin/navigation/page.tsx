@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { NavigationItem, Page } from '@/types';
 import { navigationService, buildNavigationTree } from '@/services/navigation.service';
@@ -17,7 +17,6 @@ import {
   Select,
   Modal,
   Skeleton,
-  EmptyState,
 } from '@/components/ui';
 
 /* System page keys that are strictly protected against deletion */
@@ -380,56 +379,84 @@ export default function AdminNavigationManagerScreen() {
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           {saveStatus && (
-            <Badge variant="success" style={{ padding: '6px 12px', fontSize: '0.875rem' }}>
+            <span style={{ padding: '6px 14px', fontSize: '0.875rem', fontWeight: 700, borderRadius: '20px', backgroundColor: '#E6F4EA', color: '#137333', border: '1px solid #CEEAD6' }}>
               {saveStatus}
-            </Badge>
+            </span>
           )}
-          <Button variant="primary" onClick={() => handleOpenAddModal()}>
+          <Button variant="primary" onClick={() => handleOpenAddModal()} style={{ backgroundColor: '#C85A32', borderColor: '#C85A32', color: '#FFFFFF', fontWeight: 700 }}>
             ➕ Add Top-Level Menu Tab
           </Button>
         </div>
       </div>
 
       {loading ? (
-        <Skeleton style={{ height: '140px', width: '100%', borderRadius: '12px' }} />
+        <Skeleton style={{ height: '180px', width: '100%', borderRadius: '16px' }} />
       ) : (
         <>
           {/* ==============================================================================
-             VISUAL LIVE WEBSITE NAVBAR REPLICA CANVAS
+             VISUAL LIVE WEBSITE NAVBAR REPLICA CANVAS (LIGHT MODE)
              ============================================================================== */}
           <Card
             variant="bordered"
             style={{
               borderRadius: '16px',
-              backgroundColor: '#0C0806',
-              color: '#FFFFFF',
-              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.45)',
+              backgroundColor: '#FFFFFF',
+              color: '#24221F',
+              boxShadow: '0 8px 30px rgba(36, 34, 31, 0.06)',
               overflow: 'visible',
               marginBottom: '2rem',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              border: '1.5px solid #E8DFD1',
             }}
           >
-            <CardBody style={{ padding: '1.5rem 2rem' }}>
-              {/* Canvas Header Title */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.75rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '1.25rem' }}>🎓</span>
-                  <span style={{ fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.01em' }}>{collegeName}</span>
-                  <Badge variant="success">LIVE INTERACTIVE NAVBAR CANVAS</Badge>
+            <CardBody style={{ padding: '0' }}>
+              {/* Canvas Top Branding Banner */}
+              <div
+                style={{
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center',
+                  padding: '1.25rem 1.75rem',
+                  backgroundColor: '#FAF7F2',
+                  borderBottom: '1.5px solid #E8DFD1',
+                  borderTopLeftRadius: '15px',
+                  borderTopRightRadius: '15px',
+                  flexWrap: 'wrap',
+                  gap: '1rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '8px', background: '#C85A32', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', boxShadow: '0 4px 12px rgba(200,90,50,0.25)' }}>
+                    🎓
+                  </div>
+                  <div>
+                    <span style={{ fontWeight: 800, fontSize: '1.125rem', color: '#1F1914', letterSpacing: '-0.01em', display: 'block' }}>
+                      {collegeName}
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: '#706A61', fontWeight: 600 }}>
+                      Live Navbar Header Preview &amp; Layout Manager
+                    </span>
+                  </div>
+                  <span style={{ padding: '4px 10px', fontSize: '0.75rem', fontWeight: 800, borderRadius: '20px', backgroundColor: '#E6F4EA', color: '#137333', border: '1px solid #CEEAD6', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    ● LIVE INTERACTIVE CANVAS
+                  </span>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.6)' }}>
-                  🔒 5 Core System Tabs are Protected Against Deletion
+                <div style={{ fontSize: '0.8125rem', color: '#706A61', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>🔒 5 Core System Tabs are Protected Against Deletion</span>
                 </div>
               </div>
 
-              {/* Top-Level Horizontal Navbar Bar */}
+              {/* Top-Level Horizontal Navbar Bar (Light Mode Header Bar) */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '10px',
+                  padding: '1.5rem 1.75rem',
+                  backgroundColor: '#FFFFFF',
                   flexWrap: 'wrap',
                   position: 'relative',
+                  borderBottomLeftRadius: '15px',
+                  borderBottomRightRadius: '15px',
                 }}
               >
                 {treeItems.map((parentItem) => {
@@ -450,7 +477,7 @@ export default function AdminNavigationManagerScreen() {
                         display: 'inline-block',
                       }}
                     >
-                      {/* Top-Level Navbar Button */}
+                      {/* Top-Level Navbar Button (Light Mode) */}
                       <div
                         onClick={() => setOpenDropdownId(isDropdownOpen ? null : parentItem.id)}
                         style={{
@@ -459,64 +486,66 @@ export default function AdminNavigationManagerScreen() {
                           gap: '8px',
                           padding: '10px 16px',
                           borderRadius: '8px',
-                          backgroundColor: isDragTarget ? 'rgba(200, 90, 50, 0.4)' : isDropdownOpen ? 'rgba(255, 255, 255, 0.16)' : 'rgba(255, 255, 255, 0.08)',
-                          border: isDragTarget ? '2px dashed #C85A32' : isDropdownOpen ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
-                          color: '#FFFFFF',
+                          backgroundColor: isDragTarget ? '#FFF5F0' : isDropdownOpen ? '#FFF5F0' : '#FAF7F2',
+                          border: isDragTarget ? '2px dashed #C85A32' : isDropdownOpen ? '1.5px solid #C85A32' : '1.5px solid #DED4C5',
+                          color: isDropdownOpen ? '#9E3B1B' : '#24221F',
                           cursor: 'pointer',
                           fontWeight: 700,
                           fontSize: '0.9375rem',
                           transition: 'all 0.2s ease',
                           userSelect: 'none',
+                          boxShadow: isDropdownOpen ? '0 4px 12px rgba(200, 90, 50, 0.15)' : '0 2px 4px rgba(0, 0, 0, 0.03)',
                         }}
                       >
                         {/* Drag Handle Icon */}
-                        <span style={{ opacity: 0.5, cursor: 'grab', fontSize: '0.8125rem' }}>⋮⋮</span>
+                        <span style={{ opacity: 0.4, cursor: 'grab', fontSize: '0.8125rem', color: '#706A61' }}>⋮⋮</span>
 
                         <span>{parentItem.label}</span>
 
                         {isSystemProtected && (
-                          <span title="System Protected Tab (Cannot be deleted)" style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+                          <span title="System Protected Tab (Cannot be deleted)" style={{ fontSize: '0.75rem', opacity: 0.85 }}>
                             🔒
                           </span>
                         )}
 
-                        <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>
+                        <span style={{ fontSize: '0.75rem', color: isDropdownOpen ? '#C85A32' : '#706A61' }}>
                           {hasChildren ? (isDropdownOpen ? '▲' : '▼') : '➕'}
                         </span>
                       </div>
 
-                      {/* Dropdown Sub-Menu Container */}
+                      {/* Floating Dropdown Sub-Menu Panel (Light Mode) */}
                       {isDropdownOpen && (
                         <div
                           style={{
                             position: 'absolute',
-                            top: 'calc(100% + 8px)',
+                            top: 'calc(100% + 10px)',
                             left: 0,
-                            minWidth: '260px',
-                            backgroundColor: '#17110E',
-                            border: '1px solid rgba(255, 255, 255, 0.18)',
-                            borderRadius: '10px',
-                            padding: '10px 8px',
-                            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.6)',
+                            minWidth: '290px',
+                            backgroundColor: '#FFFFFF',
+                            border: '1.5px solid #DED4C5',
+                            borderRadius: '12px',
+                            padding: '12px',
+                            boxShadow: '0 16px 40px rgba(36, 34, 31, 0.14)',
                             zIndex: 100,
                           }}
                         >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', padding: '0 6px', borderBottom: '1px dashed rgba(255, 255, 255, 0.1)', paddingBottom: '6px' }}>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255, 255, 255, 0.6)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                              📁 {parentItem.label} Sub-Items
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '0 4px 8px 4px', borderBottom: '1.5px dashed #E8DFD1' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#706A61', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                              📁 {parentItem.label} SUB-ITEMS
                             </span>
                             <button
                               type="button"
                               onClick={() => handleOpenAddModal(parentItem.id)}
                               style={{
-                                background: 'rgba(200, 90, 50, 0.25)',
-                                color: '#FFAA8A',
-                                border: '1px solid #C85A32',
-                                borderRadius: '4px',
-                                padding: '2px 8px',
+                                background: '#C85A32',
+                                color: '#FFFFFF',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '4px 10px',
                                 fontSize: '0.75rem',
                                 fontWeight: 700,
                                 cursor: 'pointer',
+                                boxShadow: '0 2px 6px rgba(200,90,50,0.25)',
                               }}
                             >
                               ➕ Add Sub-Page
@@ -525,11 +554,11 @@ export default function AdminNavigationManagerScreen() {
 
                           {/* List of Child Sub-Pages */}
                           {!parentItem.children || parentItem.children.length === 0 ? (
-                            <div style={{ padding: '12px 8px', textAlign: 'center', fontSize: '0.8125rem', color: 'rgba(255, 255, 255, 0.4)' }}>
+                            <div style={{ padding: '16px 8px', textAlign: 'center', fontSize: '0.8125rem', color: '#706A61', backgroundColor: '#FAF7F2', borderRadius: '8px', border: '1px dashed #DED4C5' }}>
                               No sub-items yet. Drag a page here or click ➕ Add Sub-Page.
                             </div>
                           ) : (
-                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
                               {parentItem.children.map((child) => (
                                 <li
                                   key={child.id}
@@ -539,28 +568,29 @@ export default function AdminNavigationManagerScreen() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
-                                    padding: '8px 10px',
-                                    borderRadius: '6px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                                    color: '#F5F0E8',
+                                    padding: '9px 12px',
+                                    borderRadius: '8px',
+                                    backgroundColor: '#FAF7F2',
+                                    border: '1px solid #E8DFD1',
+                                    color: '#24221F',
                                     fontSize: '0.875rem',
                                     cursor: 'grab',
+                                    transition: 'all 0.15s ease',
                                   }}
                                 >
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>⋮⋮</span>
-                                    <span style={{ fontWeight: 600 }}>{child.label}</span>
+                                    <span style={{ opacity: 0.4, fontSize: '0.8125rem', color: '#706A61' }}>⋮⋮</span>
+                                    <span style={{ fontWeight: 600, color: '#24221F' }}>{child.label}</span>
                                   </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                    <code style={{ fontSize: '0.7rem', color: '#FFAA8A', background: 'rgba(0,0,0,0.3)', padding: '2px 6px', borderRadius: '3px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <code style={{ fontSize: '0.7rem', color: '#C85A32', background: '#FFF5F0', border: '1px solid #FCD3C1', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
                                       {child.path}
                                     </code>
                                     {!child.isSystemPage && (
                                       <button
                                         type="button"
                                         onClick={() => setDeleteConfirmId(child.id)}
-                                        style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', fontSize: '0.8125rem' }}
+                                        style={{ background: 'none', border: 'none', color: '#DC2626', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 700 }}
                                         title="Remove sub-page"
                                       >
                                         ✕
@@ -587,12 +617,13 @@ export default function AdminNavigationManagerScreen() {
                     gap: '6px',
                     padding: '10px 16px',
                     borderRadius: '8px',
-                    backgroundColor: 'rgba(200, 90, 50, 0.25)',
+                    backgroundColor: '#FFF5F0',
                     border: '1.5px dashed #C85A32',
-                    color: '#FFAA8A',
+                    color: '#C85A32',
                     fontWeight: 800,
                     fontSize: '0.875rem',
                     cursor: 'pointer',
+                    transition: 'all 0.2s ease',
                   }}
                 >
                   ➕ Add New Menu Tab
@@ -602,28 +633,30 @@ export default function AdminNavigationManagerScreen() {
           </Card>
 
           {/* ==============================================================================
-             UNLINKED PUBLISHED PAGES POOL (DRAG DIRECTLY INTO NAVBAR CANVAS)
+             UNLINKED PUBLISHED PAGES POOL (LIGHT MODE)
              ============================================================================== */}
-          <Card variant="bordered">
-            <CardBody style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <Card variant="bordered" style={{ borderRadius: '16px', border: '1.5px solid #E8DFD1', backgroundColor: '#FFFFFF', boxShadow: '0 4px 20px rgba(36, 34, 31, 0.04)' }}>
+            <CardBody style={{ padding: '1.5rem 1.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#24221F', margin: 0 }}>
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1F1914', margin: 0 }}>
                     📄 Available Published Pages Pool
                   </h3>
-                  <p style={{ fontSize: '0.875rem', color: '#68705A', margin: '0.25rem 0 0 0' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#706A61', margin: '0.25rem 0 0 0' }}>
                     Drag any page chip below onto a navbar tab above to automatically insert it as a dropdown sub-item!
                   </p>
                 </div>
-                <Badge variant="info">{unlinkedPages.length} Pages Available</Badge>
+                <Badge variant="info" style={{ backgroundColor: '#EBF5FF', color: '#1E40AF', border: '1px solid #BFDBFE', padding: '6px 12px', fontSize: '0.8125rem' }}>
+                  {unlinkedPages.length} Pages Available
+                </Badge>
               </div>
 
               {unlinkedPages.length === 0 ? (
-                <div style={{ padding: '1rem', background: '#F7F2E9', color: '#68705A', fontSize: '0.875rem', textAlign: 'center', borderRadius: '4px' }}>
+                <div style={{ padding: '1.25rem', backgroundColor: '#FAF7F2', color: '#706A61', fontSize: '0.875rem', textAlign: 'center', borderRadius: '10px', border: '1px dashed #DED4C5', fontWeight: 600 }}>
                   ✓ All published pages are currently linked in the navigation bar!
                 </div>
               ) : (
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '0.875rem', flexWrap: 'wrap' }}>
                   {unlinkedPages.map((pageOpt) => (
                     <div
                       key={pageOpt.id}
@@ -633,20 +666,23 @@ export default function AdminNavigationManagerScreen() {
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '8px',
-                        padding: '8px 14px',
+                        padding: '9px 16px',
                         backgroundColor: '#FFFFFF',
-                        border: '1.5px solid #DED4C5',
-                        borderRadius: '6px',
+                        border: '1.5px solid #C85A32',
+                        borderRadius: '8px',
                         cursor: 'grab',
                         fontSize: '0.875rem',
                         fontWeight: 700,
                         color: '#24221F',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                        boxShadow: '0 2px 8px rgba(200, 90, 50, 0.12)',
+                        transition: 'all 0.2s ease',
                       }}
                     >
-                      <span style={{ opacity: 0.5 }}>⋮⋮</span>
+                      <span style={{ opacity: 0.4, color: '#706A61' }}>⋮⋮</span>
                       <span>{pageOpt.title}</span>
-                      <code style={{ fontSize: '0.75rem', color: '#C85A32' }}>{pageOpt.path}</code>
+                      <code style={{ fontSize: '0.75rem', color: '#C85A32', backgroundColor: '#FFF5F0', padding: '2px 6px', borderRadius: '4px', border: '1px solid #FCD3C1' }}>
+                        {pageOpt.path}
+                      </code>
                     </div>
                   ))}
                 </div>
@@ -665,7 +701,7 @@ export default function AdminNavigationManagerScreen() {
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {formError && (
-              <div style={{ padding: '0.75rem', background: '#FEE2E2', border: '1px solid #FCA5A5', color: '#B91C1C', borderRadius: '4px', fontSize: '0.875rem' }}>
+              <div style={{ padding: '0.75rem', background: '#FEE2E2', border: '1px solid #FCA5A5', color: '#B91C1C', borderRadius: '6px', fontSize: '0.875rem' }}>
                 {formError}
               </div>
             )}
@@ -681,11 +717,12 @@ export default function AdminNavigationManagerScreen() {
                 style={{
                   width: '100%',
                   padding: '0.625rem',
-                  borderRadius: '0px',
+                  borderRadius: '6px',
                   border: '1px solid #DED4C5',
                   backgroundColor: '#FFFFFF',
                   fontSize: '0.875rem',
                   fontWeight: 600,
+                  color: '#24221F',
                 }}
               >
                 <option value="">📌 Top-Level Menu Bar</option>
@@ -703,7 +740,7 @@ export default function AdminNavigationManagerScreen() {
                 Menu Action Type
               </label>
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', cursor: 'pointer' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 600 }}>
                   <input
                     type="radio"
                     name="linkType"
@@ -712,7 +749,7 @@ export default function AdminNavigationManagerScreen() {
                   />
                   ✨ Create Brand New Page
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', cursor: 'pointer' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 600 }}>
                   <input
                     type="radio"
                     name="linkType"
@@ -721,7 +758,7 @@ export default function AdminNavigationManagerScreen() {
                   />
                   📄 Link Existing Page
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', cursor: 'pointer' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 600 }}>
                   <input
                     type="radio"
                     name="linkType"
@@ -763,7 +800,7 @@ export default function AdminNavigationManagerScreen() {
                     value={pageSlug}
                     onChange={(e) => setPageSlug(e.target.value)}
                   />
-                  <span style={{ fontSize: '0.75rem', color: '#68705A', marginTop: '4px', display: 'block' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#706A61', marginTop: '4px', display: 'block' }}>
                     Live URL: <code>http://localhost:3000/{pageSlug || 'your-slug'}</code>
                   </span>
                 </div>
@@ -819,7 +856,7 @@ export default function AdminNavigationManagerScreen() {
               <Button variant="ghost" onClick={() => setIsAddModalOpen(false)}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={handleSaveNewSubPage} disabled={isSaving}>
+              <Button variant="primary" onClick={handleSaveNewSubPage} disabled={isSaving} style={{ backgroundColor: '#C85A32', borderColor: '#C85A32', color: '#FFFFFF', fontWeight: 700 }}>
                 {isSaving ? 'Creating Page...' : '✨ Create & Sync Page'}
               </Button>
             </div>
@@ -842,7 +879,7 @@ export default function AdminNavigationManagerScreen() {
               <Button variant="ghost" onClick={() => setDeleteConfirmId(null)}>
                 Cancel
               </Button>
-              <Button variant="primary" style={{ backgroundColor: '#DC2626' }} onClick={handleDeleteNavItem} disabled={isSaving}>
+              <Button variant="primary" style={{ backgroundColor: '#DC2626', borderColor: '#DC2626', color: '#FFFFFF' }} onClick={handleDeleteNavItem} disabled={isSaving}>
                 {isSaving ? 'Deleting...' : 'Remove Link'}
               </Button>
             </div>
