@@ -242,8 +242,10 @@ export const navigationService = {
         visible: showInNavigation,
       };
 
-      if (parentId) {
-        navPayload.parentId = parentId;
+      // Custom pages default to being nested inside a dropdown menu (e.g. About Us) so they only show in dropdown menus, not top-level main nav
+      const effectiveParentId = parentId || (!isSys ? 'nav_sys_about' : undefined);
+      if (effectiveParentId) {
+        navPayload.parentId = effectiveParentId;
       }
 
       if (isSys && systemKey) {
