@@ -1,64 +1,87 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import styles from './admin.module.css';
 
-interface NavGroup {
+interface NavSubItem {
   label: string;
-  items: { label: string; href: string; icon: string }[];
+  href: string;
+  icon?: string;
 }
 
-const adminNavGroups: NavGroup[] = [
+interface NavItem {
+  label: string;
+  href?: string;
+  icon: string;
+  subItems?: NavSubItem[];
+}
+
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+const websiteMatchedNavGroups: NavGroup[] = [
   {
     label: 'Overview',
     items: [{ label: 'Dashboard', href: '/admin/dashboard', icon: '📊' }],
   },
   {
-    label: 'Website Builder',
+    label: 'Website Menu Pages (Non-Tech CMS)',
     items: [
-      { label: 'Pages (CMS Pages)', href: '/admin/pages', icon: '📄' },
-      { label: 'Homepage Editor', href: '/admin/homepage', icon: '🏠' },
-      { label: 'About Page Editor', href: '/admin/about-page', icon: '📖' },
-      { label: 'Admissions Editor', href: '/admin/admissions-config', icon: '🎓' },
-      { label: 'Contact Page Editor', href: '/admin/contact-page', icon: '📞' },
-      { label: 'Navigation Menu', href: '/admin/navigation', icon: '🧭' },
-      { label: 'Footer Links', href: '/admin/footer', icon: '🦶' },
-      { label: 'SEO Settings', href: '/admin/seo', icon: '🔎' },
+      { label: '🏠 Home Page', href: '/admin/homepage', icon: '🏠' },
+      {
+        label: '📖 About Us',
+        icon: '📖',
+        subItems: [
+          { label: 'About Overview & Legacy', href: '/admin/about-page' },
+          { label: "Principal's Desk Message", href: '/admin/about-page/principal' },
+          { label: 'Governing Body & Council', href: '/admin/about-page/governing-body' },
+          { label: 'IQAC Cell & NAAC', href: '/admin/about-page/iqac' },
+        ],
+      },
+      {
+        label: '🎓 Academics',
+        icon: '🎓',
+        subItems: [
+          { label: 'Courses & Degree Programs', href: '/admin/courses' },
+          { label: 'Departments & HODs', href: '/admin/departments' },
+          { label: 'Faculty Directory', href: '/admin/faculty' },
+        ],
+      },
+      {
+        label: '📌 Notices & Updates',
+        icon: '📌',
+        subItems: [
+          { label: 'Official Notices & Circulars', href: '/admin/notices' },
+          { label: 'News & Press Releases', href: '/admin/news' },
+          { label: 'Campus Events Calendar', href: '/admin/events' },
+        ],
+      },
+      {
+        label: '🖼️ Media & Downloads',
+        icon: '🖼️',
+        subItems: [
+          { label: 'Photo Gallery Albums', href: '/admin/gallery' },
+          { label: 'Document Downloads', href: '/admin/downloads' },
+          { label: 'Media Asset Library', href: '/admin/media' },
+        ],
+      },
+      { label: '🎓 Admissions Page', href: '/admin/admissions-config', icon: '📝' },
+      { label: '📞 Contact Us Page', href: '/admin/contact-page', icon: '📞' },
     ],
   },
   {
-    label: 'Academics',
+    label: 'Menu Builder & Settings',
     items: [
-      { label: 'Departments', href: '/admin/departments', icon: '🏛️' },
-      { label: 'Courses & Programs', href: '/admin/courses', icon: '🎓' },
-      { label: 'Faculty Directory', href: '/admin/faculty', icon: '👨‍🏫' },
-    ],
-  },
-  {
-    label: 'Notices & Content',
-    items: [
-      { label: 'Notices & Circulars', href: '/admin/notices', icon: '📌' },
-      { label: 'News & Press', href: '/admin/news', icon: '📰' },
-      { label: 'Campus Events', href: '/admin/events', icon: '📅' },
-      { label: 'Contact Messages', href: '/admin/contact-messages', icon: '✉️' },
-    ],
-  },
-  {
-    label: 'Media & Documents',
-    items: [
-      { label: 'Photo Gallery', href: '/admin/gallery', icon: '🖼️' },
-      { label: 'Document Downloads', href: '/admin/downloads', icon: '📥' },
-      { label: 'Media Library', href: '/admin/media', icon: '📁' },
-    ],
-  },
-  {
-    label: 'Configuration',
-    items: [
-      { label: 'Site Settings & Branding', href: '/admin/settings', icon: '⚙️' },
-      { label: 'Admin Setup Wizard', href: '/admin/setup', icon: '🚀' },
+      { label: '🧭 Drag & Drop Menu Manager', href: '/admin/navigation', icon: '🧭' },
+      { label: '📄 Custom CMS Pages', href: '/admin/pages', icon: '📄' },
+      { label: '🦶 Footer Links Editor', href: '/admin/footer', icon: '🦶' },
+      { label: '⚙️ Site Branding & Logo', href: '/admin/settings', icon: '⚙️' },
+      { label: '✉️ Form Inquiries', href: '/admin/contact-messages', icon: '✉️' },
     ],
   },
 ];
@@ -67,6 +90,18 @@ export const AdminSidebar: React.FC = () => {
   const pathname = usePathname();
   const { user } = useAuth();
   const userInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'A';
+
+  // Open state for accordion submenus
+  const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({
+    '📖 About Us': true,
+    '🎓 Academics': true,
+    '📌 Notices & Updates': true,
+    '🖼️ Media & Downloads': true,
+  });
+
+  const toggleSubMenu = (label: string) => {
+    setOpenSubMenus((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
 
   return (
     <aside className={styles.sidebar}>
@@ -81,20 +116,101 @@ export const AdminSidebar: React.FC = () => {
 
       {/* Navigation Body */}
       <div className={styles.sidebarBody}>
-        {adminNavGroups.map((group, idx) => (
+        {websiteMatchedNavGroups.map((group, idx) => (
           <div key={idx} className={styles.navGroup}>
-            <div className={styles.navGroupLabel}>{group.label}</div>
+            <div className={styles.navGroupLabel} style={{ color: '#A09A90', fontWeight: 800 }}>
+              {group.label}
+            </div>
             <ul className={styles.sidebarList}>
               {group.items.map((item) => {
-                const isActive = pathname === item.href;
+                const hasSubItems = item.subItems && item.subItems.length > 0;
+                const isSubMenuOpen = openSubMenus[item.label] ?? false;
+                const isDirectActive = item.href ? pathname === item.href : false;
+                const isChildActive = hasSubItems && item.subItems?.some((sub) => pathname === sub.href);
+
+                if (hasSubItems) {
+                  return (
+                    <li key={item.label} className={styles.sidebarListItem} style={{ marginBottom: 4 }}>
+                      <button
+                        type="button"
+                        onClick={() => toggleSubMenu(item.label)}
+                        className={`${styles.sidebarLink} ${isChildActive ? styles.sidebarLinkActive : ''}`}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          background: isChildActive ? 'rgba(200, 90, 50, 0.22)' : 'transparent',
+                          color: isChildActive ? '#FFAA8A' : '#E2DFD8',
+                          border: 'none',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <span className={styles.sidebarLinkIcon}>{item.icon}</span>
+                          <span style={{ fontWeight: 700, color: isChildActive ? '#FFAA8A' : '#E2DFD8' }}>
+                            {item.label}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '0.75rem', opacity: 0.8, color: '#E2DFD8' }}>
+                          {isSubMenuOpen ? '▲' : '▼'}
+                        </span>
+                      </button>
+
+                      {isSubMenuOpen && item.subItems && (
+                        <ul
+                          style={{
+                            listStyle: 'none',
+                            paddingLeft: 28,
+                            marginTop: 4,
+                            marginBottom: 6,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 3,
+                          }}
+                        >
+                          {item.subItems.map((sub) => {
+                            const isSubActive = pathname === sub.href;
+                            return (
+                              <li key={sub.href}>
+                                <Link
+                                  href={sub.href}
+                                  style={{
+                                    display: 'block',
+                                    fontSize: '0.8125rem',
+                                    padding: '6px 12px',
+                                    borderRadius: '4px',
+                                    color: isSubActive ? '#FFAA8A' : 'rgba(226, 223, 216, 0.85)',
+                                    fontWeight: isSubActive ? 800 : 600,
+                                    backgroundColor: isSubActive ? 'rgba(200, 90, 50, 0.22)' : 'transparent',
+                                    borderLeft: isSubActive ? '3px solid #C85A32' : '3px solid transparent',
+                                    textDecoration: 'none',
+                                    transition: 'all 0.2s ease',
+                                  }}
+                                >
+                                  {sub.label}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                }
+
                 return (
-                  <li key={item.href} className={styles.sidebarListItem}>
+                  <li key={item.href || item.label} className={styles.sidebarListItem}>
                     <Link
-                      href={item.href}
-                      className={`${styles.sidebarLink} ${isActive ? styles.sidebarLinkActive : ''}`}
+                      href={item.href || '#'}
+                      className={`${styles.sidebarLink} ${isDirectActive ? styles.sidebarLinkActive : ''}`}
+                      style={{ color: isDirectActive ? '#FFAA8A' : '#E2DFD8' }}
                     >
                       <span className={styles.sidebarLinkIcon}>{item.icon}</span>
-                      <span>{item.label}</span>
+                      <span style={{ color: isDirectActive ? '#FFAA8A' : '#E2DFD8', fontWeight: isDirectActive ? 800 : 600 }}>
+                        {item.label}
+                      </span>
                     </Link>
                   </li>
                 );

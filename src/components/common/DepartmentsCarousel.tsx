@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Building2, UserCheck, ArrowRight } from 'lucide-react';
-import styles from '@/app/(public)/home.module.css';
+import { Building2, UserCheck, ArrowRight, BookOpen, Microscope, Sparkles, Binary, Cpu, Compass } from 'lucide-react';
+import styles from './DepartmentsCarousel.module.css';
 
 interface DepartmentItem {
   id: string;
@@ -17,105 +17,155 @@ interface DepartmentsCarouselProps {
   departments: DepartmentItem[];
 }
 
+const colorVariants = [
+  styles.variantTerracotta,
+  styles.variantEmerald,
+  styles.variantSapphire,
+  styles.variantGold,
+  styles.variantViolet,
+  styles.variantCyan,
+];
+
+const departmentIcons = [
+  Cpu,
+  Microscope,
+  Binary,
+  BookOpen,
+  Sparkles,
+  Compass,
+  Building2,
+];
+
 export function DepartmentsCarousel({ departments }: DepartmentsCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const isCarousel = departments.length > 4;
-
-  const checkScroll = () => {
+  // Sync scroll position with active index dot
+  const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    setCanScrollLeft(scrollLeft > 5);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
-  };
+    const { scrollLeft } = scrollRef.current;
+    const cardWidth = 360 + 24; // card width + gap
+    const index = Math.round(scrollLeft / cardWidth);
+    setActiveIndex(Math.min(Math.max(index, 0), departments.length - 1));
+  }, [departments.length]);
 
   useEffect(() => {
-    checkScroll();
     const el = scrollRef.current;
     if (el) {
-      el.addEventListener('scroll', checkScroll);
-      window.addEventListener('resize', checkScroll);
+      el.addEventListener('scroll', handleScroll, { passive: true });
     }
     return () => {
-      if (el) el.removeEventListener('scroll', checkScroll);
-      window.removeEventListener('resize', checkScroll);
+      if (el) el.removeEventListener('scroll', handleScroll);
     };
-  }, [departments]);
+  }, [handleScroll]);
 
-  const handleScroll = (direction: 'left' | 'right') => {
+  // Industry Standard Auto-Play Carousel (Pauses on Hover)
+  useEffect(() => {
+    if (isHovered || departments.length <= 1) return;
+
+    const timer = setInterval(() => {
+      if (!scrollRef.current) return;
+      const nextIndex = (activeIndex + 1) % departments.length;
+      const cardWidth = 360 + 24;
+      scrollRef.current.scrollTo({
+        left: nextIndex * cardWidth,
+        behavior: 'smooth',
+      });
+      setActiveIndex(nextIndex);
+    }, 4500);
+
+    return () => clearInterval(timer);
+  }, [activeIndex, isHovered, departments.length]);
+
+  const scrollToCard = (index: number) => {
     if (!scrollRef.current) return;
-    const scrollAmount = 360;
-    scrollRef.current.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
+    const cardWidth = 360 + 24;
+    scrollRef.current.scrollTo({
+      left: index * cardWidth,
       behavior: 'smooth',
     });
+    setActiveIndex(index);
   };
 
   return (
-    <section className={styles.secAlt} aria-label="Academic Departments">
+    <section className={styles.sec} aria-label="Academic Departments">
       <div className="container">
-        <div className={styles.secHeadWithNav}>
-          <div className={styles.secHeadText}>
-            <span className={styles.eyebrow}>Departments</span>
-            <h2 className={styles.secTitle}>Academic Departments</h2>
-            <p className={styles.secSub}>Hubs of specialized study, interdisciplinary research, and academic leadership.</p>
-          </div>
-          {isCarousel && (
-            <div className={styles.carouselNavControls}>
-              <button
-                type="button"
-                className={`${styles.carouselArrowBtn} ${!canScrollLeft ? styles.carouselBtnDisabled : ''}`}
-                onClick={() => handleScroll('left')}
-                disabled={!canScrollLeft}
-                aria-label="Previous departments"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                type="button"
-                className={`${styles.carouselArrowBtn} ${!canScrollRight ? styles.carouselBtnDisabled : ''}`}
-                onClick={() => handleScroll('right')}
-                disabled={!canScrollRight}
-                aria-label="Next departments"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-          )}
+        {/* Centered Section Header */}
+        <div className={styles.secHeadCenter}>
+          <span className={styles.eyebrow}>Specialized Faculties</span>
+          <h2 className={styles.secTitle}>Academic Departments</h2>
+          <p className={styles.secSub}>
+            Hubs of specialized study, pioneering interdisciplinary research, and academic excellence.
+          </p>
         </div>
 
+        {/* Carousel Viewport Canvas (No < > Arrow Buttons, Hidden Scrollbars) */}
         <div
           ref={scrollRef}
-          className={isCarousel ? styles.progCarouselContainer : styles.deptGrid}
+          className={styles.carouselViewport}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
-          {departments.map((dept) => (
-            <div key={dept.id} className={styles.deptCard}>
-              <div className={styles.deptTop}>
-                <span className={styles.deptBadge}>{dept.code}</span>
-                <div className={styles.deptIconBadge}>
-                  <Building2 size={18} />
+          {departments.map((dept, idx) => {
+            const variantClass = colorVariants[idx % colorVariants.length];
+            const IconComponent = departmentIcons[idx % departmentIcons.length];
+
+            return (
+              <div key={dept.id} className={`${styles.deptCard} ${variantClass}`}>
+                {/* Top Bar with Badge & Icon */}
+                <div className={styles.deptTop}>
+                  <span className={styles.deptBadge}>{dept.code || 'DEPT'}</span>
+                  <div className={styles.deptIconBadge}>
+                    <IconComponent size={24} />
+                  </div>
+                </div>
+
+                {/* Department Name & Description */}
+                <h3 className={styles.deptName}>{dept.name}</h3>
+                <p className={styles.deptDesc}>
+                  {dept.description ||
+                    'Advancing academic rigor, innovative laboratory experimentation, and industry research collaborations.'}
+                </p>
+
+                {/* Head of Department Tag */}
+                {dept.hodName && (
+                  <div className={styles.deptHodTag}>
+                    <UserCheck size={16} className={styles.hodIcon} />
+                    <span>
+                      <strong>Head:</strong> {dept.hodName}
+                    </span>
+                  </div>
+                )}
+
+                {/* Footer Action */}
+                <div className={styles.deptFooter}>
+                  <Link href={`/courses?dept=${dept.id}`} className={styles.deptLink}>
+                    <span>Explore Courses</span>
+                    <ArrowRight size={16} className={styles.arrowIcon} />
+                  </Link>
                 </div>
               </div>
-              <h3 className={styles.deptName}>{dept.name}</h3>
-              <p className={styles.deptDesc}>
-                {dept.description || 'Advancing academic rigor, interdisciplinary studies, and research.'}
-              </p>
-              {dept.hodName && (
-                <div className={styles.deptHodTag}>
-                  <UserCheck size={14} className={styles.metaIcon} />
-                  <span><strong>Head:</strong> {dept.hodName}</span>
-                </div>
-              )}
-              <Link href={`/courses?dept=${dept.id}`} className={styles.deptLink}>
-                <span>Explore Courses</span>
-                <ArrowRight size={14} className={styles.progLinkArrow} />
-              </Link>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
+        {/* Industry Standard Dot Pagination Bar */}
+        {departments.length > 1 && (
+          <div className={styles.dotsContainer}>
+            {departments.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className={`${styles.dot} ${idx === activeIndex ? styles.activeDot : ''}`}
+                onClick={() => scrollToCard(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* View All Departments CTA */}
         <div className={styles.secAction}>
           <Link href="/departments" className={styles.btnOutlineDark}>
             <span>View All Departments</span>

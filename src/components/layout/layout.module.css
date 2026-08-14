@@ -342,15 +342,17 @@
 
 .dropdownMenu {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   left: 0;
-  min-width: 230px;
-  background-color: rgba(12, 8, 6, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: var(--radius-md);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-width: 240px;
+  width: max-content;
+  max-width: 320px;
+  background-color: rgba(12, 8, 6, 0.96);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   list-style: none;
   padding: 8px 0;
   margin: 0;
@@ -358,13 +360,21 @@
   animation: dropdownFadeIn var(--transition-fast);
 }
 
+.navDropdownWrapper:last-child .dropdownMenu,
+.navDropdownWrapper:nth-last-child(2) .dropdownMenu,
+.navDropdownWrapper:nth-last-child(3) .dropdownMenu {
+  left: auto;
+  right: 0;
+}
+
 .dropdownItemLink {
   display: block;
   padding: 0.75rem 1.25rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
+  white-space: nowrap;
   transition: all var(--transition-fast);
 }
 
@@ -644,9 +654,9 @@
    ULTRA-PREMIUM EXECUTIVE FOOTER (#1A1816 Dark Charcoal / Warm Editorial Surface)
    ============================================================================== */
 .footer {
-  background-color: #060403;
+  background-color: #0A0806;
   background-image: 
-    radial-gradient(circle at 50% 0%, #160c07 0%, #060403 70%),
+    radial-gradient(circle at 50% 0%, #1A120B 0%, #0A0806 70%),
     radial-gradient(circle at 85% 100%, rgba(200, 90, 50, 0.08) 0%, transparent 60%);
   color: #E2D9CE;
   position: relative;
@@ -760,11 +770,11 @@
 }
 
 .footerSocialIcon:hover {
-  background-color: #B85C3A;
-  border-color: #B85C3A;
+  background-color: #C85A32;
+  border-color: #C85A32;
   color: #FFFFFF;
   transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(184, 92, 58, 0.4);
+  box-shadow: 0 6px 16px rgba(200, 90, 50, 0.4);
 }
 
 .footerNavCol {
@@ -787,31 +797,76 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
-.footerLink {
-  font-size: 0.875rem;
-  color: #A8A095;
-  text-decoration: none;
+/* ==============================================================================
+   FOOTER LINKS & ITEMS — SMOOTH SLOW LEFT-TO-RIGHT THEME BACKGROUND FILL (ZERO RADIUS)
+   ============================================================================== */
+
+.footerLink,
+.footerContactItem,
+.footerBottomLink {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.25s ease;
+  gap: 8px;
+  padding: 8px 16px;
+  margin: -2px -10px;
+  border-radius: 0px !important;
+  color: #A8A095;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Background pseudo-element expanding smoothly from LEFT to RIGHT */
+.footerLink::before,
+.footerContactItem::before,
+.footerBottomLink::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  width: 0%;
+  background: linear-gradient(90deg, #C85A32 0%, #A04220 100%);
+  border-radius: 0px !important;
+  z-index: -1;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(200, 90, 50, 0.35);
+}
+
+/* On Hover: Expand 100% from Left to Right & Text becomes Pure White */
+.footerLink:hover::before,
+.footerContactItem:hover::before,
+.footerBottomLink:hover::before {
+  width: 100%;
+}
+
+.footerLink:hover,
+.footerContactItem:hover,
+.footerBottomLink:hover,
+.footerContactItem:hover .footerContactLink,
+.footerContactItem:hover .contactIcon {
+  color: #FFFFFF !important;
 }
 
 .footerLink:hover {
-  color: #B85C3A;
   transform: translateX(4px);
 }
 
 .externalLinkIcon {
-  opacity: 0.6;
+  opacity: 0.7;
   transition: opacity 0.25s ease;
 }
 
 .footerLink:hover .externalLinkIcon {
   opacity: 1;
+  color: #FFFFFF;
 }
 
 .footerContactList {
@@ -820,22 +875,14 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-
-.footerContactItem {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 0.875rem;
-  color: #A8A095;
-  line-height: 1.5;
+  gap: 10px;
 }
 
 .contactIcon {
-  color: #B85C3A;
+  color: #C85A32;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
+  transition: color 0.25s ease;
 }
 
 .footerContactLink {
@@ -844,15 +891,11 @@
   transition: color 0.25s ease;
 }
 
-.footerContactLink:hover {
-  color: #B85C3A;
-}
-
 /* Bottom Bar */
 .footerBottom {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding: 22px 0;
-  background-color: #030201;
+  background-color: #040302;
 }
 
 .footerBottomInner {
@@ -879,17 +922,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.footerBottomLink {
-  font-size: 0.8125rem;
-  color: #8E877D;
-  text-decoration: none;
-  transition: color 0.25s ease;
-}
-
-.footerBottomLink:hover {
-  color: #B85C3A;
 }
 
 .footerDivider {

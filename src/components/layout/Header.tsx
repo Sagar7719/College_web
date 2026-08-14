@@ -108,7 +108,7 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
     }
   };
 
-  const navClassName = `${styles.unifiedHeaderNav} ${isScrolled ? styles.heroNavScrolled : styles.heroTransparentNav}`;
+  const navClassName = `${styles.unifiedHeaderNav} ${isHomePage && !isScrolled ? styles.heroTransparentNav : styles.heroNavScrolled}`;
 
   return (
     <header className={styles.headerShellTransparent}>

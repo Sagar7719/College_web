@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { NavigationItem, Page, OptionGroup } from '@/types';
+import { NavigationItem, Page } from '@/types';
 import { navigationService, buildNavigationTree } from '@/services/navigation.service';
 import { pagesService } from '@/services/pages.service';
 import { selectablePagesService, SelectablePageOption } from '@/services/selectable-pages.service';
-import {
-  isValidExternalUrl,
-} from '@/validations/navigation.schema';
+import { isValidExternalUrl } from '@/validations/navigation.schema';
 import {
   Card,
   CardBody,
@@ -32,6 +30,11 @@ export default function AdminNavigationManagerScreen() {
   const [selectablePages, setSelectablePages] = useState<SelectablePageOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Drag and Drop States
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [isSavingReorder, setIsSavingReorder] = useState(false);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -100,6 +103,63 @@ export default function AdminNavigationManagerScreen() {
     const selectedOpt = selectablePages.find((p) => p.id === optId);
     if (selectedOpt && (!label.trim() || editingItem === null)) {
       setLabel(selectedOpt.title);
+    }
+  };
+
+  // Drag and Drop Event Handlers
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDrop = async (dropIndex: number) => {
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const newItems = [...navItems];
+    const [draggedItem] = newItems.splice(draggedIndex, 1);
+    newItems.splice(dropIndex, 0, draggedItem);
+
+    // Re-index sequential order values
+    const updated = newItems.map((item, idx) => ({ ...item, order: idx }));
+    setNavItems(updated);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+
+    // Persist to database
+    setIsSavingReorder(true);
+    try {
+      await navigationService.saveNavigationItems(updated);
+    } catch (err) {
+      console.warn('Failed to persist drag reorder:', err);
+    } finally {
+      setIsSavingReorder(false);
+    }
+  };
+
+  // Quick Nest Item under Parent Dropdown
+  const handleNestUnderParent = async (itemId: string, targetParentId: string) => {
+    const updated = navItems.map((item) => {
+      if (item.id === itemId) {
+        return { ...item, parentId: targetParentId || undefined };
+      }
+      return item;
+    });
+    setNavItems(updated);
+
+    try {
+      await navigationService.saveNavigationItems(updated);
+    } catch (err) {
+      console.warn('Failed to update nested dropdown parent:', err);
     }
   };
 
@@ -201,402 +261,406 @@ export default function AdminNavigationManagerScreen() {
 
     setIsSaving(true);
     try {
-      const newItem: NavigationItem = {
-        id: editingItem?.id || (isSystemPage && systemKey ? `nav_sys_${systemKey}_${Date.now()}` : isCMSPage && cmsPageId ? `nav_cms_${cmsPageId}` : `nav_${Date.now()}`),
+      const payload: NavigationItem = {
+        id: editingItem ? editingItem.id : '',
         label: label.trim(),
         path: finalPath,
-        order,
-        visible,
+        parentId: parentId || undefined,
         isCMSPage,
         cmsPageId,
-        ...(parentId ? { parentId } : {}),
-        ...(isSystemPage && systemKey ? { isSystemPage: true, systemKey: systemKey as any } : {}),
         isExternal,
-        targetBlank: isExternal ? openInNewTab : undefined,
+        isSystemPage,
+        systemKey,
+        order,
+        visible,
+        targetBlank: openInNewTab,
       };
 
-      await navigationService.saveSingleNavigationItem(newItem);
+      await navigationService.saveSingleNavigationItem(payload);
       setIsModalOpen(false);
-      loadData();
-    } catch (err: unknown) {
-      const errMsg = err instanceof Error ? err.message : 'Failed to save navigation item.';
-      setErrorMessage(errMsg);
+      await loadData();
+    } catch (err) {
+      setErrorMessage('Failed to save navigation item. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Reorder Up
-  const moveUp = async (index: number) => {
-    if (index === 0) return;
-    const updated = [...navItems];
-    const temp = updated[index - 1];
-    updated[index - 1] = updated[index];
-    updated[index] = temp;
-    setNavItems(updated);
-    await navigationService.saveNavigationItems(updated);
-  };
-
-  // Reorder Down
-  const moveDown = async (index: number) => {
-    if (index === navItems.length - 1) return;
-    const updated = [...navItems];
-    const temp = updated[index + 1];
-    updated[index + 1] = updated[index];
-    updated[index] = temp;
-    setNavItems(updated);
-    await navigationService.saveNavigationItems(updated);
-  };
-
-  // Toggle Visibility
+  // Toggle Item Visibility
   const handleToggleVisibility = async (item: NavigationItem) => {
-    const updatedItem = { ...item, visible: !item.visible };
-    await navigationService.saveSingleNavigationItem(updatedItem);
-    loadData();
-  };
-
-  // Delete Item (Does NOT delete CMS page!)
-  const confirmDelete = async (id: string) => {
     try {
-      await navigationService.deleteNavigationItem(id);
-      setDeleteConfirmId(null);
-      loadData();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to delete navigation item';
-      alert(msg);
-      setDeleteConfirmId(null);
+      const updated = { ...item, visible: !item.visible };
+      await navigationService.saveSingleNavigationItem(updated);
+      await loadData();
+    } catch (err) {
+      console.warn('Failed to toggle visibility:', err);
     }
   };
 
-  const parentMap = new Map<string, string>();
-  navItems.forEach((i) => parentMap.set(i.id, i.label));
+  // Delete Item
+  const handleDeleteItem = async () => {
+    if (!deleteConfirmId) return;
+    setIsSaving(true);
+    try {
+      await navigationService.deleteNavigationItem(deleteConfirmId);
+      setDeleteConfirmId(null);
+      await loadData();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to delete navigation item.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <div>
-      {/* Page Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+    <div style={{ paddingBottom: '3rem' }}>
+      {/* Header Bar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <Badge variant="info" style={{ marginBottom: '0.375rem' }}>2-Level Mega Navigation</Badge>
-          <h1 style={{ fontSize: '1.75rem', color: 'var(--primary)' }}>Header Navigation Manager</h1>
-          <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Manage 2-level top-level and dropdown child navigation items for system and custom CMS pages.
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#24221F', margin: 0 }}>
+            🧭 Drag &amp; Drop Navigation Menu Manager
+          </h1>
+          <p style={{ color: '#68705A', margin: '0.25rem 0 0 0', fontSize: '0.9375rem' }}>
+            Drag and drop items to reorder the main website menu bar or nest items under dropdown menus.
           </p>
         </div>
-        <Button variant="primary" size="md" onClick={handleOpenCreateModal}>
-          + Add Menu Item
-        </Button>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          {isSavingReorder && (
+            <Badge variant="warning">Saving Order...</Badge>
+          )}
+          <Button variant="primary" onClick={handleOpenCreateModal}>
+            ➕ Add New Menu Link
+          </Button>
+        </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <Card variant="bordered" style={{ marginBottom: '1.5rem' }}>
-        <CardBody style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '240px' }}>
+      {/* Main Table Card */}
+      <Card variant="outline">
+        <CardBody style={{ padding: '1.25rem' }}>
+          {/* Search Bar */}
+          <div style={{ marginBottom: '1.25rem', maxWidth: '360px' }}>
             <Input
-              placeholder="Filter menu items by label or path..."
+              type="text"
+              placeholder="Search menu items by label or path..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          {searchQuery && (
-            <Button variant="ghost" size="md" onClick={() => setSearchQuery('')}>
-              Clear
-            </Button>
+
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <Skeleton style={{ height: '48px', width: '100%' }} />
+              <Skeleton style={{ height: '48px', width: '100%' }} />
+              <Skeleton style={{ height: '48px', width: '100%' }} />
+            </div>
+          ) : filteredNavItems.length === 0 ? (
+            <EmptyState
+              icon="🧭"
+              title="No Navigation Items Found"
+              description="Click 'Add New Menu Link' to add custom links or restore system page links."
+              action={{
+                label: 'Add Menu Link',
+                onClick: handleOpenCreateModal,
+              }}
+            />
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead style={{ width: '48px' }}>Drag</TableHead>
+                    <TableHead>Menu Label &amp; Hierarchy</TableHead>
+                    <TableHead>Target Path</TableHead>
+                    <TableHead>Menu Position</TableHead>
+                    <TableHead>Visibility</TableHead>
+                    <TableHead style={{ textAlign: 'right' }}>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredNavItems.map((item, index) => {
+                    const isParent = !item.parentId;
+                    const parentObj = item.parentId ? navItems.find((p) => p.id === item.parentId) : null;
+                    const isBeingDragged = draggedIndex === index;
+                    const isDragTarget = dragOverIndex === index;
+
+                    return (
+                      <TableRow
+                        key={item.id}
+                        draggable
+                        onDragStart={() => handleDragStart(index)}
+                        onDragOver={(e) => handleDragOver(e, index)}
+                        onDrop={() => handleDrop(index)}
+                        style={{
+                          opacity: isBeingDragged ? 0.4 : 1,
+                          backgroundColor: isDragTarget ? '#FFFBEB' : isParent ? '#FFFFFF' : '#FAFAF8',
+                          borderLeft: isDragTarget ? '4px solid #C85A32' : item.parentId ? '3px solid #DED4C5' : '4px solid #24221F',
+                          cursor: 'grab',
+                          transition: 'background-color 0.2s ease',
+                        }}
+                      >
+                        {/* Drag Handle */}
+                        <TableCell>
+                          <span
+                            title="Click and drag to reorder menu items"
+                            style={{
+                              cursor: 'grab',
+                              fontSize: '1.25rem',
+                              color: '#8E877D',
+                              userSelect: 'none',
+                              padding: '4px 8px',
+                            }}
+                          >
+                            ⋮⋮
+                          </span>
+                        </TableCell>
+
+                        {/* Label & Type */}
+                        <TableCell>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingLeft: item.parentId ? '1.5rem' : '0' }}>
+                            {item.parentId && <span style={{ color: '#C85A32', fontWeight: 'bold' }}>↳</span>}
+                            <span style={{ fontWeight: isParent ? 800 : 600, color: '#24221F', fontSize: '0.9375rem' }}>
+                              {item.label}
+                            </span>
+                            {item.isSystemPage && <Badge variant="info">System</Badge>}
+                            {item.isCMSPage && !item.isSystemPage && <Badge variant="accent">CMS Page</Badge>}
+                            {item.isExternal && <Badge variant="warning">External</Badge>}
+                          </div>
+                        </TableCell>
+
+                        {/* Path */}
+                        <TableCell>
+                          <code style={{ fontSize: '0.8125rem', color: '#68705A', background: '#F7F2E9', padding: '2px 8px', borderRadius: '2px' }}>
+                            {item.path}
+                          </code>
+                        </TableCell>
+
+                        {/* Nesting Dropdown Assignment */}
+                        <TableCell>
+                          <select
+                            value={item.parentId || ''}
+                            onChange={(e) => handleNestUnderParent(item.id, e.target.value)}
+                            style={{
+                              fontSize: '0.8125rem',
+                              padding: '4px 8px',
+                              borderRadius: '0px',
+                              border: '1px solid #DED4C5',
+                              backgroundColor: '#FFFFFF',
+                              color: '#24221F',
+                            }}
+                          >
+                            <option value="">📌 Top-Level Menu</option>
+                            {navItems
+                              .filter((p) => !p.parentId && p.id !== item.id)
+                              .map((p) => (
+                                <option key={p.id} value={p.id}>
+                                  📁 Nested under "{p.label}"
+                                </option>
+                              ))}
+                          </select>
+                        </TableCell>
+
+                        {/* Visibility */}
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            variant={item.visible ? 'outline' : 'ghost'}
+                            onClick={() => handleToggleVisibility(item)}
+                          >
+                            {item.visible ? '👁️ Published' : '🙈 Hidden'}
+                          </Button>
+                        </TableCell>
+
+                        {/* Actions */}
+                        <TableCell style={{ textAlign: 'right' }}>
+                          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                            <Button size="sm" variant="outline" onClick={() => handleOpenEditModal(item)}>
+                              ✏️ Edit
+                            </Button>
+                            {!item.isSystemPage && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                style={{ color: '#DC2626' }}
+                                onClick={() => setDeleteConfirmId(item.id)}
+                              >
+                                🗑️ Delete
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardBody>
       </Card>
 
-      {/* Content Table / Cards */}
-      {loading ? (
-        <Card variant="bordered">
-          <CardBody style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <Skeleton height="2.5rem" />
-            <Skeleton height="2.5rem" />
-            <Skeleton height="2.5rem" />
-          </CardBody>
-        </Card>
-      ) : filteredNavItems.length === 0 ? (
-        <EmptyState
-          title={searchQuery ? `No menu items matching "${searchQuery}"` : 'No Navigation Items Configured'}
-          description={
-            searchQuery
-              ? 'Try searching with a different term.'
-              : 'Add your first menu item to customize the public college header navbar.'
-          }
-          actionLabel={!searchQuery ? '+ Add Menu Item' : undefined}
-          onAction={!searchQuery ? handleOpenCreateModal : undefined}
-        />
-      ) : (
-        <Card variant="bordered">
-          <CardBody style={{ padding: 0 }}>
-            <Table responsive>
-              <TableHeader>
-                <TableRow>
-                  <TableHead style={{ width: '60px' }}>Order</TableHead>
-                  <TableHead>Menu Label &amp; Hierarchy</TableHead>
-                  <TableHead>Link Destination &amp; Type</TableHead>
-                  <TableHead>Visibility Status</TableHead>
-                  <TableHead style={{ textAlign: 'right' }}>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(() => {
-                  const topLevelItemsList = navItems.filter((i) => !i.parentId);
-                  return filteredNavItems.map((item, idx) => {
-                    const isSys = item.isSystemPage;
-                    const isChild = Boolean(item.parentId);
-                    const parentLabel = item.parentId ? parentMap.get(item.parentId) : undefined;
+      {/* Edit / Create Modal */}
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title={editingItem ? 'Edit Navigation Link' : 'Add New Navigation Link'}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {errorMessage && (
+              <div style={{ padding: '0.75rem', background: '#FEE2E2', border: '1px solid #FCA5A5', color: '#B91C1C', borderRadius: '4px', fontSize: '0.875rem' }}>
+                {errorMessage}
+              </div>
+            )}
 
-                    let orderDisplay = '';
-                    if (!isChild) {
-                      const topIdx = topLevelItemsList.findIndex((i) => i.id === item.id);
-                      orderDisplay = `#${topIdx !== -1 ? topIdx + 1 : item.order + 1}`;
-                    } else {
-                      const siblings = navItems.filter((i) => i.parentId === item.parentId);
-                      const childIdx = siblings.findIndex((i) => i.id === item.id);
-                      orderDisplay = `↳ #${childIdx !== -1 ? childIdx + 1 : item.order + 1}`;
-                    }
-
-                    return (
-                      <TableRow key={item.id} style={{ opacity: item.visible ? 1 : 0.6 }}>
-                        <TableCell style={{ fontWeight: 700, color: isChild ? 'var(--primary)' : 'var(--text-main)' }}>
-                          {orderDisplay}
-                        </TableCell>
-                      <TableCell>
-                        <div style={{ paddingLeft: isChild ? '1.5rem' : 0, display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                          {isChild && <span style={{ color: 'var(--primary)', fontWeight: 700 }}>↳ </span>}
-                          <strong style={{ color: 'var(--primary)' }}>{item.label}</strong>
-                          {isChild && parentLabel && (
-                            <Badge variant="default" style={{ fontSize: '0.6875rem' }}>
-                              Inside {parentLabel}
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                          <Badge variant={isSys ? 'info' : item.isExternal ? 'warning' : 'default'}>
-                            {isSys ? 'SYSTEM' : item.isExternal ? 'EXTERNAL' : 'CUSTOM CMS'}
-                          </Badge>
-                          <span className="small-text">{item.path}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={item.visible ? 'success' : 'danger'}>
-                          {item.visible ? 'Visible in Navbar' : 'Hidden'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.25rem', flexWrap: 'wrap' }}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => moveUp(idx)}
-                            disabled={idx === 0}
-                            aria-label="Move navigation item up"
-                          >
-                            ↑
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => moveDown(idx)}
-                            disabled={idx === navItems.length - 1}
-                            aria-label="Move navigation item down"
-                          >
-                            ↓
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => handleToggleVisibility(item)}
-                            aria-label={item.visible ? 'Hide navigation item' : 'Show navigation item'}
-                          >
-                            {item.visible ? 'Hide' : 'Show'}
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => handleOpenEditModal(item)}>
-                            Edit
-                          </Button>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            disabled={isSys}
-                            title={isSys ? 'System page navigation items cannot be deleted.' : 'Remove menu item'}
-                            onClick={() => !isSys && setDeleteConfirmId(item.id)}
-                            style={isSys ? { opacity: 0.4, cursor: 'not-allowed' } : undefined}
-                            aria-label="Remove menu item"
-                          >
-                            ✕
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                });
-              })()}
-              </TableBody>
-            </Table>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Modal 1: Create / Edit Navigation Item */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingItem ? 'Edit Navigation Menu Item' : 'Add New Navigation Menu Item'}
-        description="Configure menu label, parent dropdown location, link destination, and public navbar visibility."
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" isLoading={isSaving} onClick={handleSaveModalItem}>
-              {editingItem ? 'Save Changes' : 'Add Menu Item'}
-            </Button>
-          </>
-        }
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {errorMessage && (
-            <div
-              style={{
-                backgroundColor: 'var(--semantic-error-bg)',
-                color: 'var(--semantic-error)',
-                padding: '0.75rem',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-              }}
-            >
-              ⚠️ {errorMessage}
-            </div>
-          )}
-
-          <Input
-            label="Menu Display Label *"
-            placeholder="e.g. Scholarship Information"
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            required
-          />
-
-          <Select
-            label="Navbar Parent Location"
-            value={parentId}
-            onChange={(e) => setParentId(e.target.value)}
-            options={parentSelectOptions}
-          />
-
-          <Select
-            label="Link Destination Type *"
-            value={linkType}
-            onChange={(e) => {
-              const val = e.target.value as 'existing' | 'external';
-              setLinkType(val);
-              if (val === 'existing' && selectablePages.length > 0) {
-                handleSelectPageOption(selectablePages[0].id);
-              }
-            }}
-            options={[
-              { label: '📌 Existing Page (System Page, System Module, or Custom Page)', value: 'existing' },
-              { label: '🌐 External Web Link (http:// or https://)', value: 'external' },
-            ]}
-          />
-
-          {linkType === 'existing' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <Select
-                label="Select Existing Page / Route *"
-                value={selectedPageId}
-                onChange={(e) => handleSelectPageOption(e.target.value)}
-                groups={[
-                  {
-                    label: 'System Pages',
-                    options: selectablePages
-                      .filter((p) => p.category === 'system_page')
-                      .map((p) => ({ label: `${p.title} (${p.path})`, value: p.id })),
-                  },
-                  {
-                    label: 'System Modules',
-                    options: selectablePages
-                      .filter((p) => p.category === 'system_module')
-                      .map((p) => ({ label: `${p.title} (${p.path})`, value: p.id })),
-                  },
-                  {
-                    label: 'Custom CMS Pages',
-                    options:
-                      selectablePages.filter((p) => p.category === 'custom_page').length > 0
-                        ? selectablePages
-                            .filter((p) => p.category === 'custom_page')
-                            .map((p) => ({ label: `${p.title} (${p.path})`, value: p.id }))
-                        : [{ label: 'No published custom pages found', value: '', disabled: true }],
-                  },
-                ].filter((g) => g.options.length > 0)}
-              />
-              <span className="tiny-text" style={{ color: 'var(--text-muted)' }}>
-                Selecting an existing route reuses its canonical path without creating duplicate page documents.
-              </span>
-            </div>
-          )}
-
-          {linkType === 'external' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {/* Menu Label */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#24221F', marginBottom: '0.35rem' }}>
+                Menu Title / Label *
+              </label>
               <Input
-                label="External URL *"
-                placeholder="https://example.com"
-                value={externalUrl}
-                onChange={(e) => setExternalUrl(e.target.value)}
+                type="text"
+                placeholder="e.g. Courses & Degrees"
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
               />
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <input
-                  type="checkbox"
-                  id="targetBlank"
-                  checked={openInNewTab}
-                  onChange={(e) => setOpenInNewTab(e.target.checked)}
-                  style={{ cursor: 'pointer' }}
-                />
-                <label htmlFor="targetBlank" style={{ fontSize: '0.875rem', cursor: 'pointer' }}>
-                  Open external link in a new browser tab (target=&quot;_blank&quot;)
+            </div>
+
+            {/* Parent Dropdown Menu */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#24221F', marginBottom: '0.35rem' }}>
+                Menu Hierarchy Position
+              </label>
+              <Select
+                value={parentId}
+                onChange={(e) => setParentId(e.target.value)}
+                options={parentSelectOptions}
+              />
+            </div>
+
+            {/* Link Type Radio */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#24221F', marginBottom: '0.35rem' }}>
+                Link Target Type
+              </label>
+              <div style={{ display: 'flex', gap: '1.5rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
+                  <input
+                    type="radio"
+                    name="linkType"
+                    checked={linkType === 'existing'}
+                    onChange={() => setLinkType('existing')}
+                  />
+                  Existing Website Page
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
+                  <input
+                    type="radio"
+                    name="linkType"
+                    checked={linkType === 'external'}
+                    onChange={() => setLinkType('external')}
+                  />
+                  External URL Link
                 </label>
               </div>
             </div>
-          )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <input
-              type="checkbox"
-              id="visibleCheck"
-              checked={visible}
-              onChange={(e) => setVisible(e.target.checked)}
-              style={{ cursor: 'pointer' }}
-            />
-            <label htmlFor="visibleCheck" style={{ fontSize: '0.9375rem', fontWeight: 600, cursor: 'pointer' }}>
-              Visible in Public Header Navbar
-            </label>
+            {/* Existing Page Select */}
+            {linkType === 'existing' && (
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#24221F', marginBottom: '0.35rem' }}>
+                  Select Target Page *
+                </label>
+                <Select
+                  value={selectedPageId}
+                  onChange={(e) => handleSelectPageOption(e.target.value)}
+                  options={selectablePages.map((p) => ({
+                    label: `${p.isSystemPage ? '🏛️ System: ' : '📄 Custom: '}${p.title} (${p.path})`,
+                    value: p.id,
+                  }))}
+                />
+              </div>
+            )}
+
+            {/* External URL Input */}
+            {linkType === 'external' && (
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#24221F', marginBottom: '0.35rem' }}>
+                  External Website URL *
+                </label>
+                <Input
+                  type="url"
+                  placeholder="https://example.edu/portal"
+                  value={externalUrl}
+                  onChange={(e) => setExternalUrl(e.target.value)}
+                />
+              </div>
+            )}
+
+            {/* Visibility Toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <input
+                type="checkbox"
+                id="visibleCheck"
+                checked={visible}
+                onChange={(e) => setVisible(e.target.checked)}
+                style={{ width: '18px', height: '18px' }}
+              />
+              <label htmlFor="visibleCheck" style={{ fontSize: '0.875rem', fontWeight: 700, color: '#24221F', cursor: 'pointer' }}>
+                Visible in live header navigation bar
+              </label>
+            </div>
+
+            {/* Target Blank Check */}
+            {linkType === 'external' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <input
+                  type="checkbox"
+                  id="targetBlankCheck"
+                  checked={openInNewTab}
+                  onChange={(e) => setOpenInNewTab(e.target.checked)}
+                  style={{ width: '18px', height: '18px' }}
+                />
+                <label htmlFor="targetBlankCheck" style={{ fontSize: '0.875rem', fontWeight: 700, color: '#24221F', cursor: 'pointer' }}>
+                  Open link in a new browser tab
+                </label>
+              </div>
+            )}
+
+            {/* Modal Actions */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem' }}>
+              <Button variant="ghost" onClick={() => setIsModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={handleSaveModalItem} disabled={isSaving}>
+                {isSaving ? 'Saving...' : 'Save Navigation Link'}
+              </Button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      )}
 
-      {/* Modal 2: Delete Confirmation */}
-      <Modal
-        isOpen={Boolean(deleteConfirmId)}
-        onClose={() => setDeleteConfirmId(null)}
-        title="Remove Navigation Item?"
-        description="This will remove the item from the public navigation bar."
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setDeleteConfirmId(null)}>
-              Cancel
-            </Button>
-            <Button variant="danger" onClick={() => deleteConfirmId && confirmDelete(deleteConfirmId)}>
-              Remove Menu Item
-            </Button>
-          </>
-        }
-      >
-        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-          Removing a navigation menu item only removes the link from the public header menu. <strong>The underlying custom CMS page will NOT be deleted.</strong>
-        </p>
-      </Modal>
+      {/* Delete Confirm Modal */}
+      {deleteConfirmId && (
+        <Modal
+          isOpen={Boolean(deleteConfirmId)}
+          onClose={() => setDeleteConfirmId(null)}
+          title="Delete Navigation Link"
+        >
+          <div>
+            <p style={{ color: '#24221F', fontSize: '0.9375rem' }}>
+              Are you sure you want to delete this custom menu link from the navigation bar?
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
+              <Button variant="ghost" onClick={() => setDeleteConfirmId(null)}>
+                Cancel
+              </Button>
+              <Button variant="primary" style={{ backgroundColor: '#DC2626' }} onClick={handleDeleteItem} disabled={isSaving}>
+                {isSaving ? 'Deleting...' : 'Delete Link'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { GalleryImage } from '@/types';
 import { GalleryLightbox } from '@/components/layout/GalleryLightbox';
-import styles from '../../inner.module.css';
+import { ZoomIn } from 'lucide-react';
+import styles from './AlbumDetail.module.css';
 
 interface Props {
   images: GalleryImage[];
@@ -14,51 +15,36 @@ export function GalleryAlbumClient({ images }: Props) {
 
   return (
     <>
-      <div className={styles.galleryGrid}>
+      <div className={styles.photoGrid}>
         {images.map((img, idx) => (
           <button
             key={img.id || idx}
             onClick={() => setLightboxIndex(idx)}
             aria-label={`Open photo ${idx + 1}${img.caption ? `: ${img.caption}` : ''}`}
-            className={styles.lightboxButton}
+            className={styles.photoCardBtn}
           >
-            <div
-              style={{
-                width: '100%', height: '220px',
-                backgroundColor: 'var(--color-surface-muted)',
-                position: 'relative',
-              }}
-            >
+            <div className={styles.photoImgBox}>
               <img
                 src={img.url}
                 alt={img.altText || `Photo ${idx + 1}`}
-                style={{
-                  width: '100%', height: '100%', objectFit: 'cover',
-                  display: 'block', transition: 'transform var(--transition-normal)'
-                }}
+                className={styles.photoImg}
                 loading="lazy"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).style.opacity = '0.3';
+                  (e.target as HTMLImageElement).style.opacity = '0.4';
                 }}
               />
-              {/* Hover overlay */}
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'rgba(11,31,58,0)',
-                transition: 'background 0.25s ease',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }} />
+
+              <div className={styles.zoomOverlay}>
+                <div className={styles.zoomBadge}>
+                  <ZoomIn size={22} />
+                </div>
+              </div>
             </div>
+
             {img.caption && (
-              <p style={{
-                fontSize: '0.8125rem', color: 'var(--color-text-secondary)',
-                marginTop: '0.5rem', textAlign: 'center',
-                padding: '0 0.5rem',
-                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                fontWeight: 500
-              }}>
+              <div className={styles.photoCaption}>
                 {img.caption}
-              </p>
+              </div>
             )}
           </button>
         ))}

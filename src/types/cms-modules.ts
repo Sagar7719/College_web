@@ -58,6 +58,7 @@ export interface Notice {
   title: string;
   slug: string;
   category: 'General' | 'Academic' | 'Admission' | 'Exam' | 'Event' | string;
+  tag?: string; // e.g. 'NEW', 'IMP', 'URGENT', 'EXAM', 'ADMISSION', 'SYLLABUS'
   content?: string;
   attachmentUrl?: string;
   attachmentName?: string;
@@ -121,6 +122,7 @@ export interface DocumentItem {
   id: string;
   title: string;
   category: 'General' | 'Admissions' | 'Academic' | 'Circulars' | 'Syllabus' | 'Forms' | string;
+  tag?: string; // e.g. 'NEW', 'IMP', 'SYLLABUS', 'FORM', 'PROSPECTUS'
   fileUrl: string;
   fileName: string;
   fileSizeFormatted?: string; // e.g. '2.4 MB'

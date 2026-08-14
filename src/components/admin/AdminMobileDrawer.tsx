@@ -11,22 +11,24 @@ export interface AdminMobileDrawerProps {
 }
 
 const adminDrawerNav = [
-  { label: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
-  { label: 'Pages (Page Builder)', href: '/admin/pages', icon: '📄' },
-  { label: 'Navigation Menu', href: '/admin/navigation', icon: '🧭' },
-  { label: 'Footer Links', href: '/admin/footer', icon: '🦶' },
-  { label: 'Departments', href: '/admin/departments', icon: '🏛️' },
-  { label: 'Courses', href: '/admin/courses', icon: '🎓' },
-  { label: 'Faculty Directory', href: '/admin/faculty', icon: '👨‍🏫' },
-  { label: 'Notices', href: '/admin/notices', icon: '📌' },
-  { label: 'News & Press', href: '/admin/news', icon: '📰' },
-  { label: 'Events', href: '/admin/events', icon: '📅' },
-  { label: 'Contact Messages', href: '/admin/contact-messages', icon: '✉️' },
-
-  { label: 'Gallery', href: '/admin/gallery', icon: '🖼️' },
-  { label: 'Downloads', href: '/admin/downloads', icon: '📥' },
-  { label: 'Media Library', href: '/admin/media', icon: '📁' },
-  { label: 'Site Settings', href: '/admin/settings', icon: '⚙️' },
+  { label: '📊 Dashboard', href: '/admin/dashboard' },
+  { label: '🏠 Home Page', href: '/admin/homepage' },
+  { label: '📖 About Overview & Legacy', href: '/admin/about-page' },
+  { label: "📖 Principal's Desk", href: '/admin/about-page/principal' },
+  { label: '📖 Governing Body & Council', href: '/admin/about-page/governing-body' },
+  { label: '📖 IQAC Cell & NAAC', href: '/admin/about-page/iqac' },
+  { label: '🎓 Courses & Programs', href: '/admin/courses' },
+  { label: '🎓 Departments & HODs', href: '/admin/departments' },
+  { label: '🎓 Faculty Directory', href: '/admin/faculty' },
+  { label: '📌 Notices & Circulars', href: '/admin/notices' },
+  { label: '📰 News & Press', href: '/admin/news' },
+  { label: '📅 Campus Events', href: '/admin/events' },
+  { label: '🖼️ Photo Gallery Albums', href: '/admin/gallery' },
+  { label: '📥 Document Downloads', href: '/admin/downloads' },
+  { label: '📝 Admissions Page', href: '/admin/admissions-config' },
+  { label: '📞 Contact Us Page', href: '/admin/contact-page' },
+  { label: '🧭 Drag & Drop Menu Manager', href: '/admin/navigation' },
+  { label: '⚙️ Site Branding & Settings', href: '/admin/settings' },
 ];
 
 export const AdminMobileDrawer: React.FC<AdminMobileDrawerProps> = ({ isOpen, onClose }) => {
@@ -68,7 +70,6 @@ export const AdminMobileDrawer: React.FC<AdminMobileDrawerProps> = ({ isOpen, on
                     className={`${styles.sidebarLink} ${isActive ? styles.sidebarLinkActive : ''}`}
                     onClick={onClose}
                   >
-                    <span>{item.icon}</span>
                     <span>{item.label}</span>
                   </Link>
                 </li>

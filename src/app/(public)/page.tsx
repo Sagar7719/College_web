@@ -22,6 +22,7 @@ import { EventsCarousel } from '@/components/common/EventsCarousel';
 import { GalleryCarousel } from '@/components/common/GalleryCarousel';
 import { QuickLinksCarousel } from '@/components/common/QuickLinksCarousel';
 import { InteractiveDotGrid } from '@/components/common/InteractiveDotGrid';
+import { VerticalNoticeTicker } from '@/components/common/VerticalNoticeTicker';
 import styles from './home.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -214,90 +215,10 @@ export default async function HomePage() {
         <ProgrammesCarousel courses={publishedCourses} />
       )}
 
-      {/* LATEST NOTICES & DOWNLOADS */}
+      {/* LATEST NOTICES & DOWNLOADS (VERTICAL TICKER MARQUEE) */}
       <section className={styles.secAlt} aria-label="Notices and Downloads">
         <div className="container">
-          <div className={styles.noticeDownloadGrid}>
-            {/* Left: Latest Notices */}
-            <div className={styles.ndColumn}>
-              <div className={styles.ndHeader}>
-                <h2 className={styles.ndTitle}>
-                  <Bell size={20} className={styles.ndHeaderIcon} />
-                  <span>Latest Updates & Notices</span>
-                </h2>
-                <Link href="/notices" className={styles.ndViewAll}>
-                  <span>View All</span>
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
-              <div className={styles.ndList}>
-                {notices.length > 0 ? (
-                  notices.slice(0, 5).map((n) => (
-                    <div key={n.id} className={`${styles.ndItem} ${n.isUrgent ? styles.ndUrgent : ''}`}>
-                      <div className={styles.ndDate}>{formatDate(n.publishDate)}</div>
-                      <div className={styles.ndBody}>
-                        <Link href="/notices" className={styles.ndItemTitle}>{n.title}</Link>
-                        <span className={`${styles.ndCat} ${n.isUrgent ? styles.ndCatRed : ''}`}>{n.category}</span>
-                      </div>
-                      {n.attachmentUrl && (
-                        <a href={n.attachmentUrl} target="_blank" rel="noopener noreferrer" className={styles.ndDownloadBtn} aria-label="Download Attachment">
-                          <Download size={16} />
-                        </a>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <div className={styles.ndEmptyBox}>
-                    <div className={styles.ndEmptyIconBadge}>
-                      <BellOff size={24} />
-                    </div>
-                    <strong className={styles.ndEmptyTitle}>No Active Circulars</strong>
-                    <p className={styles.ndEmptyDesc}>Official circulars and announcements will appear here when published.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Right: Downloads */}
-            <div className={styles.ndColumn}>
-              <div className={styles.ndHeader}>
-                <h2 className={styles.ndTitle}>
-                  <FolderDown size={20} className={styles.ndHeaderIcon} />
-                  <span>Official Downloads</span>
-                </h2>
-                <Link href="/downloads" className={styles.ndViewAll}>
-                  <span>View All</span>
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
-              <div className={styles.ndList}>
-                {recentDownloads.length > 0 ? (
-                  recentDownloads.map((d) => (
-                    <div key={d.id} className={styles.ndItem}>
-                      <div className={styles.ndFileIcon}>
-                        <FileCheck size={20} />
-                      </div>
-                      <div className={styles.ndBody}>
-                        <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className={styles.ndItemTitle}>{d.title}</a>
-                        <span className={styles.ndCat}>{d.category}{d.fileSizeFormatted ? ` • ${d.fileSizeFormatted}` : ''}</span>
-                      </div>
-                      <a href={d.fileUrl} target="_blank" rel="noopener noreferrer" className={styles.ndDownloadBtn} aria-label="Download File">
-                        <Download size={16} />
-                      </a>
-                    </div>
-                  ))
-                ) : (
-                  <div className={styles.ndEmptyBox}>
-                    <div className={styles.ndEmptyIconBadge}>
-                      <FileText size={24} />
-                    </div>
-                    <strong className={styles.ndEmptyTitle}>No Downloads Available</strong>
-                    <p className={styles.ndEmptyDesc}>Syllabus PDFs, prospectus, and application forms will be listed here.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <VerticalNoticeTicker notices={notices} downloads={downloads} />
         </div>
       </section>
 
@@ -359,17 +280,17 @@ export default async function HomePage() {
         <GalleryCarousel albums={galleryAlbums} collegeName={collegeName} />
       )}
 
-      {/* ACCREDITATION STRIP */}
+      {/* ACCREDITATION & RECOGNITION */}
       <section className={styles.accredBar} aria-label="Accreditation & Recognition">
         <div className={`container ${styles.accredRow}`}>
           {hpData.accreditations.map((item, idx) => (
             <div key={idx} className={styles.accredItem}>
               <div className={styles.accredIcon}>
-                {resolveIcon(item.iconKey, 22)}
+                {resolveIcon(item.iconKey, 24)}
               </div>
-              <div>
-                <strong>{idx === 3 ? `${item.title} ${estYear}` : item.title}</strong>
-                <p>{item.subtitle}</p>
+              <div className={styles.accredItemText}>
+                <strong className={styles.accredTitle}>{idx === 3 ? `${item.title} ${estYear}` : item.title}</strong>
+                <p className={styles.accredSub}>{item.subtitle}</p>
               </div>
             </div>
           ))}

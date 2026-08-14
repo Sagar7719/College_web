@@ -25,6 +25,7 @@ interface DocFormState {
   id?: string;
   title: string;
   category: string;
+  tag: string;
   description: string;
   fileUrl: string;
   fileName: string;
@@ -36,6 +37,7 @@ interface DocFormState {
 const emptyDocForm = (): DocFormState => ({
   title: '',
   category: 'General',
+  tag: 'NEW',
   description: '',
   fileUrl: '',
   fileName: '',
@@ -98,7 +100,8 @@ export default function AdminDownloadsPage() {
   const filteredDocs = docs.filter((d) => {
     const matchSearch = d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (d.fileName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (d.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+      (d.description || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (d.tag || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchStatus = statusFilter === 'all' || d.status === statusFilter;
     const matchCat = categoryFilter === 'all' || d.category === categoryFilter;
     return matchSearch && matchStatus && matchCat;
@@ -117,6 +120,7 @@ export default function AdminDownloadsPage() {
       id: doc.id,
       title: doc.title,
       category: doc.category || 'General',
+      tag: doc.tag || 'NEW',
       description: doc.description || '',
       fileUrl: doc.fileUrl,
       fileName: doc.fileName,
@@ -140,6 +144,7 @@ export default function AdminDownloadsPage() {
         id: docForm.id,
         title: docForm.title.trim(),
         category: docForm.category,
+        tag: docForm.tag.trim().toUpperCase(),
         description: docForm.description.trim(),
         fileUrl: docForm.fileUrl.trim(),
         fileName: docForm.fileName.trim(),
@@ -352,6 +357,42 @@ export default function AdminDownloadsPage() {
             onChange={(e) => setDocForm((p) => ({ ...p, category: e.target.value }))}
             options={DOCUMENT_CATEGORIES.map((c) => ({ label: c, value: c }))}
           />
+
+          {/* TAG BADGE SELECTION */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>Document Tag Badge (Shown in vertical marquee)</label>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+              {['NEW', 'IMP', 'PROSPECTUS', 'SYLLABUS', 'FORM'].map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setDocForm((p) => ({ ...p, tag: preset }))}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '100px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    border: docForm.tag === preset ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                    backgroundColor: docForm.tag === preset ? 'var(--primary-bg)' : '#F7F2E9',
+                    color: docForm.tag === preset ? 'var(--primary)' : 'var(--text-secondary)',
+                  }}
+                >
+                  {preset === 'NEW' && '🟢 '}
+                  {preset === 'IMP' && '🔥 '}
+                  {preset === 'PROSPECTUS' && '📖 '}
+                  {preset === 'SYLLABUS' && '📚 '}
+                  {preset === 'FORM' && '📄 '}
+                  {preset}
+                </button>
+              ))}
+            </div>
+            <Input
+              placeholder="Or type custom tag badge text (e.g. RESULTS, FEE)..."
+              value={docForm.tag}
+              onChange={(e) => setDocForm((p) => ({ ...p, tag: e.target.value }))}
+            />
+          </div>
 
           <Input
             label="Description (Optional)"

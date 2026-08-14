@@ -2,12 +2,11 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { coursesService } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
-import { Card, CardBody, Badge, EmptyState, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui';
-import styles from '../inner.module.css';
+import { CoursesClient } from './CoursesClient';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'College';
+  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College, Jaysingpur';
   const title = `Courses & Degree Programs — ${collegeName}`;
   const description = `Explore undergraduate, postgraduate, and doctoral degree programs offered at ${collegeName}.`;
   const ogImageUrl = settings.seoConfig?.defaultOgImageUrl || settings.collegeInfo?.logoUrl;
@@ -29,53 +28,10 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-
 export default async function CoursesPage() {
   const courses = await coursesService.getAll();
+  const settings = await siteSettingsService.getSettings();
+  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College, Jaysingpur';
 
-  return (
-    <div className="container" style={{ padding: '3rem 1.5rem' }}>
-      <div className={styles.pageHeader}>
-        <Badge variant="default" style={{ marginBottom: '0.75rem' }}>Programs Offered</Badge>
-        <h1 className={styles.pageTitle}>Courses &amp; Degree Programs</h1>
-        <p className={styles.pageSubtitle}>
-          Explore undergraduate, postgraduate, and diploma programs.
-        </p>
-      </div>
-
-      {courses.length > 0 ? (
-        <Card variant="bordered">
-          <CardBody style={{ padding: 0 }}>
-            <Table responsive>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Course Code</TableHead>
-                  <TableHead>Program Name</TableHead>
-                  <TableHead>Degree Level</TableHead>
-                  <TableHead>Duration</TableHead>
-                  <TableHead>Eligibility</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {courses.map((course) => (
-                  <TableRow key={course.id}>
-                    <TableCell><Badge variant="default">{course.code}</Badge></TableCell>
-                    <TableCell style={{ fontWeight: 700, color: 'var(--color-primary)' }}>{course.title}</TableCell>
-                    <TableCell>{course.degreeType}</TableCell>
-                    <TableCell>{course.durationYears} Years</TableCell>
-                    <TableCell style={{ fontSize: '0.875rem' }}>{course.eligibility || 'Higher Secondary Pass'}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardBody>
-        </Card>
-      ) : (
-        <EmptyState
-          title="No Courses Listed Yet"
-          description="Degree program details will be available soon."
-        />
-      )}
-    </div>
-  );
+  return <CoursesClient initialCourses={courses} collegeName={collegeName} />;
 }

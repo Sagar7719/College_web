@@ -34,6 +34,7 @@ export default function AdminNoticesPage() {
   // Form State
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<Notice['category']>('Academic');
+  const [tag, setTag] = useState<string>('NEW');
   const [publishDate, setPublishDate] = useState(new Date().toISOString().slice(0, 10));
   const [content, setContent] = useState('');
   const [attachmentUrl, setAttachmentUrl] = useState('');
@@ -63,7 +64,8 @@ export default function AdminNoticesPage() {
   const filteredNotices = notices.filter((n) => {
     const matchesSearch =
       n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      n.category.toLowerCase().includes(searchQuery.toLowerCase());
+      n.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (n.tag || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat = categoryFilter === 'all' || n.category === categoryFilter;
     return matchesSearch && matchesCat;
   });
@@ -72,6 +74,7 @@ export default function AdminNoticesPage() {
     setEditingNotice(null);
     setTitle('');
     setCategory('Academic');
+    setTag('NEW');
     setPublishDate(new Date().toISOString().slice(0, 10));
     setContent('');
     setAttachmentUrl('');
@@ -86,6 +89,7 @@ export default function AdminNoticesPage() {
     setEditingNotice(n);
     setTitle(n.title);
     setCategory(n.category);
+    setTag(n.tag || (n.isUrgent ? 'IMP' : 'NEW'));
     setPublishDate(n.publishDate ? n.publishDate.slice(0, 10) : new Date().toISOString().slice(0, 10));
     setContent(n.content || '');
     setAttachmentUrl(n.attachmentUrl || '');
@@ -110,11 +114,12 @@ export default function AdminNoticesPage() {
         id: editingNotice?.id,
         title: title.trim(),
         category,
+        tag: tag.trim().toUpperCase(),
         publishDate,
         content: content.trim(),
         attachmentUrl: attachmentUrl.trim(),
         attachmentName: attachmentName.trim(),
-        isUrgent,
+        isUrgent: isUrgent || tag.trim().toUpperCase() === 'IMP' || tag.trim().toUpperCase() === 'URGENT',
         status,
       });
 
@@ -141,7 +146,7 @@ export default function AdminNoticesPage() {
           <Badge variant="info" style={{ marginBottom: '0.375rem' }}>Content CMS</Badge>
           <h1 style={{ fontSize: '1.75rem', color: 'var(--primary)' }}>Notices & Circulars</h1>
           <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Publish official academic notices, exam circulars, and downloadable attachments.
+            Publish official academic notices, exam circulars, and downloadable attachments with custom badges.
           </p>
         </div>
         <Button variant="primary" size="md" onClick={handleOpenCreateModal}>
@@ -153,7 +158,7 @@ export default function AdminNoticesPage() {
         <CardBody style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: '240px' }}>
             <Input
-              placeholder="Search notices by title or category..."
+              placeholder="Search notices by title, category, or tag (NEW, IMP)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -195,7 +200,7 @@ export default function AdminNoticesPage() {
             <Table responsive>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Category</TableHead>
+                  <TableHead>Category & Tag</TableHead>
                   <TableHead>Notice Title</TableHead>
                   <TableHead>Publish Date</TableHead>
                   <TableHead>Status</TableHead>
@@ -206,9 +211,12 @@ export default function AdminNoticesPage() {
                 {filteredNotices.map((n) => (
                   <TableRow key={n.id}>
                     <TableCell>
-                      <Badge variant={n.isUrgent ? 'danger' : 'info'}>
-                        {n.isUrgent ? '🔥 URGENT' : n.category}
-                      </Badge>
+                      <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <Badge variant="info">{n.category}</Badge>
+                        <Badge variant={n.isUrgent || n.tag === 'IMP' ? 'danger' : 'success'}>
+                          {n.tag || (n.isUrgent ? 'IMP' : 'NEW')}
+                        </Badge>
+                      </div>
                     </TableCell>
                     <TableCell><strong style={{ color: 'var(--primary)' }}>{n.title}</strong></TableCell>
                     <TableCell className="small-text">{n.publishDate ? n.publishDate.slice(0, 10) : 'Today'}</TableCell>
@@ -236,7 +244,7 @@ export default function AdminNoticesPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingNotice ? 'Edit Notice' : 'Post Official Notice'}
-        description="Enter circular title, category, publish date, and document attachment."
+        description="Enter circular title, category, tag badge, publish date, and document attachment."
         footer={
           <>
             <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Cancel</Button>
@@ -263,6 +271,46 @@ export default function AdminNoticesPage() {
             />
             <Input label="Publish Date *" type="date" value={publishDate} onChange={(e) => setPublishDate(e.target.value)} required />
           </div>
+
+          {/* TAG BADGE SELECTION */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>Notice Tag Badge (Shown in vertical marquee)</label>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+              {['NEW', 'IMP', 'URGENT', 'EXAM', 'ADMISSION', 'SYLLABUS'].map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => {
+                    setTag(preset);
+                    if (preset === 'IMP' || preset === 'URGENT') setIsUrgent(true);
+                  }}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '100px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    border: tag === preset ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                    backgroundColor: tag === preset ? 'var(--primary-bg)' : '#F7F2E9',
+                    color: tag === preset ? 'var(--primary)' : 'var(--text-secondary)',
+                  }}
+                >
+                  {preset === 'NEW' && '🟢 '}
+                  {(preset === 'IMP' || preset === 'URGENT') && '🔥 '}
+                  {preset === 'EXAM' && '📝 '}
+                  {preset === 'ADMISSION' && '🎓 '}
+                  {preset === 'SYLLABUS' && '📚 '}
+                  {preset}
+                </button>
+              ))}
+            </div>
+            <Input
+              placeholder="Or type custom tag badge text (e.g. RESULTS, TIMETABLE)..."
+              value={tag}
+              onChange={(e) => setTag(e.target.value)}
+            />
+          </div>
+
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <input type="checkbox" id="urgentCheck" checked={isUrgent} onChange={(e) => setIsUrgent(e.target.checked)} style={{ cursor: 'pointer' }} />
             <label htmlFor="urgentCheck" style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--semantic-error)', cursor: 'pointer' }}>Mark as High Priority / Urgent Notice 🔥</label>

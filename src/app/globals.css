@@ -259,3 +259,107 @@ a:hover {
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* ==============================================================================
+   ACTIVE BORDER-CREATING LASER LINE TRACE ON HOVER FOR ALL BUTTONS
+   ============================================================================== */
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes borderTraceCreation {
+  0% {
+    --border-angle: 0deg;
+  }
+  100% {
+    --border-angle: 360deg;
+  }
+}
+
+button,
+a[class*="btn"],
+.btnPrimary,
+.btnOutlineDark,
+.btnSmall,
+.btnSmallOutline,
+.btnPrimaryTerracotta,
+.btnSecondary,
+.btnDark,
+[class*="btnPrimary"],
+[class*="btnOutline"],
+[class*="btnSmall"],
+[class*="btn"] {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button::after,
+a[class*="btn"]::after,
+.btnPrimary::after,
+.btnOutlineDark::after,
+.btnSmall::after,
+.btnSmallOutline::after,
+.btnPrimaryTerracotta::after,
+.btnSecondary::after,
+.btnDark::after,
+[class*="btnPrimary"]::after,
+[class*="btnOutline"]::after,
+[class*="btnSmall"]::after,
+[class*="btn"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2.5px;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0deg,
+    transparent 200deg,
+    #B85C3A 260deg,
+    #D97706 310deg,
+    #059669 340deg,
+    #2563EB 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  animation: borderTraceCreation 3.8s linear infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+button:hover::after,
+a[class*="btn"]:hover::after,
+.btnPrimary:hover::after,
+.btnOutlineDark:hover::after,
+.btnSmall:hover::after,
+.btnSmallOutline:hover::after,
+.btnPrimaryTerracotta:hover::after,
+.btnSecondary:hover::after,
+.btnDark:hover::after,
+[class*="btnPrimary"]:hover::after,
+[class*="btnOutline"]:hover::after,
+[class*="btnSmall"]:hover::after,
+[class*="btn"]:hover::after {
+  opacity: 1;
+}
+
+button:hover,
+a[class*="btn"]:hover,
+.btnPrimary:hover,
+.btnOutlineDark:hover,
+.btnSmall:hover,
+.btnSmallOutline:hover,
+.btnPrimaryTerracotta:hover {
+  box-shadow: 0 0 18px rgba(184, 92, 58, 0.3);
+  transform: translateY(-2px);
+}
+

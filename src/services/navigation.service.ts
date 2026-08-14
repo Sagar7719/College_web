@@ -305,14 +305,19 @@ export function buildNavigationTree(flatItems: NavigationItem[]): NavigationItem
   const topLevelMap = new Map<string, NavigationItem>();
   const topLevelItems: NavigationItem[] = [];
   const orphanChildren: NavigationItem[] = [];
+  const seenTopLevelKeys = new Set<string>();
 
   sorted.forEach((item) => {
     const itemCopy: NavigationItem = { ...item };
     delete itemCopy.children;
 
     if (!item.parentId) {
-      topLevelMap.set(item.id, itemCopy);
-      topLevelItems.push(itemCopy);
+      const topKey = `${(item.path || '').toLowerCase()}_${(item.label || '').toLowerCase()}`;
+      if (!seenTopLevelKeys.has(topKey)) {
+        seenTopLevelKeys.add(topKey);
+        topLevelMap.set(item.id, itemCopy);
+        topLevelItems.push(itemCopy);
+      }
     } else {
       orphanChildren.push(itemCopy);
     }
@@ -322,12 +327,22 @@ export function buildNavigationTree(flatItems: NavigationItem[]): NavigationItem
     const parent = child.parentId ? topLevelMap.get(child.parentId) : undefined;
     if (parent) {
       parent.children = parent.children || [];
-      delete child.children;
-      parent.children.push(child);
+      const childKey = `${(child.path || '').toLowerCase()}_${(child.label || '').toLowerCase()}`;
+      const isAlreadyAdded = parent.children.some(
+        (c) => `${(c.path || '').toLowerCase()}_${(c.label || '').toLowerCase()}` === childKey
+      );
+      if (!isAlreadyAdded) {
+        delete child.children;
+        parent.children.push(child);
+      }
     } else {
-      delete child.parentId;
-      delete child.children;
-      topLevelItems.push(child);
+      const topKey = `${(child.path || '').toLowerCase()}_${(child.label || '').toLowerCase()}`;
+      if (!seenTopLevelKeys.has(topKey)) {
+        seenTopLevelKeys.add(topKey);
+        delete child.parentId;
+        delete child.children;
+        topLevelItems.push(child);
+      }
     }
   });
 

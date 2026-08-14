@@ -1,0 +1,324 @@
+/* ==============================================================================
+   ACADEMIC DEPARTMENTS CAROUSEL — MULTI-COLOR CARDS & DOT PAGINATION
+   ============================================================================== */
+
+.sec {
+  padding: 80px 0;
+  background-color: var(--color-secondary-bg, #EFE7DA);
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--color-border, #DED4C5);
+  border-bottom: 1px solid var(--color-border, #DED4C5);
+}
+
+.secHeadCenter {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-accent, #C85A32);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.secTitle {
+  font-family: var(--font-display) !important;
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  font-weight: 800;
+  color: #24221F;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.secSub {
+  font-size: 1.0625rem;
+  color: #68705A;
+  margin-top: 12px;
+  line-height: 1.6;
+}
+
+/* ── CAROUSEL CONTAINER (HIDDEN SCROLLBARS) ── */
+.carouselViewport {
+  width: 100%;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 12px 4px 32px 4px;
+  display: flex;
+  gap: 24px;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.carouselViewport::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* ── CARD BASE ── */
+.deptCard {
+  flex: 0 0 calc(100% - 32px);
+  max-width: 380px;
+  scroll-snap-align: center;
+  background-color: #FFFFFF;
+  border-radius: 24px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(20, 18, 15, 0.04);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(222, 212, 197, 0.8);
+}
+
+@media (min-width: 640px) {
+  .deptCard {
+    flex: 0 0 340px;
+    scroll-snap-align: start;
+  }
+}
+
+@media (min-width: 1024px) {
+  .deptCard {
+    flex: 0 0 360px;
+  }
+}
+
+/* Accent Header Line on Card Top */
+.deptCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--card-accent-gradient);
+  border-radius: 24px 24px 0 0;
+}
+
+.deptCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 48px -10px var(--card-glow-color);
+  border-color: var(--card-accent-color);
+}
+
+.deptTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.deptBadge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--card-accent-color);
+  background-color: var(--card-bg-light);
+  padding: 6px 14px;
+  border-radius: 100px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid var(--card-border-color);
+}
+
+.deptIconBadge {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--card-bg-light);
+  color: var(--card-accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--card-border-color);
+  transition: transform 0.3s ease;
+}
+
+.deptCard:hover .deptIconBadge {
+  transform: scale(1.1) rotate(5deg);
+  background: var(--card-accent-gradient);
+  color: #FFFFFF;
+}
+
+.deptName {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #24221F;
+  margin-bottom: 10px;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+}
+
+.deptDesc {
+  font-size: 0.875rem;
+  color: #68705A;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.deptHodTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: #555047;
+  background-color: #F7F2E9;
+  padding: 8px 14px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.hodIcon {
+  color: var(--card-accent-color);
+}
+
+.deptFooter {
+  padding-top: 16px;
+  border-top: 1px solid rgba(222, 212, 197, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.deptLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.90625rem;
+  font-weight: 700;
+  color: var(--card-accent-color);
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.deptLink:hover {
+  gap: 12px;
+}
+
+.arrowIcon {
+  transition: transform 0.25s ease;
+}
+
+.deptLink:hover .arrowIcon {
+  transform: translateX(4px);
+}
+
+/* ── DOT PAGINATION (INDUSTRY STANDARD) ── */
+.dotsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 100px;
+  background-color: rgba(222, 212, 197, 0.9);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+}
+
+.dot:hover {
+  background-color: var(--color-accent, #C85A32);
+}
+
+.activeDot {
+  width: 28px;
+  background-color: var(--color-accent, #C85A32);
+}
+
+.secAction {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.btnOutlineDark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 28px;
+  background-color: transparent;
+  color: #24221F;
+  border: 1.5px solid #24221F;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.btnOutlineDark:hover {
+  background-color: #24221F;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(36, 34, 31, 0.2);
+}
+
+/* ── MULTI-COLOR THEME VARIANTS ── */
+.variantTerracotta {
+  --card-accent-color: #C85A32;
+  --card-accent-gradient: linear-gradient(135deg, #C85A32 0%, #A04220 100%);
+  --card-bg-light: rgba(200, 90, 50, 0.08);
+  --card-border-color: rgba(200, 90, 50, 0.22);
+  --card-glow-color: rgba(200, 90, 50, 0.22);
+}
+
+.variantEmerald {
+  --card-accent-color: #059669;
+  --card-accent-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
+  --card-bg-light: rgba(5, 150, 105, 0.08);
+  --card-border-color: rgba(5, 150, 105, 0.22);
+  --card-glow-color: rgba(5, 150, 105, 0.22);
+}
+
+.variantSapphire {
+  --card-accent-color: #2563EB;
+  --card-accent-gradient: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  --card-bg-light: rgba(37, 99, 235, 0.08);
+  --card-border-color: rgba(37, 99, 235, 0.22);
+  --card-glow-color: rgba(37, 99, 235, 0.22);
+}
+
+.variantGold {
+  --card-accent-color: #D97706;
+  --card-accent-gradient: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+  --card-bg-light: rgba(217, 119, 6, 0.08);
+  --card-border-color: rgba(217, 119, 6, 0.22);
+  --card-glow-color: rgba(217, 119, 6, 0.22);
+}
+
+.variantViolet {
+  --card-accent-color: #7C3AED;
+  --card-accent-gradient: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+  --card-bg-light: rgba(124, 58, 237, 0.08);
+  --card-border-color: rgba(124, 58, 237, 0.22);
+  --card-glow-color: rgba(124, 58, 237, 0.22);
+}
+
+.variantCyan {
+  --card-accent-color: #0891B2;
+  --card-accent-gradient: linear-gradient(135deg, #0891B2 0%, #0E7490 100%);
+  --card-bg-light: rgba(8, 145, 178, 0.08);
+  --card-border-color: rgba(8, 145, 178, 0.22);
+  --card-glow-color: rgba(8, 145, 178, 0.22);
+}
