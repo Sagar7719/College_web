@@ -12,9 +12,7 @@ import {
   downloadsService,
 } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
-import { navigationService } from '@/services/navigation.service';
 import { Card, CardBody, Button, Badge } from '@/components/ui';
-import DraggableNavbarPreview from '@/components/admin/DraggableNavbarPreview';
 import styles from '@/components/admin/admin.module.css';
 
 export default async function AdminDashboardPage() {
@@ -29,7 +27,6 @@ export default async function AdminDashboardPage() {
     gallery,
     downloads,
     settings,
-    navItems,
   ] = await Promise.all([
     pagesService.getAllPages().catch(() => []),
     departmentsService.getAll().catch(() => []),
@@ -41,7 +38,6 @@ export default async function AdminDashboardPage() {
     galleryService.getAll().catch(() => []),
     downloadsService.getAll().catch(() => []),
     siteSettingsService.getSettings().catch(() => null),
-    navigationService.getNavigationItems().catch(() => []),
   ]);
 
   const collegeName = settings?.collegeInfo?.name || 'College CMS';
@@ -120,7 +116,7 @@ export default async function AdminDashboardPage() {
       )}
 
       {/* 3D Squircle RGB Metrics Cards Grid */}
-      <div className={styles.metricsGrid} style={{ marginBottom: '2rem' }}>
+      <div className={styles.metricsGrid}>
         {metrics.map((m) => (
           <Link key={m.title} href={m.href} style={{ textDecoration: 'none' }}>
             <div className={`${styles.metricCard} ${m.theme}`}>
@@ -133,22 +129,6 @@ export default async function AdminDashboardPage() {
           </Link>
         ))}
       </div>
-
-      {/* Live Website Header / Navbar Structure Preview Widget with Drag & Drop */}
-      <Card
-        variant="bordered"
-        style={{
-          borderRadius: '18px',
-          border: '1px solid rgba(222, 212, 197, 0.8)',
-          background: '#FFFFFF',
-          boxShadow: '0 8px 30px rgba(24, 22, 19, 0.04)',
-          overflow: 'hidden',
-        }}
-      >
-        <CardBody style={{ padding: '1.75rem' }}>
-          <DraggableNavbarPreview navItems={navItems} collegeName={collegeName} pages={pages} />
-        </CardBody>
-      </Card>
     </div>
   );
 }
