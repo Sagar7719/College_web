@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui';
+import { Menu, ExternalLink, LogOut, ShieldCheck } from 'lucide-react';
 import styles from './admin.module.css';
 
 export interface AdminHeaderProps {
@@ -29,7 +30,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ title, onOpenMobileMen
           className={styles.mobileMenuBtn}
           aria-label="Toggle admin sidebar drawer"
         >
-          ☰
+          <Menu size={20} />
         </button>
         <div>
           <h1 className={styles.headerTitle}>{title}</h1>
@@ -43,19 +44,23 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ title, onOpenMobileMen
 
       <div className={styles.userControl}>
         {/* Direct Link to View Public Website */}
-        <Link href="/" target="_blank" className={styles.publicViewBtn} title="View Live Public Website">
+        <Link href="/" target="_blank" className={styles.publicViewBtn} title="View Live Public Website" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <span>View Website</span>
-          <span style={{ fontSize: '0.875rem' }}>↗</span>
+          <ExternalLink size={14} />
         </Link>
 
         {user && (
           <div className={styles.userInfo}>
             <p className={styles.userEmail}>{user.email || 'Administrator'}</p>
-            <span className={styles.userRole}>Super Admin</span>
+            <span className={styles.userRole} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <ShieldCheck size={12} />
+              Super Admin
+            </span>
           </div>
         )}
-        <Button variant="outline" size="sm" onClick={handleLogout}>
-          Logout 🚪
+        <Button variant="outline" size="sm" onClick={handleLogout} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <LogOut size={14} />
+          Logout
         </Button>
       </div>
     </header>

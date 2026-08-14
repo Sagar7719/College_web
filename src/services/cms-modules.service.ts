@@ -25,6 +25,15 @@ import {
 
 // Helper for safe query execution with empty array fallback
 async function fetchDocs<T>(colName: string, queryConstraints: QueryConstraint[] = []): Promise<T[]> {
+  if (typeof window !== 'undefined') {
+    try {
+      const res = await fetch(`/api/cms/${colName}`);
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) return json.data as T[];
+    } catch (err) {
+      console.warn(`Pattern B API /api/cms/${colName} fallback:`, err);
+    }
+  }
   try {
     const q = query(collection(db, colName), ...queryConstraints);
     const snapshot = await getDocs(q);

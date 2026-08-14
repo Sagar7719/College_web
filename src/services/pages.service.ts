@@ -140,6 +140,15 @@ export const pagesService = {
   },
 
   async getAllPages(): Promise<Page[]> {
+    if (typeof window !== 'undefined') {
+      try {
+        const res = await fetch('/api/pages');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) return json.data;
+      } catch (err) {
+        console.warn('Pattern B API /api/pages fallback:', err);
+      }
+    }
     try {
       await ensureSystemPages();
       const q = query(collection(db, COLLECTION_NAME), orderBy('updatedAt', 'desc'));

@@ -257,4 +257,8 @@ export interface SiteSettings {
   aboutPage?: AboutPageConfig;
   contactPage?: ContactPageConfig;
   admissions?: AdmissionsConfig;
+  principalName?: string;
+  principalQualification?: string;
+  principalPhotoUrl?: string;
+  principalMessage?: string;
 }

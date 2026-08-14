@@ -52,6 +52,12 @@ export default function EditPageScreen({ params }: EditPageProps) {
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  const [allPagesList, setAllPagesList] = useState<Page[]>([]);
+
+  useEffect(() => {
+    pagesService.getAllPages().then(setAllPagesList).catch(() => {});
+  }, []);
+
   useEffect(() => {
     const fetchPage = async () => {
       setIsLoading(true);
@@ -189,7 +195,30 @@ export default function EditPageScreen({ params }: EditPageProps) {
           <Badge variant="info" style={{ marginBottom: '0.375rem' }}>CMS Page Builder</Badge>
           <h1 style={{ fontSize: '1.75rem', color: 'var(--primary)' }}>Edit Page: {title}</h1>
         </div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {allPagesList.length > 0 && (
+            <select
+              value={id}
+              onChange={(e) => router.push(`/admin/pages/${e.target.value}/edit`)}
+              style={{
+                padding: '0.5rem 0.875rem',
+                borderRadius: '8px',
+                border: '1.5px solid var(--color-border)',
+                backgroundColor: '#FFFFFF',
+                fontSize: '0.875rem',
+                fontWeight: 700,
+                color: '#24221F',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+              }}
+            >
+              {allPagesList.map((p) => (
+                <option key={p.id} value={p.id}>
+                  📄 Edit: {p.title} (/{p.slug})
+                </option>
+              ))}
+            </select>
+          )}
           <Button variant="secondary" onClick={() => router.push('/admin/pages')}>
             Cancel
           </Button>

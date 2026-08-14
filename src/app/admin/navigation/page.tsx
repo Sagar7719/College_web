@@ -9,6 +9,25 @@ import { selectablePagesService, SelectablePageOption } from '@/services/selecta
 import { siteSettingsService } from '@/services/site-settings.service';
 import { isValidExternalUrl } from '@/validations/navigation.schema';
 import {
+  Compass,
+  Plus,
+  Pencil,
+  Eye,
+  EyeOff,
+  Trash2,
+  Lock,
+  GripVertical,
+  GraduationCap,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Sparkles,
+  Link2,
+  Globe,
+  AlertTriangle,
+  FolderOpen,
+} from 'lucide-react';
+import {
   Card,
   CardBody,
   Button,
@@ -36,9 +55,6 @@ export default function AdminNavigationManagerScreen() {
   const [dragOverTargetId, setDragOverTargetId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string>('');
-
-  // Dropdown Open State in Visual Canvas (Closed by default)
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   // Hover Action Box Tracking State
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
@@ -91,30 +107,6 @@ export default function AdminNavigationManagerScreen() {
   useEffect(() => {
     loadData();
   }, []);
-
-  // Ref for click-outside detection
-  const canvasRef = useRef<HTMLDivElement>(null);
-
-  // Close open dropdown flyout whenever user clicks outside or presses Escape
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (openDropdownId && canvasRef.current && !canvasRef.current.contains(e.target as Node)) {
-        setOpenDropdownId(null);
-      }
-    };
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && openDropdownId) {
-        setOpenDropdownId(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleOutsideClick);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [openDropdownId]);
 
   // Update tree representation whenever navItems changes
   useEffect(() => {
@@ -315,7 +307,6 @@ export default function AdminNavigationManagerScreen() {
       });
 
       setNavItems(updatedNavItems);
-      setOpenDropdownId(targetParentId);
       await persistNavigationState(updatedNavItems);
       return;
     }
@@ -333,14 +324,13 @@ export default function AdminNavigationManagerScreen() {
         isCMSPage: matchedPageOpt.category === 'custom_page',
         cmsPageId: matchedPageOpt.pageId,
         isSystemPage: matchedPageOpt.isSystemPage,
-        systemKey: matchedPageOpt.systemKey,
+        systemKey: matchedPageOpt.systemKey as any,
         order: navItems.length,
         visible: true,
       };
 
       const updatedNavItems = [...navItems, newNavItem];
       setNavItems(updatedNavItems);
-      setOpenDropdownId(targetParentId);
       await persistNavigationState(updatedNavItems);
     }
   };
@@ -379,7 +369,6 @@ export default function AdminNavigationManagerScreen() {
         const updatedNavItems = [...otherNavItems, ...reorderedChildren];
 
         setNavItems(updatedNavItems);
-        setOpenDropdownId(targetParentId);
         await persistNavigationState(updatedNavItems);
         return;
       } else {
@@ -392,7 +381,6 @@ export default function AdminNavigationManagerScreen() {
         });
 
         setNavItems(updatedNavItems);
-        setOpenDropdownId(targetParentId);
         await persistNavigationState(updatedNavItems);
         return;
       }
@@ -411,14 +399,13 @@ export default function AdminNavigationManagerScreen() {
         isCMSPage: matchedPageOpt.category === 'custom_page',
         cmsPageId: matchedPageOpt.pageId,
         isSystemPage: matchedPageOpt.isSystemPage,
-        systemKey: matchedPageOpt.systemKey,
+        systemKey: matchedPageOpt.systemKey as any,
         order: navItems.length,
         visible: true,
       };
 
       const updatedNavItems = [...navItems, newNavItem];
       setNavItems(updatedNavItems);
-      setOpenDropdownId(targetParentId);
       await persistNavigationState(updatedNavItems);
     }
   };
@@ -461,7 +448,7 @@ export default function AdminNavigationManagerScreen() {
           slug,
           status: 'published',
           showInNavigation: true,
-          content: [],
+          sections: [],
         });
 
         // Enforce that new custom pages default to a dropdown menu (e.g. About Us or More) so they only show in dropdown menus, not top-level main nav
@@ -504,7 +491,7 @@ export default function AdminNavigationManagerScreen() {
           isCMSPage: selectedOpt.category === 'custom_page',
           cmsPageId: selectedOpt.pageId,
           isSystemPage: selectedOpt.isSystemPage,
-          systemKey: selectedOpt.systemKey,
+          systemKey: selectedOpt.systemKey as any,
           parentId: targetParentId || undefined,
           order: navItems.length,
           visible: true,
@@ -567,13 +554,18 @@ export default function AdminNavigationManagerScreen() {
     <div style={{ paddingBottom: '4rem' }}>
       {/* Header Info */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#24221F', margin: 0 }}>
-            🧭 Live Visual Website Navbar Drag &amp; Drop Manager
-          </h1>
-          <p style={{ color: '#68705A', margin: '0.25rem 0 0 0', fontSize: '0.9375rem' }}>
-            Drag top tabs or sub-pages to reorder. Hover any menu item to open its <strong>Edit, Hide, Delete</strong> action box!
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ padding: '10px', borderRadius: '12px', background: '#FFF5F0', border: '1.5px solid #FCD3C1', color: '#C85A32', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Compass size={24} />
+          </div>
+          <div>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#24221F', margin: 0 }}>
+              Live Visual Website Navbar Drag &amp; Drop Manager
+            </h1>
+            <p style={{ color: '#68705A', margin: '0.25rem 0 0 0', fontSize: '0.9375rem' }}>
+              All categories and sub-pages are <strong>fully expanded &amp; visible by default</strong>! Drag items or hover to edit, hide, delete.
+            </p>
+          </div>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           {saveStatus && (
@@ -585,9 +577,10 @@ export default function AdminNavigationManagerScreen() {
           <Button
             variant="primary"
             onClick={() => handleOpenAddModal()}
-            style={{ backgroundColor: '#C85A32', borderColor: '#C85A32', color: '#FFFFFF', fontWeight: 700, padding: '0.625rem 1.25rem', fontSize: '0.9375rem', borderRadius: '8px' }}
+            style={{ backgroundColor: '#C85A32', borderColor: '#C85A32', color: '#FFFFFF', fontWeight: 700, padding: '0.625rem 1.25rem', fontSize: '0.9375rem', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
           >
-            ➕ Add Menu Tab / Page
+            <Plus size={16} />
+            <span>Add Menu Tab / Page</span>
           </Button>
         </div>
       </div>
@@ -595,9 +588,9 @@ export default function AdminNavigationManagerScreen() {
       {loading ? (
         <Skeleton style={{ height: '180px', width: '100%', borderRadius: '16px' }} />
       ) : (
-        <div ref={canvasRef}>
+        <div>
           {/* ==============================================================================
-             VISUAL LIVE WEBSITE NAVBAR REPLICA CANVAS (LIGHT MODE)
+             1. LIVE WEBSITE HEADER NAVBAR PREVIEW STRIP
              ============================================================================== */}
           <Card
             variant="bordered"
@@ -605,410 +598,345 @@ export default function AdminNavigationManagerScreen() {
               borderRadius: '16px',
               backgroundColor: '#FFFFFF',
               color: '#24221F',
-              boxShadow: '0 8px 30px rgba(36, 34, 31, 0.06)',
-              overflow: 'visible',
-              marginBottom: '2rem',
+              boxShadow: '0 4px 20px rgba(36, 34, 31, 0.04)',
+              overflow: 'hidden',
+              marginBottom: '1.5rem',
               border: '1.5px solid #E8DFD1',
             }}
           >
-            <CardBody style={{ padding: '0' }}>
-              {/* Canvas Top Branding Banner */}
-              <div
-                style={{
-                  display: 'flex',
-                  justify: 'space-between',
-                  alignItems: 'center',
-                  padding: '1.25rem 1.75rem',
-                  backgroundColor: '#FAF7F2',
-                  borderBottom: '1.5px solid #E8DFD1',
-                  borderTopLeftRadius: '15px',
-                  borderTopRightRadius: '15px',
-                  flexWrap: 'wrap',
-                  gap: '1rem',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '8px', background: '#C85A32', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', boxShadow: '0 4px 12px rgba(200,90,50,0.25)' }}>
-                    🎓
-                  </div>
-                  <div>
-                    <span style={{ fontWeight: 800, fontSize: '1.125rem', color: '#1F1914', letterSpacing: '-0.01em', display: 'block' }}>
-                      {collegeName}
-                    </span>
-                    <span style={{ fontSize: '0.75rem', color: '#706A61', fontWeight: 600 }}>
-                      Live Single Line Website Header Navigation Bar
-                    </span>
-                  </div>
-                  <span style={{ padding: '4px 10px', fontSize: '0.75rem', fontWeight: 800, borderRadius: '20px', backgroundColor: '#E6F4EA', color: '#137333', border: '1px solid #CEEAD6', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    ● LIVE INTERACTIVE CANVAS
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '1rem 1.5rem',
+                backgroundColor: '#FAF7F2',
+                borderBottom: '1.5px solid #E8DFD1',
+                flexWrap: 'wrap',
+                gap: '1rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: 32, height: 32, borderRadius: '8px', background: '#C85A32', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <GraduationCap size={18} />
+                </div>
+                <div>
+                  <span style={{ fontWeight: 800, fontSize: '1rem', color: '#1F1914' }}>
+                    {collegeName}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: '#706A61', fontWeight: 600, marginLeft: 8 }}>
+                    Live Header Preview Bar
                   </span>
                 </div>
-                <div style={{ fontSize: '0.8125rem', color: '#706A61', fontWeight: 600 }}>
-                  🔒 5 Core System Tabs Protected Against Deletion
+              </div>
+              <div style={{ fontSize: '0.8125rem', color: '#137333', fontWeight: 700, backgroundColor: '#E6F4EA', padding: '4px 12px', borderRadius: '20px', border: '1px solid #CEEAD6' }}>
+                ● 6 Main Header Tabs Synced
+              </div>
+            </div>
+
+            {/* PREVIEW STRIP */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '1rem 1.5rem', flexWrap: 'wrap', backgroundColor: '#FFFFFF' }}>
+              {treeItems.map((item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    backgroundColor: '#FAF7F2',
+                    border: '1.5px solid #DED4C5',
+                    fontSize: '0.875rem',
+                    fontWeight: 700,
+                    color: '#24221F',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <span>{item.label}</span>
+                  {item.children && item.children.length > 0 && <span style={{ fontSize: '0.7rem', color: '#C85A32' }}>▾ ({item.children.length})</span>}
                 </div>
-              </div>
-
-              {/* SINGLE HORIZONTAL LINE MAIN NAVBAR ROW */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '2.75rem 1.75rem 1.75rem',
-                  backgroundColor: '#FFFFFF',
-                  flexWrap: 'wrap',
-                  position: 'relative',
-                  borderBottomLeftRadius: '15px',
-                  borderBottomRightRadius: '15px',
-                }}
-              >
-                {treeItems.map((parentItem) => {
-                  const isSystemProtected = Boolean(parentItem.isSystemPage && parentItem.systemKey && PROTECTED_SYSTEM_KEYS.has(parentItem.systemKey));
-                  const hasChildren = Boolean(parentItem.children && parentItem.children.length > 0);
-                  const isDropdownOpen = openDropdownId === parentItem.id;
-                  const isDragTarget = dragOverTargetId === parentItem.id;
-                  const isHovered = hoveredItemId === parentItem.id;
-                  const isHidden = parentItem.visible === false;
-
-                  return (
-                    <div
-                      key={parentItem.id}
-                      draggable={true}
-                      onDragStart={(e) => handleTopDragStart(e, parentItem.id)}
-                      onDragOver={(e) => handleDragOver(e, parentItem.id)}
-                      onDragEnter={(e) => handleDragEnter(e, parentItem.id)}
-                      onDrop={(e) => handleDropOnParentTab(e, parentItem.id)}
-                      onDragEnd={handleDragEnd}
-                      onMouseEnter={() => {
-                        if (!draggedItemId) setHoveredItemId(parentItem.id);
-                      }}
-                      onMouseLeave={() => setHoveredItemId(null)}
-                      style={{
-                        position: 'relative',
-                        display: 'inline-block',
-                        opacity: isHidden ? 0.6 : 1,
-                      }}
-                    >
-                      {/* ==========================================================
-                         PROPER HIGH-VISIBILITY HOVER ACTION TOOLBAR (TOP TAB)
-                         ========================================================== */}
-                      {isHovered && !draggedItemId && (
-                        <div
-                          style={{
-                            position: 'absolute',
-                            top: '-46px',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            zIndex: 140,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            backgroundColor: '#1F1914',
-                            padding: '5px 10px',
-                            borderRadius: '24px',
-                            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.25)',
-                            border: '1.5px solid #C85A32',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {/* EDIT BADGE BUTTON */}
-                          <button
-                            type="button"
-                            onClick={(e) => handleOpenEditModal(parentItem, e)}
-                            style={{
-                              backgroundColor: '#2563EB',
-                              color: '#FFFFFF',
-                              border: 'none',
-                              borderRadius: '14px',
-                              padding: '4px 10px',
-                              fontSize: '0.75rem',
-                              fontWeight: 800,
-                              cursor: 'pointer',
-                              boxShadow: '0 2px 6px rgba(37,99,235,0.3)',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                            }}
-                            title="Edit navigation label and URL slug"
-                          >
-                            ✏️ Edit
-                          </button>
-
-                          {/* HIDE / SHOW BADGE BUTTON */}
-                          <button
-                            type="button"
-                            onClick={(e) => handleToggleVisibility(parentItem, e)}
-                            style={{
-                              backgroundColor: isHidden ? '#059669' : '#D97706',
-                              color: '#FFFFFF',
-                              border: 'none',
-                              borderRadius: '14px',
-                              padding: '4px 10px',
-                              fontSize: '0.75rem',
-                              fontWeight: 800,
-                              cursor: 'pointer',
-                              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                            }}
-                            title={isHidden ? 'Show in live navigation' : 'Hide from live navigation'}
-                          >
-                            {isHidden ? '👁️ Show' : '👁️ Hide'}
-                          </button>
-
-                          {/* DELETE BADGE BUTTON */}
-                          {!isSystemProtected && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeleteConfirmId(parentItem.id);
-                              }}
-                              style={{
-                                backgroundColor: '#DC2626',
-                                color: '#FFFFFF',
-                                border: 'none',
-                                borderRadius: '14px',
-                                padding: '4px 10px',
-                                fontSize: '0.75rem',
-                                fontWeight: 800,
-                                cursor: 'pointer',
-                                boxShadow: '0 2px 6px rgba(220,38,38,0.3)',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                              }}
-                              title="Delete custom navigation tab"
-                            >
-                              🗑️ Delete
-                            </button>
-                          )}
-                        </div>
-                      )}
-
-                      {/* + ICON BUTTON FLOATING ON TOP-RIGHT OF TAB */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenAddModal(parentItem.id);
-                        }}
-                        style={{
-                          position: 'absolute',
-                          top: '-8px',
-                          right: '-6px',
-                          zIndex: 10,
-                          background: '#C85A32',
-                          color: '#FFFFFF',
-                          border: '2px solid #FFFFFF',
-                          borderRadius: '50%',
-                          width: '22px',
-                          height: '22px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '14px',
-                          fontWeight: 900,
-                          cursor: 'pointer',
-                          boxShadow: '0 2px 6px rgba(200,90,50,0.35)',
-                        }}
-                        title={`Add sub-page directly into "${parentItem.label}"`}
-                      >
-                        +
-                      </button>
-
-                      {/* Top-Level Navbar Button (Clean Name Box) */}
-                      <div
-                        onClick={() => setOpenDropdownId(isDropdownOpen ? null : parentItem.id)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '10px 16px',
-                          borderRadius: '8px',
-                          backgroundColor: isDragTarget ? '#FFF5F0' : isDropdownOpen ? '#FFF5F0' : isHidden ? '#F3F4F6' : '#FAF7F2',
-                          border: isDragTarget ? '2.5px dashed #C85A32' : isDropdownOpen ? '1.5px solid #C85A32' : '1.5px solid #DED4C5',
-                          color: isHidden ? '#9CA3AF' : isDropdownOpen ? '#9E3B1B' : '#24221F',
-                          cursor: 'grab',
-                          fontWeight: 700,
-                          fontSize: '0.9375rem',
-                          transition: 'all 0.15s ease',
-                          userSelect: 'none',
-                          boxShadow: isDropdownOpen ? '0 4px 12px rgba(200, 90, 50, 0.15)' : '0 2px 4px rgba(0, 0, 0, 0.03)',
-                          transform: isDragTarget ? 'scale(1.03)' : 'scale(1)',
-                        }}
-                      >
-                        {/* Drag Handle Icon */}
-                        <span
-                          draggable={true}
-                          onDragStart={(e) => handleTopDragStart(e, parentItem.id)}
-                          style={{ opacity: 0.7, cursor: 'grab', fontSize: '0.875rem', color: '#C85A32', padding: '0 2px' }}
-                        >
-                          ⋮⋮
-                        </span>
-
-                        <span>{parentItem.label}</span>
-
-                        {isHidden && (
-                          <span style={{ fontSize: '0.7rem', color: '#9CA3AF', backgroundColor: '#E5E7EB', padding: '1px 5px', borderRadius: '3px' }}>
-                            Hidden
-                          </span>
-                        )}
-
-                        {isSystemProtected && (
-                          <span title="System Protected Tab (Cannot be deleted)" style={{ fontSize: '0.75rem', opacity: 0.85 }}>
-                            🔒
-                          </span>
-                        )}
-
-                        {hasChildren && (
-                          <span style={{ fontSize: '0.75rem', color: isDropdownOpen ? '#C85A32' : '#706A61' }}>
-                            {isDropdownOpen ? '▲' : '▼'}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Clean Light Mode Dropdown Flyout Panel */}
-                      {isDropdownOpen && (
-                        <div
-                          style={{
-                            position: 'absolute',
-                            top: 'calc(100% + 8px)',
-                            left: 0,
-                            minWidth: '340px',
-                            backgroundColor: '#FFFFFF',
-                            border: '1.5px solid #DED4C5',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            boxShadow: '0 16px 40px rgba(36, 34, 31, 0.14)',
-                            zIndex: 100,
-                          }}
-                        >
-                          {/* List of Child Sub-Pages */}
-                          {!parentItem.children || parentItem.children.length === 0 ? (
-                            <div style={{ padding: '14px 10px', textAlign: 'center', fontSize: '0.8125rem', color: '#706A61', backgroundColor: '#FAF7F2', borderRadius: '8px', border: '1px dashed #DED4C5' }}>
-                              No sub-pages yet. Click <strong>+</strong> on tab or drag a page here.
-                            </div>
-                          ) : (
-                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                              {parentItem.children.map((child) => {
-                                const isChildHovered = hoveredItemId === child.id;
-                                const isChildHidden = child.visible === false;
-                                const isChildDragTarget = dragOverTargetId === child.id;
-                                const isChildProtected = Boolean(child.isSystemPage && child.systemKey && PROTECTED_SYSTEM_KEYS.has(child.systemKey));
-
-                                return (
-                                  <li
-                                    key={child.id}
-                                    draggable={true}
-                                    onDragStart={(e) => handleChildDragStart(e, child.id)}
-                                    onDragOver={(e) => handleDragOver(e, child.id)}
-                                    onDragEnter={(e) => handleDragEnter(e, child.id)}
-                                    onDrop={(e) => handleDropOnChildItem(e, child.id, parentItem.id)}
-                                    onDragEnd={handleDragEnd}
-                                    onMouseEnter={() => {
-                                      if (!draggedItemId) setHoveredItemId(child.id);
-                                    }}
-                                    onMouseLeave={() => setHoveredItemId(null)}
-                                    style={{
-                                      position: 'relative',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      padding: '10px 12px',
-                                      borderRadius: '8px',
-                                      backgroundColor: isChildDragTarget ? '#FFF5F0' : isChildHidden ? '#F3F4F6' : '#FAF7F2',
-                                      border: isChildDragTarget ? '2px dashed #C85A32' : '1px solid #E8DFD1',
-                                      color: isChildHidden ? '#9CA3AF' : '#24221F',
-                                      fontSize: '0.875rem',
-                                      cursor: 'grab',
-                                      transition: 'all 0.15s ease',
-                                      opacity: isChildHidden ? 0.65 : 1,
-                                    }}
-                                  >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                      <span
-                                        draggable={true}
-                                        onDragStart={(e) => handleChildDragStart(e, child.id)}
-                                        style={{ opacity: 0.7, fontSize: '0.8125rem', color: '#C85A32', cursor: 'grab' }}
-                                      >
-                                        ⋮⋮
-                                      </span>
-                                      <span style={{ fontWeight: 600, color: isChildHidden ? '#9CA3AF' : '#24221F' }}>{child.label}</span>
-                                      {isChildHidden && (
-                                        <span style={{ fontSize: '0.65rem', color: '#9CA3AF', backgroundColor: '#E5E7EB', padding: '1px 4px', borderRadius: '3px' }}>
-                                          Hidden
-                                        </span>
-                                      )}
-                                    </div>
-
-                                    {/* PROPER INLINE HOVER ACTION BUTTONS (SUB-ITEM) */}
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                      {isChildHovered && !draggedItemId ? (
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                          <button
-                                            type="button"
-                                            onClick={(e) => handleOpenEditModal(child, e)}
-                                            style={{ backgroundColor: '#2563EB', color: '#FFFFFF', border: 'none', borderRadius: '12px', padding: '3px 8px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer' }}
-                                            title="Edit sub-page"
-                                          >
-                                            ✏️ Edit
-                                          </button>
-                                          <button
-                                            type="button"
-                                            onClick={(e) => handleToggleVisibility(child, e)}
-                                            style={{ backgroundColor: isChildHidden ? '#059669' : '#D97706', color: '#FFFFFF', border: 'none', borderRadius: '12px', padding: '3px 8px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer' }}
-                                            title={isChildHidden ? 'Show' : 'Hide'}
-                                          >
-                                            {isChildHidden ? '👁️ Show' : '👁️ Hide'}
-                                          </button>
-                                          {!isChildProtected && (
-                                            <button
-                                              type="button"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                setDeleteConfirmId(child.id);
-                                              }}
-                                              style={{ backgroundColor: '#DC2626', color: '#FFFFFF', border: 'none', borderRadius: '12px', padding: '3px 8px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer' }}
-                                              title="Delete sub-page"
-                                            >
-                                              🗑️ Delete
-                                            </button>
-                                          )}
-                                        </div>
-                                      ) : (
-                                        <code style={{ fontSize: '0.7rem', color: '#C85A32', background: '#FFF5F0', border: '1px solid #FCD3C1', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
-                                          {child.path}
-                                        </code>
-                                      )}
-                                    </div>
-                                  </li>
-                                );
-                              })}
-                            </ul>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </CardBody>
+              ))}
+            </div>
           </Card>
 
           {/* ==============================================================================
-             UNLINKED PUBLISHED PAGES POOL (LIGHT MODE)
+             2. STRUCTURED CATEGORY CARDS IN ONE SINGLE ROW (ZERO SCROLLBAR)
+             ============================================================================== */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'nowrap',
+              gap: '0.875rem',
+              width: '100%',
+              overflow: 'visible',
+              marginBottom: '2rem',
+              alignItems: 'stretch',
+            }}
+          >
+            {treeItems.map((parentItem) => {
+              const isSystemProtected = Boolean(parentItem.isSystemPage && parentItem.systemKey && PROTECTED_SYSTEM_KEYS.has(parentItem.systemKey));
+              const hasChildren = Boolean(parentItem.children && parentItem.children.length > 0);
+              const isDragTarget = dragOverTargetId === parentItem.id;
+              const isHovered = hoveredItemId === parentItem.id;
+              const isHidden = parentItem.visible === false;
+
+              return (
+                <div
+                  key={parentItem.id}
+                  draggable={true}
+                  onDragStart={(e) => handleTopDragStart(e, parentItem.id)}
+                  onDragOver={(e) => handleDragOver(e, parentItem.id)}
+                  onDragEnter={(e) => handleDragEnter(e, parentItem.id)}
+                  onDrop={(e) => handleDropOnParentTab(e, parentItem.id)}
+                  onDragEnd={handleDragEnd}
+                  onMouseEnter={() => {
+                    if (!draggedItemId) setHoveredItemId(parentItem.id);
+                  }}
+                  onMouseLeave={() => setHoveredItemId(null)}
+                  style={{
+                    position: 'relative',
+                    backgroundColor: isDragTarget ? '#FFF5F0' : '#FFFFFF',
+                    border: isDragTarget ? '2.5px dashed #C85A32' : '1.5px solid #E8DFD1',
+                    borderRadius: '14px',
+                    boxShadow: '0 4px 16px rgba(36, 34, 31, 0.04)',
+                    padding: '1rem 0.75rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.875rem',
+                    flex: '1 1 0px',
+                    minWidth: 0,
+                    opacity: isHidden ? 0.65 : 1,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {/* HOVER TOOLBAR FOR CATEGORY TAB */}
+                  {isHovered && !draggedItemId && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-18px',
+                        right: '16px',
+                        zIndex: 140,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        backgroundColor: '#FAF7F2',
+                        padding: '4px 8px',
+                        borderRadius: '20px',
+                        boxShadow: '0 6px 18px rgba(36, 34, 31, 0.14)',
+                        border: '1.5px solid #C85A32',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => handleOpenEditModal(parentItem, e)}
+                        style={{ backgroundColor: '#FFF5F0', color: '#C85A32', border: '1px solid #FCD3C1', borderRadius: '50%', width: '24px', height: '24px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(200,90,50,0.15)' }}
+                        title="Edit category tab title & path"
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => handleToggleVisibility(parentItem, e)}
+                        style={{ backgroundColor: isHidden ? '#FEF3C7' : '#E6F4EA', color: isHidden ? '#92400E' : '#137333', border: isHidden ? '1px solid #FCD34D' : '1px solid #CEEAD6', borderRadius: '50%', width: '24px', height: '24px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.06)' }}
+                        title={isHidden ? 'Show category' : 'Hide category'}
+                      >
+                        {isHidden ? <Eye size={13} /> : <EyeOff size={13} />}
+                      </button>
+                      {!isSystemProtected && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteConfirmId(parentItem.id);
+                          }}
+                          style={{ backgroundColor: '#FEF2F2', color: '#991B1B', border: '1px solid #FCA5A5', borderRadius: '50%', width: '24px', height: '24px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(220,38,38,0.12)' }}
+                          title="Delete custom category tab"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* CATEGORY HEADER BAR */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '8px 10px',
+                      backgroundColor: '#FAF7F2',
+                      borderRadius: '8px',
+                      border: '1.5px solid #DED4C5',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                      <span
+                        draggable={true}
+                        onDragStart={(e) => handleTopDragStart(e, parentItem.id)}
+                        style={{ opacity: 0.7, cursor: 'grab', color: '#C85A32', display: 'flex', alignItems: 'center', flexShrink: 0 }}
+                      >
+                        <GripVertical size={14} />
+                      </span>
+                      <FolderOpen size={15} color="#C85A32" style={{ flexShrink: 0 }} />
+                      <span style={{ fontWeight: 800, fontSize: '0.875rem', color: '#1F1914', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {parentItem.label}
+                      </span>
+                      {isSystemProtected && (
+                        <span title="System Protected Category" style={{ flexShrink: 0 }}>
+                          <Lock size={12} color="#C85A32" />
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenAddModal(parentItem.id);
+                      }}
+                      style={{
+                        background: '#C85A32',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '22px',
+                        height: '22px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        boxShadow: '0 2px 4px rgba(200,90,50,0.25)',
+                      }}
+                      title={`Add sub-page into "${parentItem.label}"`}
+                    >
+                      <Plus size={13} strokeWidth={2.5} />
+                    </button>
+                  </div>
+
+                  {/* SUB-PAGES LIST (ALWAYS VISIBLE & OPEN BY DEFAULT) */}
+                  <div style={{ flex: 1 }}>
+                    {!parentItem.children || parentItem.children.length === 0 ? (
+                      <div style={{ padding: '0.875rem 0.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#706A61', backgroundColor: '#FAF7F2', borderRadius: '8px', border: '1px dashed #DED4C5', fontWeight: 600, lineHeight: 1.4 }}>
+                        No sub-pages yet.<br />Click <strong>+</strong> or drag a page here.
+                      </div>
+                    ) : (
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {parentItem.children.map((child) => {
+                          const isChildHovered = hoveredItemId === child.id;
+                          const isChildHidden = child.visible === false;
+                          const isChildDragTarget = dragOverTargetId === child.id;
+                          const isChildProtected = Boolean(child.isSystemPage && child.systemKey && PROTECTED_SYSTEM_KEYS.has(child.systemKey));
+
+                          return (
+                            <li
+                              key={child.id}
+                              draggable={true}
+                              onDragStart={(e) => handleChildDragStart(e, child.id)}
+                              onDragOver={(e) => handleDragOver(e, child.id)}
+                              onDragEnter={(e) => handleDragEnter(e, child.id)}
+                              onDrop={(e) => handleDropOnChildItem(e, child.id, parentItem.id)}
+                              onDragEnd={handleDragEnd}
+                              onMouseEnter={() => {
+                                if (!draggedItemId) setHoveredItemId(child.id);
+                              }}
+                              onMouseLeave={() => setHoveredItemId(null)}
+                              style={{
+                                position: 'relative',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '10px 12px',
+                                borderRadius: '8px',
+                                backgroundColor: isChildDragTarget ? '#FFF5F0' : isChildHidden ? '#F3F4F6' : '#FFFFFF',
+                                border: isChildDragTarget ? '2px dashed #C85A32' : '1px solid #E8DFD1',
+                                color: isChildHidden ? '#9CA3AF' : '#24221F',
+                                fontSize: '0.875rem',
+                                cursor: 'grab',
+                                transition: 'all 0.15s ease',
+                                opacity: isChildHidden ? 0.65 : 1,
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, overflow: 'hidden' }}>
+                                <span
+                                  draggable={true}
+                                  onDragStart={(e) => handleChildDragStart(e, child.id)}
+                                  style={{ opacity: 0.7, color: '#C85A32', cursor: 'grab', display: 'flex', alignItems: 'center', flexShrink: 0 }}
+                                >
+                                  <GripVertical size={14} />
+                                </span>
+                                <span style={{ fontWeight: 600, color: isChildHidden ? '#9CA3AF' : '#24221F', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{child.label}</span>
+                                {isChildHidden && (
+                                  <span style={{ fontSize: '0.65rem', color: '#9CA3AF', backgroundColor: '#E5E7EB', padding: '1px 4px', borderRadius: '3px', flexShrink: 0 }}>
+                                    Hidden
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* INLINE HOVER ACTION BUTTONS */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                {isChildHovered && !draggedItemId && (
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => handleOpenEditModal(child, e)}
+                                      style={{ backgroundColor: '#FFF5F0', color: '#C85A32', border: '1px solid #FCD3C1', borderRadius: '50%', width: '22px', height: '22px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(200,90,50,0.12)' }}
+                                      title="Edit sub-page"
+                                    >
+                                      <Pencil size={12} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => handleToggleVisibility(child, e)}
+                                      style={{ backgroundColor: isChildHidden ? '#FEF3C7' : '#E6F4EA', color: isChildHidden ? '#92400E' : '#137333', border: isChildHidden ? '1px solid #FCD34D' : '1px solid #CEEAD6', borderRadius: '50%', width: '22px', height: '22px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
+                                      title={isChildHidden ? 'Show sub-page' : 'Hide sub-page'}
+                                    >
+                                      {isChildHidden ? <Eye size={12} /> : <EyeOff size={12} />}
+                                    </button>
+                                    {!isChildProtected && (
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setDeleteConfirmId(child.id);
+                                        }}
+                                        style={{ backgroundColor: '#FEF2F2', color: '#991B1B', border: '1px solid #FCA5A5', borderRadius: '50%', width: '22px', height: '22px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(220,38,38,0.1)' }}
+                                        title="Delete sub-page"
+                                      >
+                                        <Trash2 size={12} />
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* ==============================================================================
+             3. UNLINKED PUBLISHED PAGES POOL (LIGHT MODE)
              ============================================================================== */}
           <Card variant="bordered" style={{ borderRadius: '16px', border: '1.5px solid #E8DFD1', backgroundColor: '#FFFFFF', boxShadow: '0 4px 20px rgba(36, 34, 31, 0.04)' }}>
             <CardBody style={{ padding: '1.5rem 1.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1F1914', margin: 0 }}>
-                    📄 Available Published Pages Pool
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1F1914', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <FileText size={18} color="#C85A32" />
+                    <span>Available Published Pages Pool</span>
                   </h3>
                   <p style={{ fontSize: '0.875rem', color: '#706A61', margin: '0.25rem 0 0 0' }}>
-                    Drag any page chip below onto a header tab above to insert it as a dropdown sub-item!
+                    Drag any page chip below onto a category card above to insert it as a dropdown sub-item!
                   </p>
                 </div>
                 <Badge variant="info" style={{ backgroundColor: '#EBF5FF', color: '#1E40AF', border: '1px solid #BFDBFE', padding: '6px 12px', fontSize: '0.8125rem' }}>
@@ -1044,11 +972,8 @@ export default function AdminNavigationManagerScreen() {
                         transition: 'all 0.2s ease',
                       }}
                     >
-                      <span style={{ opacity: 0.5, color: '#C85A32' }}>⋮⋮</span>
+                      <GripVertical size={14} color="#C85A32" />
                       <span>{pageOpt.title}</span>
-                      <code style={{ fontSize: '0.75rem', color: '#C85A32', backgroundColor: '#FFF5F0', padding: '2px 6px', borderRadius: '4px', border: '1px solid #FCD3C1' }}>
-                        {pageOpt.path}
-                      </code>
                     </div>
                   ))}
                 </div>
@@ -1169,7 +1094,7 @@ export default function AdminNavigationManagerScreen() {
                     checked={linkType === 'create_page'}
                     onChange={() => setLinkType('create_page')}
                   />
-                  ✨ Create Brand New Page
+                  <span>Create Brand New Page</span>
                 </label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 600 }}>
                   <input
@@ -1178,7 +1103,7 @@ export default function AdminNavigationManagerScreen() {
                     checked={linkType === 'existing_page'}
                     onChange={() => setLinkType('existing_page')}
                   />
-                  📄 Link Existing Page
+                  <span>Link Existing Page</span>
                 </label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 600 }}>
                   <input
@@ -1187,7 +1112,7 @@ export default function AdminNavigationManagerScreen() {
                     checked={linkType === 'external_url'}
                     onChange={() => setLinkType('external_url')}
                   />
-                  🌐 External URL
+                  <span>External URL</span>
                 </label>
               </div>
             </div>
@@ -1278,31 +1203,42 @@ export default function AdminNavigationManagerScreen() {
               <Button variant="ghost" onClick={() => setIsAddModalOpen(false)}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={handleSaveNewSubPage} disabled={isSaving} style={{ backgroundColor: '#C85A32', borderColor: '#C85A32', color: '#FFFFFF', fontWeight: 700 }}>
-                {isSaving ? 'Creating Page...' : '✨ Create & Sync Page'}
+              <Button variant="primary" onClick={handleSaveNewSubPage} disabled={isSaving} style={{ backgroundColor: '#C85A32', borderColor: '#C85A32', color: '#FFFFFF', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <Sparkles size={16} />
+                <span>{isSaving ? 'Creating Page...' : 'Create & Sync Page'}</span>
               </Button>
             </div>
           </div>
         </Modal>
       )}
 
-      {/* DELETE CONFIRMATION MODAL */}
+      {/* HARD DELETE CONFIRMATION MODAL */}
       {deleteConfirmId && (
         <Modal
           isOpen={Boolean(deleteConfirmId)}
           onClose={() => setDeleteConfirmId(null)}
-          title="Delete Sub-Page Link"
+          title="Hard Delete Page & Navigation Item"
         >
           <div>
-            <p style={{ color: '#24221F', fontSize: '0.9375rem' }}>
-              Are you sure you want to remove this custom menu link from the navigation bar?
+            <p style={{ color: '#24221F', fontSize: '0.9375rem', lineHeight: 1.5 }}>
+              Are you sure you want to <strong>permanently hard delete</strong> this page and remove its navigation link from the live website?
+            </p>
+            <p style={{ color: '#991B1B', backgroundColor: '#FEF2F2', border: '1px solid #FCA5A5', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8125rem', marginTop: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <AlertTriangle size={16} color="#991B1B" />
+              <span>Warning: This will permanently delete the page document and its content from the database. This action cannot be undone.</span>
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
               <Button variant="ghost" onClick={() => setDeleteConfirmId(null)}>
                 Cancel
               </Button>
-              <Button variant="primary" style={{ backgroundColor: '#DC2626', borderColor: '#DC2626', color: '#FFFFFF' }} onClick={handleDeleteNavItem} disabled={isSaving}>
-                {isSaving ? 'Deleting...' : 'Remove Link'}
+              <Button
+                variant="primary"
+                style={{ backgroundColor: '#DC2626', borderColor: '#DC2626', color: '#FFFFFF', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                onClick={handleDeleteNavItem}
+                disabled={isSaving}
+              >
+                <Trash2 size={16} />
+                <span>{isSaving ? 'Hard Deleting...' : 'Hard Delete Page'}</span>
               </Button>
             </div>
           </div>

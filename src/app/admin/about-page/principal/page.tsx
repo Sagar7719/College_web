@@ -43,7 +43,7 @@ export default function AdminPrincipalDeskEditor() {
     setSuccessMsg('');
     setErrorMsg('');
     try {
-      await siteSettingsService.saveSettings({
+      await siteSettingsService.updateSettings({
         principalName,
         principalQualification: qualification,
         principalPhotoUrl: photoUrl,
@@ -81,7 +81,7 @@ export default function AdminPrincipalDeskEditor() {
         </div>
       )}
 
-      <Card variant="outline">
+      <Card variant="bordered">
         <CardBody style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {/* Principal Details */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>

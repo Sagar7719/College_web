@@ -9,6 +9,7 @@ import {
   deleteDoc,
   query,
   orderBy,
+  where,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { NavigationItem } from '@/types';
@@ -118,54 +119,93 @@ export const navigationService = {
     try {
       const q = query(collection(db, COLLECTION_NAME), orderBy('order', 'asc'));
       const snapshot = await getDocs(q);
-      const items = snapshot.docs.map(
-        (docSnap) => ({ id: docSnap.id, ...docSnap.data() } as NavigationItem)
-      );
+      const items: NavigationItem[] = [];
 
-      const visible = items.filter((item) => item.visible);
-      if (visible.length > 0) {
-        return buildNavigationTree(visible);
-      }
-      return buildNavigationTree(CANONICAL_SYSTEM_NAV_ITEMS);
+      snapshot.docs.forEach((docSnap) => {
+        const data = docSnap.data();
+        const isSys = Boolean(data.isSystemPage);
+        const navItem: NavigationItem = {
+          id: docSnap.id,
+          label: data.label || '',
+          path: data.path || '/',
+          isCMSPage: Boolean(data.isCMSPage),
+          cmsPageId: data.cmsPageId || undefined,
+          isSystemPage: isSys,
+          systemKey: data.systemKey || undefined,
+          order: typeof data.order === 'number' ? data.order : 99,
+          visible: data.visible !== false,
+          isExternal: Boolean(data.isExternal),
+          externalUrl: data.externalUrl || undefined,
+          targetBlank: Boolean(data.targetBlank),
+          parentId: data.parentId || undefined,
+        };
+        items.push(navItem);
+      });
+
+      return buildNavigationTree(items.filter((i) => i.visible));
     } catch (err) {
-      console.warn('Firestore navigation fetch warning:', err);
-      return buildNavigationTree(CANONICAL_SYSTEM_NAV_ITEMS);
+      console.warn('Firestore getNavigationItems error:', err);
+      return CANONICAL_SYSTEM_NAV_ITEMS;
     }
   }),
 
-  /**
-   * Returns ALL navigation items (visible & hidden) for the Admin Navigation Manager.
-   * Single unified list containing both System and Custom navigation items.
-   */
-  async getAllAdminNavigationItems(): Promise<NavigationItem[]> {
-    try {
-      await ensureSystemNavigationItems();
-
-      const q = query(collection(db, COLLECTION_NAME), orderBy('order', 'asc'));
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(
-        (docSnap) => ({ id: docSnap.id, ...docSnap.data() } as NavigationItem)
-      );
-    } catch (err) {
-      console.warn('Firestore admin navigation fetch warning:', err);
-      return [];
+  getAllAdminNavigationItems: async (): Promise<NavigationItem[]> => {
+    if (typeof window !== 'undefined') {
+      try {
+        const res = await fetch('/api/navigation?scope=admin');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) return json.data;
+      } catch (err) {
+        console.warn('Pattern B API /api/navigation fallback:', err);
+      }
     }
+    await ensureSystemNavigationItems();
+    const q = query(collection(db, COLLECTION_NAME), orderBy('order', 'asc'));
+    const snapshot = await getDocs(q);
+    const items: NavigationItem[] = [];
+
+    snapshot.docs.forEach((docSnap) => {
+      const data = docSnap.data();
+      const isSys = Boolean(data.isSystemPage);
+      const navItem: NavigationItem = {
+        id: docSnap.id,
+        label: data.label || '',
+        path: data.path || '/',
+        isCMSPage: Boolean(data.isCMSPage),
+        cmsPageId: data.cmsPageId || undefined,
+        isSystemPage: isSys,
+        systemKey: data.systemKey || undefined,
+        order: typeof data.order === 'number' ? data.order : 99,
+        visible: data.visible !== false,
+        isExternal: Boolean(data.isExternal),
+        externalUrl: data.externalUrl || undefined,
+        targetBlank: Boolean(data.targetBlank),
+        parentId: data.parentId || undefined,
+      };
+      items.push(navItem);
+    });
+
+    return items;
   },
 
-  async saveSingleNavigationItem(item: NavigationItem): Promise<string> {
-    const itemId = item.id || doc(collection(db, COLLECTION_NAME)).id;
-    const itemRef = doc(db, COLLECTION_NAME, itemId);
-    const rawPayload: Record<string, unknown> = {
-      ...item,
-      id: itemId,
-    };
-    if (!item.parentId) {
-      delete rawPayload.parentId;
-    }
+  async saveSingleNavigationItem(item: NavigationItem): Promise<void> {
+    const isCoreNav = CANONICAL_SYSTEM_NAV_ITEMS.some((c) => c.id === item.id);
+    const rawPayload: Record<string, unknown> = { ...item };
+    if (!item.parentId) delete rawPayload.parentId;
     delete rawPayload.children;
-    const payload = sanitizeForFirestore(rawPayload);
-    await setDoc(itemRef, payload, { merge: true });
-    return itemId;
+
+    if (isCoreNav) {
+      const canonical = CANONICAL_SYSTEM_NAV_ITEMS.find((c) => c.id === item.id);
+      if (canonical) {
+        rawPayload.path = canonical.path;
+        rawPayload.isSystemPage = true;
+        rawPayload.systemKey = canonical.systemKey;
+      }
+    }
+
+    const sanitized = sanitizeForFirestore(rawPayload);
+    const ref = doc(db, COLLECTION_NAME, item.id);
+    await setDoc(ref, sanitized, { merge: true });
   },
 
   /**
@@ -174,8 +214,24 @@ export const navigationService = {
    * Filters out any transient placeholder items.
    */
   async saveNavigationItems(items: NavigationItem[]): Promise<void> {
-    const validItems = items.filter((item) => item.id && item.id !== 'current_page_target');
-    if (validItems.length === 0) return;
+    if (typeof window !== 'undefined') {
+      try {
+        const res = await fetch('/api/navigation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(items),
+        });
+        const json = await res.json();
+        if (json.success) return;
+      } catch (err) {
+        console.warn('Pattern B API /api/navigation save fallback:', err);
+      }
+    }
+
+    const validItems = items.filter((item) => {
+      if (!item.id || !item.label) return false;
+      return true;
+    });
 
     const batch = writeBatch(db);
     for (let i = 0; i < validItems.length; i++) {
@@ -191,6 +247,17 @@ export const navigationService = {
   },
 
   async deleteNavigationItem(id: string): Promise<void> {
+    if (typeof window !== 'undefined') {
+      try {
+        const res = await fetch(`/api/navigation?id=${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+        });
+        const json = await res.json();
+        if (json.success) return;
+      } catch (err) {
+        console.warn('Pattern B API /api/navigation delete fallback:', err);
+      }
+    }
     const itemRef = doc(db, COLLECTION_NAME, id);
     const snap = await getDoc(itemRef);
     if (snap.exists()) {
@@ -198,6 +265,29 @@ export const navigationService = {
       const isCoreNav = CANONICAL_SYSTEM_NAV_ITEMS.some((c) => c.id === id);
       if (data?.isSystemPage && isCoreNav) {
         throw new Error('Mandatory institutional system page navigation items cannot be deleted.');
+      }
+
+      // Hard Delete: Delete corresponding CMS page document from Firestore pages collection
+      if (data?.cmsPageId && !data?.isSystemPage) {
+        try {
+          await deleteDoc(doc(db, 'pages', data.cmsPageId));
+        } catch (err) {
+          console.warn('Could not hard-delete pages document:', err);
+        }
+      }
+
+      // Hard Delete: If parent item has child items, hard delete child pages and navigation items
+      const childrenSnap = await getDocs(query(collection(db, COLLECTION_NAME), where('parentId', '==', id)));
+      if (childrenSnap.docs.length > 0) {
+        const batch = writeBatch(db);
+        for (const cSnap of childrenSnap.docs) {
+          const cData = cSnap.data();
+          if (cData.cmsPageId && !cData.isSystemPage) {
+            batch.delete(doc(db, 'pages', cData.cmsPageId));
+          }
+          batch.delete(cSnap.ref);
+        }
+        await batch.commit();
       }
     }
     await deleteDoc(itemRef);
@@ -297,9 +387,9 @@ export const navigationService = {
 
 /**
  * Builds a 2-level navigation tree from flat navigation items.
- * Level 1: Top-level items (no parentId)
- * Level 2: Child items nested in parent's `children` array
- * Enforces a strict maximum depth of 2.
+ * Level 1: Core 5 System Tabs + More (Total 6 items max)
+ * Level 2: All other pages/links nested as dropdown sub-items
+ * Enforces that only 6 items max sit on the top-level main bar.
  */
 export function buildNavigationTree(flatItems: NavigationItem[]): NavigationItem[] {
   const sorted = [...flatItems].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -325,30 +415,66 @@ export function buildNavigationTree(flatItems: NavigationItem[]): NavigationItem
     }
   });
 
+  // Ensure canonical "More" tab exists in topLevelItems as the 6th item container
+  let canonicalMore: NavigationItem = topLevelItems.find((i) => i.id === 'nav_sys_more' || i.label?.toLowerCase() === 'more') || {
+    id: 'nav_sys_more',
+    label: 'More',
+    path: '#',
+    isSystemPage: true,
+    systemKey: 'more',
+    order: 99,
+    visible: true,
+    children: [],
+  };
+  if (!topLevelMap.has(canonicalMore.id)) {
+    topLevelMap.set(canonicalMore.id, canonicalMore);
+  }
+
+  // Nest child items under their designated parents
   orphanChildren.forEach((child) => {
-    const parent = child.parentId ? topLevelMap.get(child.parentId) : undefined;
-    if (parent) {
-      parent.children = parent.children || [];
-      const childKey = `${(child.path || '').toLowerCase()}_${(child.label || '').toLowerCase()}`;
-      const isAlreadyAdded = parent.children.some(
-        (c) => `${(c.path || '').toLowerCase()}_${(c.label || '').toLowerCase()}` === childKey
-      );
-      if (!isAlreadyAdded) {
-        delete child.children;
-        parent.children.push(child);
-      }
-    } else {
-      const topKey = `${(child.path || '').toLowerCase()}_${(child.label || '').toLowerCase()}`;
-      if (!seenTopLevelKeys.has(topKey)) {
-        seenTopLevelKeys.add(topKey);
-        delete child.parentId;
-        delete child.children;
-        topLevelItems.push(child);
-      }
+    const parent = (child.parentId ? topLevelMap.get(child.parentId) : undefined) || canonicalMore;
+    child.parentId = parent.id;
+    parent.children = parent.children || [];
+    const childKey = `${(child.path || '').toLowerCase()}_${(child.label || '').toLowerCase()}`;
+    const isAlreadyAdded = parent.children.some(
+      (c) => `${(c.path || '').toLowerCase()}_${(c.label || '').toLowerCase()}` === childKey
+    );
+    if (!isAlreadyAdded) {
+      delete child.children;
+      parent.children.push(child);
     }
   });
 
-  return topLevelItems;
+  // Enforce Max 6 Top-Level Navbar Tabs (5 Core + More)
+  const coreTopKeys = new Set(['home', 'about', 'academics', 'admissions', 'contact']);
+  const finalTopItems: NavigationItem[] = [];
+  const overflowItems: NavigationItem[] = [];
+
+  topLevelItems.forEach((topItem) => {
+    if (topItem.isSystemPage && topItem.systemKey && coreTopKeys.has(topItem.systemKey)) {
+      finalTopItems.push(topItem);
+    } else if (topItem.id === canonicalMore.id || topItem.label?.toLowerCase() === 'more') {
+      // Saved for 6th tab position
+    } else {
+      // Extra custom top tab -> auto-move into More dropdown!
+      overflowItems.push(topItem);
+    }
+  });
+
+  // Add overflow items into More dropdown
+  canonicalMore.children = canonicalMore.children || [];
+  overflowItems.forEach((overflow) => {
+    const key = `${(overflow.path || '').toLowerCase()}_${(overflow.label || '').toLowerCase()}`;
+    if (!canonicalMore.children!.some((c) => `${(c.path || '').toLowerCase()}_${(c.label || '').toLowerCase()}` === key)) {
+      overflow.parentId = canonicalMore.id;
+      canonicalMore.children!.push(overflow);
+    }
+  });
+
+  // Put More as the 6th item
+  finalTopItems.push(canonicalMore);
+
+  return finalTopItems;
 }
 
 /**

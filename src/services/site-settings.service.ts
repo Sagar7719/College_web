@@ -261,6 +261,15 @@ import { sanitizeForFirestore } from '@/lib/firestore-utils';
 
 export const siteSettingsService = {
   getSettings: cache(async (): Promise<SiteSettings> => {
+    if (typeof window !== 'undefined') {
+      try {
+        const res = await fetch('/api/site-settings');
+        const json = await res.json();
+        if (json.success && json.data) return json.data;
+      } catch (err) {
+        console.warn('Pattern B API /api/site-settings fallback:', err);
+      }
+    }
     try {
       const ref = doc(db, COLLECTION_NAME, SETTINGS_DOC_ID);
       const snap = await getDoc(ref);
@@ -317,6 +326,19 @@ export const siteSettingsService = {
   }),
 
   async updateSettings(partialSettings: Partial<SiteSettings>): Promise<void> {
+    if (typeof window !== 'undefined') {
+      try {
+        const res = await fetch('/api/site-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(partialSettings),
+        });
+        const json = await res.json();
+        if (json.success) return;
+      } catch (err) {
+        console.warn('Pattern B API /api/site-settings save fallback:', err);
+      }
+    }
     const ref = doc(db, COLLECTION_NAME, SETTINGS_DOC_ID);
     const updated = sanitizeForFirestore({
       ...partialSettings,

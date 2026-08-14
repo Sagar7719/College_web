@@ -5,7 +5,7 @@ export interface NavigationItem {
   isCMSPage?: boolean;
   cmsPageId?: string;
   isSystemPage?: boolean;
-  systemKey?: 'home' | 'about' | 'academics' | 'admissions' | 'notices' | 'contact';
+  systemKey?: 'home' | 'about' | 'academics' | 'admissions' | 'contact' | 'notices' | 'more' | string;
   order: number;
   visible: boolean;
   isExternal?: boolean;

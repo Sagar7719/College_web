@@ -46,7 +46,7 @@ export default function AdminIQACEditor() {
         </div>
       )}
 
-      <Card variant="outline">
+      <Card variant="bordered">
         <CardBody style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
             <div>

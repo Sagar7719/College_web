@@ -224,6 +224,15 @@ export const defaultContactData: ContactPageConfigData = {
 
 export const homepageConfigService = {
   get: cache(async (): Promise<HomepageConfigData> => {
+    if (typeof window !== 'undefined') {
+      try {
+        const res = await fetch('/api/homepage');
+        const json = await res.json();
+        if (json.success && json.data) return json.data;
+      } catch (err) {
+        console.warn('Pattern B API /api/homepage fallback:', err);
+      }
+    }
     try {
       const snap = await getDoc(doc(db, 'siteSettings', 'homepage'));
       if (!snap.exists()) return defaultHomepageData;
@@ -233,6 +242,19 @@ export const homepageConfigService = {
     }
   }),
   save: async (data: Partial<HomepageConfigData>): Promise<void> => {
+    if (typeof window !== 'undefined') {
+      try {
+        const res = await fetch('/api/homepage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json();
+        if (json.success) return;
+      } catch (err) {
+        console.warn('Pattern B API /api/homepage save fallback:', err);
+      }
+    }
     const ref = doc(db, 'siteSettings', 'homepage');
     const updated = sanitizeForFirestore({ ...data, updatedAt: new Date().toISOString() });
     await setDoc(ref, updated, { merge: true });

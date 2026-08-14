@@ -113,7 +113,7 @@ export default function AdminGoverningBodyEditor() {
         </Button>
       </div>
 
-      <Card variant="outline">
+      <Card variant="bordered">
         <CardBody style={{ padding: '1.25rem' }}>
           <Table>
             <TableHeader>
