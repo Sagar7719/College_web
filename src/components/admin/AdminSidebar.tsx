@@ -9,13 +9,14 @@ import styles from './admin.module.css';
 interface NavSubItem {
   label: string;
   href: string;
-  icon?: string;
+  badge?: string;
 }
 
 interface NavItem {
   label: string;
   href?: string;
   icon: string;
+  badge?: string;
   subItems?: NavSubItem[];
 }
 
@@ -24,27 +25,29 @@ interface NavGroup {
   items: NavItem[];
 }
 
-const websiteMatchedNavGroups: NavGroup[] = [
+const enterpriseNavGroups: NavGroup[] = [
   {
-    label: 'Overview',
-    items: [{ label: 'Dashboard', href: '/admin/dashboard', icon: '📊' }],
+    label: 'MAIN CONSOLE',
+    items: [
+      { label: 'Dashboard', href: '/admin/dashboard', icon: '📊' }
+    ],
   },
   {
-    label: 'Website Menu Pages (Non-Tech CMS)',
+    label: 'WEBSITE MENU PAGES (NON-TECH CMS)',
     items: [
-      { label: '🏠 Home Page', href: '/admin/homepage', icon: '🏠' },
+      { label: 'Home Page Editor', href: '/admin/homepage', icon: '🏠' },
       {
-        label: '📖 About Us',
+        label: 'About Us Section',
         icon: '📖',
         subItems: [
-          { label: 'About Overview & Legacy', href: '/admin/about-page' },
+          { label: 'Overview & Legacy', href: '/admin/about-page' },
           { label: "Principal's Desk Message", href: '/admin/about-page/principal' },
           { label: 'Governing Body & Council', href: '/admin/about-page/governing-body' },
-          { label: 'IQAC Cell & NAAC', href: '/admin/about-page/iqac' },
+          { label: 'IQAC Cell & NAAC Grade', href: '/admin/about-page/iqac' },
         ],
       },
       {
-        label: '🎓 Academics',
+        label: 'Academics Section',
         icon: '🎓',
         subItems: [
           { label: 'Courses & Degree Programs', href: '/admin/courses' },
@@ -53,7 +56,7 @@ const websiteMatchedNavGroups: NavGroup[] = [
         ],
       },
       {
-        label: '📌 Notices & Updates',
+        label: 'Notices & Updates',
         icon: '📌',
         subItems: [
           { label: 'Official Notices & Circulars', href: '/admin/notices' },
@@ -62,7 +65,7 @@ const websiteMatchedNavGroups: NavGroup[] = [
         ],
       },
       {
-        label: '🖼️ Media & Downloads',
+        label: 'Media & Downloads',
         icon: '🖼️',
         subItems: [
           { label: 'Photo Gallery Albums', href: '/admin/gallery' },
@@ -70,33 +73,34 @@ const websiteMatchedNavGroups: NavGroup[] = [
           { label: 'Media Asset Library', href: '/admin/media' },
         ],
       },
-      { label: '🎓 Admissions Page', href: '/admin/admissions-config', icon: '📝' },
-      { label: '📞 Contact Us Page', href: '/admin/contact-page', icon: '📞' },
+      { label: 'Admissions Page', href: '/admin/admissions-config', icon: '📝' },
+      { label: 'Contact Us Page', href: '/admin/contact-page', icon: '📞' },
     ],
   },
   {
-    label: 'Menu Builder & Settings',
+    label: 'MENU BUILDER & TOOLS',
     items: [
-      { label: '🧭 Drag & Drop Menu Manager', href: '/admin/navigation', icon: '🧭' },
-      { label: '📄 Custom CMS Pages', href: '/admin/pages', icon: '📄' },
-      { label: '🦶 Footer Links Editor', href: '/admin/footer', icon: '🦶' },
-      { label: '⚙️ Site Branding & Logo', href: '/admin/settings', icon: '⚙️' },
-      { label: '✉️ Form Inquiries', href: '/admin/contact-messages', icon: '✉️' },
+      { label: 'Drag & Drop Menu Manager', href: '/admin/navigation', icon: '🧭', badge: 'Interactive' },
+      { label: 'Custom CMS Pages', href: '/admin/pages', icon: '📄' },
+      { label: 'Data Backup & Restore', href: '/admin/backup', icon: '📦', badge: '1-Click' },
+      { label: 'Footer Links Editor', href: '/admin/footer', icon: '🦶' },
+      { label: 'Site Branding & Logo', href: '/admin/settings', icon: '⚙️' },
+      { label: 'Contact Inquiries', href: '/admin/contact-messages', icon: '✉️' },
     ],
   },
 ];
 
 export const AdminSidebar: React.FC = () => {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const userInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'A';
 
   // Open state for accordion submenus
   const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({
-    '📖 About Us': true,
-    '🎓 Academics': true,
-    '📌 Notices & Updates': true,
-    '🖼️ Media & Downloads': true,
+    'About Us Section': true,
+    'Academics Section': true,
+    'Notices & Updates': true,
+    'Media & Downloads': true,
   });
 
   const toggleSubMenu = (label: string) => {
@@ -105,20 +109,25 @@ export const AdminSidebar: React.FC = () => {
 
   return (
     <aside className={styles.sidebar}>
-      {/* Executive Branding Header */}
+      {/* Executive Glassmorphic Header */}
       <div className={styles.sidebarHeader}>
         <div className={styles.sidebarBrandBadge}>🎓</div>
-        <div>
-          <span className={styles.sidebarTitle}>College CMS</span>
-          <span className={styles.sidebarSubTitle}>Enterprise Console</span>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div className={styles.sidebarTitle}>College CMS</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE80' }}></span>
+            <span className={styles.sidebarSubTitle} style={{ margin: 0, color: '#4ADE80' }}>
+              Firestore Live
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Navigation Body */}
       <div className={styles.sidebarBody}>
-        {websiteMatchedNavGroups.map((group, idx) => (
+        {enterpriseNavGroups.map((group, idx) => (
           <div key={idx} className={styles.navGroup}>
-            <div className={styles.navGroupLabel} style={{ color: '#A09A90', fontWeight: 800 }}>
+            <div className={styles.navGroupLabel}>
               {group.label}
             </div>
             <ul className={styles.sidebarList}>
@@ -140,34 +149,46 @@ export const AdminSidebar: React.FC = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          background: isChildActive ? 'rgba(200, 90, 50, 0.22)' : 'transparent',
-                          color: isChildActive ? '#FFAA8A' : '#E2DFD8',
+                          background: isChildActive ? 'linear-gradient(90deg, rgba(200, 90, 50, 0.28) 0%, rgba(200, 90, 50, 0.08) 100%)' : 'transparent',
+                          color: isChildActive ? '#FFAA8A' : '#F5F0E8',
                           border: 'none',
                           cursor: 'pointer',
                           textAlign: 'left',
+                          padding: '0.625rem 0.875rem',
+                          borderRadius: '8px',
+                          borderLeft: isChildActive ? '3px solid #C85A32' : '3px solid transparent',
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                           <span className={styles.sidebarLinkIcon}>{item.icon}</span>
-                          <span style={{ fontWeight: 700, color: isChildActive ? '#FFAA8A' : '#E2DFD8' }}>
+                          <span style={{ fontWeight: 700, fontSize: '0.875rem', color: isChildActive ? '#FFAA8A' : '#F5F0E8' }}>
                             {item.label}
                           </span>
                         </div>
-                        <span style={{ fontSize: '0.75rem', opacity: 0.8, color: '#E2DFD8' }}>
-                          {isSubMenuOpen ? '▲' : '▼'}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          {item.badge && (
+                            <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#FFAA8A', background: 'rgba(200, 90, 50, 0.25)', padding: '2px 6px', borderRadius: '4px' }}>
+                              {item.badge}
+                            </span>
+                          )}
+                          <span style={{ fontSize: '0.75rem', color: isChildActive ? '#FFAA8A' : 'rgba(245, 240, 232, 0.6)' }}>
+                            {isSubMenuOpen ? '▲' : '▼'}
+                          </span>
+                        </div>
                       </button>
 
                       {isSubMenuOpen && item.subItems && (
                         <ul
                           style={{
                             listStyle: 'none',
-                            paddingLeft: 28,
+                            paddingLeft: 22,
                             marginTop: 4,
                             marginBottom: 6,
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 3,
+                            borderLeft: '1px dashed rgba(255, 255, 255, 0.15)',
+                            marginLeft: 18,
                           }}
                         >
                           {item.subItems.map((sub) => {
@@ -177,11 +198,13 @@ export const AdminSidebar: React.FC = () => {
                                 <Link
                                   href={sub.href}
                                   style={{
-                                    display: 'block',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
                                     fontSize: '0.8125rem',
                                     padding: '6px 12px',
-                                    borderRadius: '4px',
-                                    color: isSubActive ? '#FFAA8A' : 'rgba(226, 223, 216, 0.85)',
+                                    borderRadius: '6px',
+                                    color: isSubActive ? '#FFAA8A' : 'rgba(245, 240, 232, 0.85)',
                                     fontWeight: isSubActive ? 800 : 600,
                                     backgroundColor: isSubActive ? 'rgba(200, 90, 50, 0.22)' : 'transparent',
                                     borderLeft: isSubActive ? '3px solid #C85A32' : '3px solid transparent',
@@ -189,7 +212,12 @@ export const AdminSidebar: React.FC = () => {
                                     transition: 'all 0.2s ease',
                                   }}
                                 >
-                                  {sub.label}
+                                  <span>{sub.label}</span>
+                                  {sub.badge && (
+                                    <span style={{ fontSize: '0.625rem', padding: '1px 5px', borderRadius: '3px', background: 'rgba(255, 255, 255, 0.15)', color: '#FFFFFF' }}>
+                                      {sub.badge}
+                                    </span>
+                                  )}
                                 </Link>
                               </li>
                             );
@@ -205,12 +233,28 @@ export const AdminSidebar: React.FC = () => {
                     <Link
                       href={item.href || '#'}
                       className={`${styles.sidebarLink} ${isDirectActive ? styles.sidebarLinkActive : ''}`}
-                      style={{ color: isDirectActive ? '#FFAA8A' : '#E2DFD8' }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        color: isDirectActive ? '#FFAA8A' : '#F5F0E8',
+                        background: isDirectActive ? 'linear-gradient(90deg, rgba(200, 90, 50, 0.28) 0%, rgba(200, 90, 50, 0.08) 100%)' : 'transparent',
+                        borderLeft: isDirectActive ? '3px solid #C85A32' : '3px solid transparent',
+                        borderRadius: '8px',
+                        padding: '0.625rem 0.875rem',
+                      }}
                     >
-                      <span className={styles.sidebarLinkIcon}>{item.icon}</span>
-                      <span style={{ color: isDirectActive ? '#FFAA8A' : '#E2DFD8', fontWeight: isDirectActive ? 800 : 600 }}>
-                        {item.label}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span className={styles.sidebarLinkIcon}>{item.icon}</span>
+                        <span style={{ color: isDirectActive ? '#FFAA8A' : '#F5F0E8', fontWeight: isDirectActive ? 800 : 600, fontSize: '0.875rem' }}>
+                          {item.label}
+                        </span>
+                      </div>
+                      {item.badge && (
+                        <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#4ADE80', background: 'rgba(74, 222, 128, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                          {item.badge}
+                        </span>
+                      )}
                     </Link>
                   </li>
                 );
