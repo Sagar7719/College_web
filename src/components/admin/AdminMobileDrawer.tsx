@@ -28,6 +28,7 @@ const adminDrawerNav = [
   { label: '📝 Admissions Page', href: '/admin/admissions-config' },
   { label: '📞 Contact Us Page', href: '/admin/contact-page' },
   { label: '🧭 Drag & Drop Menu Manager', href: '/admin/navigation' },
+  { label: '📦 Data Backup & Restore', href: '/admin/backup' },
   { label: '⚙️ Site Branding & Settings', href: '/admin/settings' },
 ];
 

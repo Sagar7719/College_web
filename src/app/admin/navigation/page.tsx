@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { NavigationItem, Page } from '@/types';
 import { navigationService, buildNavigationTree } from '@/services/navigation.service';
@@ -37,8 +37,8 @@ export default function AdminNavigationManagerScreen() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string>('');
 
-  // Dropdown Open State in Visual Canvas
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>('nav_sys_about');
+  // Dropdown Open State in Visual Canvas (Closed by default)
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   // Inline + Add Page Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -66,7 +66,8 @@ export default function AdminNavigationManagerScreen() {
       ]);
 
       setNavItems(allNav);
-      setTreeItems(buildNavigationTree(allNav));
+      const tree = buildNavigationTree(allNav);
+      setTreeItems(tree);
       setPublishedPages(allPages);
       setSelectablePages(discoveredPages);
       if (settings?.collegeInfo?.name) {
@@ -82,6 +83,44 @@ export default function AdminNavigationManagerScreen() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Ref for click-outside detection
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnterTab = (id: string) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setOpenDropdownId(id);
+  };
+
+  const handleMouseLeaveTab = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setOpenDropdownId(null);
+    }, 180);
+  };
+
+  // Close open dropdown flyout whenever user clicks outside or presses Escape
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (openDropdownId && canvasRef.current && !canvasRef.current.contains(e.target as Node)) {
+        setOpenDropdownId(null);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && openDropdownId) {
+        setOpenDropdownId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [openDropdownId]);
 
   // Update tree representation whenever navItems changes
   useEffect(() => {
@@ -267,7 +306,7 @@ export default function AdminNavigationManagerScreen() {
         });
 
         // Enforce that new custom pages default to a dropdown menu (e.g. About Us or More) so they only show in dropdown menus, not top-level main nav
-        const effectiveParentId = targetParentId || treeItems.find((t) => t.id !== 'nav_sys_home')?.id || 'nav_sys_about';
+        const effectiveParentId = targetParentId || 'nav_sys_about';
 
         const newNavItem: NavigationItem = {
           id: `nav_cms_${newPageId}`,
@@ -374,7 +413,7 @@ export default function AdminNavigationManagerScreen() {
             🧭 Live Visual Website Navbar Drag &amp; Drop Manager
           </h1>
           <p style={{ color: '#68705A', margin: '0.25rem 0 0 0', fontSize: '0.9375rem' }}>
-            Drag tabs to reorder the main website menu bar. Drag child items between dropdowns, or click ➕ to create new pages.
+            Drag top tabs to reorder the main website menu bar. Click any tab to view its attached dropdown sub-pages directly below it.
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
@@ -383,8 +422,13 @@ export default function AdminNavigationManagerScreen() {
               {saveStatus}
             </span>
           )}
-          <Button variant="primary" onClick={() => handleOpenAddModal()} style={{ backgroundColor: '#C85A32', borderColor: '#C85A32', color: '#FFFFFF', fontWeight: 700 }}>
-            ➕ Add Top-Level Menu Tab
+          {/* SINGLE TOP-RIGHT ADD BUTTON */}
+          <Button
+            variant="primary"
+            onClick={() => handleOpenAddModal()}
+            style={{ backgroundColor: '#C85A32', borderColor: '#C85A32', color: '#FFFFFF', fontWeight: 700, padding: '0.625rem 1.25rem', fontSize: '0.9375rem', borderRadius: '8px' }}
+          >
+            ➕ Add Menu Tab / Page
           </Button>
         </div>
       </div>
@@ -392,7 +436,7 @@ export default function AdminNavigationManagerScreen() {
       {loading ? (
         <Skeleton style={{ height: '180px', width: '100%', borderRadius: '16px' }} />
       ) : (
-        <>
+        <div ref={canvasRef}>
           {/* ==============================================================================
              VISUAL LIVE WEBSITE NAVBAR REPLICA CANVAS (LIGHT MODE)
              ============================================================================== */}
@@ -433,19 +477,19 @@ export default function AdminNavigationManagerScreen() {
                       {collegeName}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: '#706A61', fontWeight: 600 }}>
-                      Live Navbar Header Preview &amp; Layout Manager
+                      Live Single Line Website Header Navigation Bar
                     </span>
                   </div>
                   <span style={{ padding: '4px 10px', fontSize: '0.75rem', fontWeight: 800, borderRadius: '20px', backgroundColor: '#E6F4EA', color: '#137333', border: '1px solid #CEEAD6', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     ● LIVE INTERACTIVE CANVAS
                   </span>
                 </div>
-                <div style={{ fontSize: '0.8125rem', color: '#706A61', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>🔒 5 Core System Tabs are Protected Against Deletion</span>
+                <div style={{ fontSize: '0.8125rem', color: '#706A61', fontWeight: 600 }}>
+                  🔒 5 Core System Tabs Protected Against Deletion
                 </div>
               </div>
 
-              {/* Top-Level Horizontal Navbar Bar (Light Mode Header Bar) */}
+              {/* SINGLE HORIZONTAL LINE MAIN NAVBAR ROW */}
               <div
                 style={{
                   display: 'flex',
@@ -472,6 +516,8 @@ export default function AdminNavigationManagerScreen() {
                       onDragStart={(e) => handleTopDragStart(e, parentItem.id)}
                       onDragOver={(e) => handleDragOver(e, parentItem.id)}
                       onDrop={(e) => handleDropOnParentTab(e, parentItem.id)}
+                      onMouseEnter={() => handleMouseEnterTab(parentItem.id)}
+                      onMouseLeave={handleMouseLeaveTab}
                       style={{
                         position: 'relative',
                         display: 'inline-block',
@@ -492,7 +538,7 @@ export default function AdminNavigationManagerScreen() {
                           cursor: 'pointer',
                           fontWeight: 700,
                           fontSize: '0.9375rem',
-                          transition: 'all 0.2s ease',
+                          transition: 'all 0.15s ease',
                           userSelect: 'none',
                           boxShadow: isDropdownOpen ? '0 4px 12px rgba(200, 90, 50, 0.15)' : '0 2px 4px rgba(0, 0, 0, 0.03)',
                         }}
@@ -508,17 +554,19 @@ export default function AdminNavigationManagerScreen() {
                           </span>
                         )}
 
-                        <span style={{ fontSize: '0.75rem', color: isDropdownOpen ? '#C85A32' : '#706A61' }}>
-                          {hasChildren ? (isDropdownOpen ? '▲' : '▼') : '➕'}
-                        </span>
+                        {hasChildren && (
+                          <span style={{ fontSize: '0.75rem', color: isDropdownOpen ? '#C85A32' : '#706A61' }}>
+                            {isDropdownOpen ? '▲' : '▼'}
+                          </span>
+                        )}
                       </div>
 
-                      {/* Floating Dropdown Sub-Menu Panel (Light Mode) */}
+                      {/* Dropdown Sub-Menu Attached Directly Below Button */}
                       {isDropdownOpen && (
                         <div
                           style={{
                             position: 'absolute',
-                            top: 'calc(100% + 10px)',
+                            top: 'calc(100% + 8px)',
                             left: 0,
                             minWidth: '290px',
                             backgroundColor: '#FFFFFF',
@@ -606,28 +654,6 @@ export default function AdminNavigationManagerScreen() {
                     </div>
                   );
                 })}
-
-                {/* Inline Add Button on Main Navbar Bar */}
-                <button
-                  type="button"
-                  onClick={() => handleOpenAddModal()}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '10px 16px',
-                    borderRadius: '8px',
-                    backgroundColor: '#FFF5F0',
-                    border: '1.5px dashed #C85A32',
-                    color: '#C85A32',
-                    fontWeight: 800,
-                    fontSize: '0.875rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  ➕ Add New Menu Tab
-                </button>
               </div>
             </CardBody>
           </Card>
@@ -643,7 +669,7 @@ export default function AdminNavigationManagerScreen() {
                     📄 Available Published Pages Pool
                   </h3>
                   <p style={{ fontSize: '0.875rem', color: '#706A61', margin: '0.25rem 0 0 0' }}>
-                    Drag any page chip below onto a navbar tab above to automatically insert it as a dropdown sub-item!
+                    Drag any page chip below onto a header tab above to insert it as a dropdown sub-item!
                   </p>
                 </div>
                 <Badge variant="info" style={{ backgroundColor: '#EBF5FF', color: '#1E40AF', border: '1px solid #BFDBFE', padding: '6px 12px', fontSize: '0.8125rem' }}>
@@ -689,7 +715,7 @@ export default function AdminNavigationManagerScreen() {
               )}
             </CardBody>
           </Card>
-        </>
+        </div>
       )}
 
       {/* INLINE + NEW PAGE CREATION MODAL */}
@@ -697,7 +723,7 @@ export default function AdminNavigationManagerScreen() {
         <Modal
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
-          title={targetParentId ? `➕ Create New Sub-Page in Selected Dropdown` : `➕ Add New Top-Level Navbar Tab`}
+          title={targetParentId ? `➕ Add Page into Dropdown Category` : `➕ Add New Top-Level Navbar Category`}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {formError && (
@@ -709,7 +735,7 @@ export default function AdminNavigationManagerScreen() {
             {/* Target Dropdown Selector */}
             <div>
               <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#24221F', marginBottom: '0.35rem' }}>
-                Dropdown Menu Location
+                Dropdown Menu Category Location
               </label>
               <select
                 value={targetParentId}
@@ -725,10 +751,10 @@ export default function AdminNavigationManagerScreen() {
                   color: '#24221F',
                 }}
               >
-                <option value="">📌 Top-Level Menu Bar</option>
+                <option value="">📌 Top-Level Header Bar (New Main Category)</option>
                 {treeItems.map((parent) => (
                   <option key={parent.id} value={parent.id}>
-                    📁 Inside Dropdown: "{parent.label}"
+                    📁 Inside Dropdown Category: "{parent.label}"
                   </option>
                 ))}
               </select>
