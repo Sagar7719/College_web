@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "set-admin": "tsx --env-file=.env.local scripts/set-admin.ts",
+    "remove-admin": "tsx --env-file=.env.local scripts/remove-admin.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
