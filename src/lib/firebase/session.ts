@@ -72,3 +72,49 @@ export async function revokeFirebaseSessionCookie(): Promise<void> {
     // Ignore cookie clearing errors
   }
 }
+
+/**
+ * Custom error thrown when a request lacks a valid, unexpired, or unrevoked Firebase session cookie.
+ * Maps to HTTP 401 Unauthorized.
+ */
+export class AuthenticationRequiredError extends Error {
+  readonly status = 401;
+  constructor(message = 'Authentication required. Missing, invalid, or expired session.') {
+    super(message);
+    this.name = 'AuthenticationRequiredError';
+  }
+}
+
+/**
+ * Custom error thrown when a user has a valid Firebase session cookie but lacks the `admin === true` custom claim.
+ * Maps to HTTP 403 Forbidden.
+ */
+export class AdminRequiredError extends Error {
+  readonly status = 403;
+  constructor(message = 'Administrator privileges required.') {
+    super(message);
+    this.name = 'AdminRequiredError';
+  }
+}
+
+/**
+ * Server-only authorization helper.
+ * Verifies the HttpOnly session cookie via Firebase Admin SDK and strictly validates custom claim `admin === true`.
+ * Returns decoded session claims if authorized.
+ * Throws `AuthenticationRequiredError` (401) if unauthenticated/invalid session.
+ * Throws `AdminRequiredError` (403) if authenticated user lacks admin claim.
+ */
+export async function requireAdmin(sessionCookie?: string): Promise<DecodedIdToken> {
+  const claims = await verifyFirebaseSessionCookie(sessionCookie);
+
+  if (!claims) {
+    throw new AuthenticationRequiredError();
+  }
+
+  if (claims.admin !== true) {
+    throw new AdminRequiredError();
+  }
+
+  return claims;
+}
+
