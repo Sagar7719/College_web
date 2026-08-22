@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { requireAdmin, handleApiAuthError } from '@/lib/firebase/session';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
 const MAX_DOC_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -22,13 +23,16 @@ const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'pdf', '
 
 export async function POST(request: Request) {
   try {
+    // 1. Enforce server-side administrator authorization before any file processing or storage signing
+    await requireAdmin();
+
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const altText = (formData.get('altText') as string) || '';
     const caption = (formData.get('caption') as string) || '';
 
     if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'No file provided.' }, { status: 400 });
     }
 
     const mimeType = file.type || '';
@@ -39,7 +43,7 @@ export async function POST(request: Request) {
     // Validate extension
     if (!ALLOWED_EXTENSIONS.includes(rawExtension)) {
       return NextResponse.json(
-        { error: `Unsupported file extension: .${rawExtension}. Allowed: ${ALLOWED_EXTENSIONS.join(', ')}` },
+        { success: false, error: `Unsupported file extension: .${rawExtension}. Allowed: ${ALLOWED_EXTENSIONS.join(', ')}` },
         { status: 400 }
       );
     }
@@ -54,7 +58,7 @@ export async function POST(request: Request) {
 
     if (!isImage && !isDoc) {
       return NextResponse.json(
-        { error: 'Invalid file type. Supported formats: JPG, PNG, WebP, SVG, PDF, DOC, DOCX' },
+        { success: false, error: 'Invalid file type. Supported formats: JPG, PNG, WebP, SVG, PDF, DOC, DOCX' },
         { status: 400 }
       );
     }
@@ -64,7 +68,7 @@ export async function POST(request: Request) {
     if (file.size > maxSize) {
       const limitMb = maxSize / (1024 * 1024);
       return NextResponse.json(
-        { error: `File size exceeds maximum allowed limit of ${limitMb} MB.` },
+        { success: false, error: `File size exceeds maximum allowed limit of ${limitMb} MB.` },
         { status: 400 }
       );
     }
@@ -79,8 +83,9 @@ export async function POST(request: Request) {
     if (!cloudName || !apiKey || !apiSecret || cloudName === 'demo' || cloudName === 'your_cloud_name') {
       return NextResponse.json(
         {
+          success: false,
           error:
-            'Cloudinary object storage configuration is missing. Local file upload requires configured Cloudinary credentials in .env.local.',
+            'Media storage configuration is missing. Please configure storage credentials in environment settings.',
         },
         { status: 500 }
       );
@@ -113,10 +118,8 @@ export async function POST(request: Request) {
     });
 
     if (!cloudRes.ok) {
-      const cloudErr = await cloudRes.json().catch(() => ({}));
-      const cloudMsg = cloudErr.error?.message || cloudRes.statusText || 'Cloudinary upload failed';
       return NextResponse.json(
-        { error: `Cloudinary storage upload error: ${cloudMsg}` },
+        { success: false, error: 'Media storage upload failed. Please try again.' },
         { status: 502 }
       );
     }
@@ -142,9 +145,11 @@ export async function POST(request: Request) {
       caption,
     });
   } catch (err: unknown) {
-    const errMsg = err instanceof Error ? err.message : 'Media upload handler error';
+    const authResponse = handleApiAuthError(err);
+    if (authResponse) return authResponse;
+
     return NextResponse.json(
-      { error: errMsg },
+      { success: false, error: 'Failed to upload media asset.' },
       { status: 500 }
     );
   }

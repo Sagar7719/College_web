@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getAdminAuth } from './admin';
 import type { DecodedIdToken } from 'firebase-admin/auth';
@@ -79,7 +80,7 @@ export async function revokeFirebaseSessionCookie(): Promise<void> {
  */
 export class AuthenticationRequiredError extends Error {
   readonly status = 401;
-  constructor(message = 'Authentication required. Missing, invalid, or expired session.') {
+  constructor(message = 'Authentication required.') {
     super(message);
     this.name = 'AuthenticationRequiredError';
   }
@@ -116,5 +117,26 @@ export async function requireAdmin(sessionCookie?: string): Promise<DecodedIdTok
   }
 
   return claims;
+}
+
+/**
+ * Helper to handle authorization errors consistently in API route handlers.
+ * Returns a standardized NextResponse with 401 or 403 status code if the error
+ * is an AuthenticationRequiredError or AdminRequiredError; returns null otherwise.
+ */
+export function handleApiAuthError(error: unknown): NextResponse | null {
+  if (error instanceof AuthenticationRequiredError) {
+    return NextResponse.json(
+      { success: false, error: 'Authentication required.' },
+      { status: 401 }
+    );
+  }
+  if (error instanceof AdminRequiredError) {
+    return NextResponse.json(
+      { success: false, error: 'Administrator privileges required.' },
+      { status: 403 }
+    );
+  }
+  return null;
 }
 

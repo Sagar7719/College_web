@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     if (!parseResult.success) {
       const firstError = parseResult.error.issues[0]?.message || 'Invalid form input data';
       return NextResponse.json(
-        { error: firstError, details: parseResult.error.format() },
+        { success: false, error: firstError, details: parseResult.error.format() },
         { status: 400 }
       );
     }
@@ -22,11 +22,9 @@ export async function POST(request: Request) {
       message: "Your message has been sent successfully. We'll get back to you soon.",
       id: messageId,
     });
-  } catch (err: unknown) {
-    const errorMessage = err instanceof Error ? err.message : 'Failed to submit contact message';
-    console.error('Contact API Route Handler Error:', err);
+  } catch {
     return NextResponse.json(
-      { error: errorMessage },
+      { success: false, error: 'Failed to submit contact message. Please try again later.' },
       { status: 500 }
     );
   }

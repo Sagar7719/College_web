@@ -9,6 +9,11 @@ import {
   galleryService,
   downloadsService,
 } from '@/services/cms-modules.service';
+import {
+  requireAdmin,
+  verifyFirebaseSessionCookie,
+  handleApiAuthError,
+} from '@/lib/firebase/session';
 
 interface Context {
   params: Promise<{
@@ -16,7 +21,20 @@ interface Context {
   }>;
 }
 
-const moduleServices: Record<string, any> = {
+const VALID_CMS_MODULES = [
+  'notices',
+  'news',
+  'events',
+  'courses',
+  'departments',
+  'faculty',
+  'gallery',
+  'downloads',
+] as const;
+
+type ValidModule = (typeof VALID_CMS_MODULES)[number];
+
+const moduleServices: Record<ValidModule, any> = {
   notices: noticesService,
   news: newsService,
   events: eventsService,
@@ -27,30 +45,64 @@ const moduleServices: Record<string, any> = {
   downloads: downloadsService,
 };
 
+function isValidModule(module: string): module is ValidModule {
+  return VALID_CMS_MODULES.includes(module as ValidModule);
+}
+
 export async function GET(req: NextRequest, { params }: Context) {
   try {
     const { module } = await params;
-    const service = moduleServices[module];
 
-    if (!service) {
-      return NextResponse.json({ success: false, error: `Invalid CMS module: ${module}` }, { status: 400 });
+    if (!module || !isValidModule(module)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid CMS module.' },
+        { status: 400 }
+      );
     }
 
+    const service = moduleServices[module];
     const { searchParams } = new URL(req.url);
     const publishedOnly = searchParams.get('published') === 'true';
-    const limitCount = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : undefined;
+    const limitCount = searchParams.get('limit')
+      ? parseInt(searchParams.get('limit')!, 10)
+      : undefined;
 
-    let data;
-    if (publishedOnly && typeof service.getPublished === 'function') {
-      data = await service.getPublished(limitCount);
-    } else {
-      data = await service.getAll();
+    // Helper to retrieve published-only records safely
+    const fetchPublishedOnly = async () => {
+      if (typeof service.getPublished === 'function') {
+        return await service.getPublished(limitCount);
+      }
+      if (typeof service.getUpcoming === 'function') {
+        return await service.getUpcoming();
+      }
+      const all = await service.getAll();
+      const published = all.filter(
+        (item: any) => item.status === 'published' || item.status === undefined
+      );
+      return limitCount ? published.slice(0, limitCount) : published;
+    };
+
+    if (publishedOnly) {
+      const data = await fetchPublishedOnly();
+      return NextResponse.json({ success: true, data });
     }
 
+    // Broad request without ?published=true: verify if caller is an administrator
+    const claims = await verifyFirebaseSessionCookie();
+    if (claims && claims.admin === true) {
+      const data = await service.getAll();
+      return NextResponse.json({ success: true, data });
+    }
+
+    // Unauthenticated or non-admin requests receive only published items to prevent draft leakage
+    const data = await fetchPublishedOnly();
     return NextResponse.json({ success: true, data });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const authResponse = handleApiAuthError(error);
+    if (authResponse) return authResponse;
+
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to fetch module data' },
+      { success: false, error: 'Failed to fetch module data.' },
       { status: 500 }
     );
   }
@@ -58,19 +110,32 @@ export async function GET(req: NextRequest, { params }: Context) {
 
 export async function POST(req: NextRequest, { params }: Context) {
   try {
-    const { module } = await params;
-    const service = moduleServices[module];
+    // 1. Enforce server-side administrator authorization first
+    await requireAdmin();
 
-    if (!service) {
-      return NextResponse.json({ success: false, error: `Invalid CMS module: ${module}` }, { status: 400 });
+    const { module } = await params;
+    if (!module || !isValidModule(module)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid CMS module.' },
+        { status: 400 }
+      );
     }
 
+    const service = moduleServices[module];
     const body = await req.json();
     const savedId = await service.save(body);
-    return NextResponse.json({ success: true, id: savedId, message: `${module} item saved successfully` });
-  } catch (error: any) {
+
+    return NextResponse.json({
+      success: true,
+      id: savedId,
+      message: 'Item saved successfully.',
+    });
+  } catch (error: unknown) {
+    const authResponse = handleApiAuthError(error);
+    if (authResponse) return authResponse;
+
     return NextResponse.json(
-      { success: false, error: error.message || `Failed to save ${module} item` },
+      { success: false, error: 'Failed to save item.' },
       { status: 500 }
     );
   }
@@ -78,18 +143,26 @@ export async function POST(req: NextRequest, { params }: Context) {
 
 export async function DELETE(req: NextRequest, { params }: Context) {
   try {
-    const { module } = await params;
-    const service = moduleServices[module];
+    // 1. Enforce server-side administrator authorization first
+    await requireAdmin();
 
-    if (!service) {
-      return NextResponse.json({ success: false, error: `Invalid CMS module: ${module}` }, { status: 400 });
+    const { module } = await params;
+    if (!module || !isValidModule(module)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid CMS module.' },
+        { status: 400 }
+      );
     }
 
+    const service = moduleServices[module];
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json({ success: false, error: 'Missing item id' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Missing item id.' },
+        { status: 400 }
+      );
     }
 
     if (typeof service.delete === 'function') {
@@ -98,10 +171,16 @@ export async function DELETE(req: NextRequest, { params }: Context) {
       await service.save({ id, status: 'archived' });
     }
 
-    return NextResponse.json({ success: true, message: `${module} item ${id} deleted` });
-  } catch (error: any) {
+    return NextResponse.json({
+      success: true,
+      message: 'Item deleted successfully.',
+    });
+  } catch (error: unknown) {
+    const authResponse = handleApiAuthError(error);
+    if (authResponse) return authResponse;
+
     return NextResponse.json(
-      { success: false, error: error.message || `Failed to delete ${module} item` },
+      { success: false, error: 'Failed to delete item.' },
       { status: 500 }
     );
   }
