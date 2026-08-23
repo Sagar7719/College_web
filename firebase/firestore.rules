@@ -2,76 +2,88 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper function to check if the user is authenticated as an administrator
+    // Helper function to verify that the request is made by an authenticated administrator with admin custom claim
     function isAdmin() {
-      return request.auth != null;
+      return request.auth != null && request.auth.token.admin == true;
     }
 
-    // Public Pages & Content Read Access (Readable publicly, Writable only by Admin)
+    // CMS Pages: Public users can only read published pages; Admins have full access
     match /pages/{pageId} {
-      allow read: if true;
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow write: if isAdmin();
     }
 
+    // Navigation: Public users can only read visible navigation items; Admins have full access
     match /navigation/{itemId} {
-      allow read: if true;
+      allow read: if resource.data.visible == true || isAdmin();
       allow write: if isAdmin();
     }
 
+    // Site Settings: Public users can read branding/settings; Admins only can write
     match /siteSettings/{settingId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
+    // Departments: Public users can only read published departments; Admins have full access
     match /departments/{deptId} {
-      allow read: if true;
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow write: if isAdmin();
     }
 
+    // Courses: Public users can only read published courses; Admins have full access
     match /courses/{courseId} {
-      allow read: if true;
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow write: if isAdmin();
     }
 
+    // Faculty: Public users can only read published faculty members; Admins have full access
     match /faculty/{facultyId} {
-      allow read: if true;
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow write: if isAdmin();
     }
 
+    // Notices: Public users can only read published notices; Admins have full access
     match /notices/{noticeId} {
-      allow read: if true;
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow write: if isAdmin();
     }
 
+    // News: Public users can only read published news articles; Admins have full access
     match /news/{newsId} {
-      allow read: if true;
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow write: if isAdmin();
     }
 
+    // Events: Public users can only read published events; Admins have full access
     match /events/{eventId} {
-      allow read: if true;
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow write: if isAdmin();
     }
 
+    // Photo Gallery: Public users can only read published albums; Admins have full access
     match /gallery/{albumId} {
-      allow read: if true;
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow write: if isAdmin();
     }
 
+    // Document Downloads: Public users can only read published documents; Admins have full access
     match /downloads/{downloadId} {
-      allow read: if true;
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow write: if isAdmin();
     }
 
+    // Media Asset Metadata: Admins only can read, create, update, or delete
     match /media/{mediaId} {
-      allow read: if true;
-      allow write: if isAdmin();
+      allow read, write: if isAdmin();
     }
 
+    // Users Collection: Admins only can read or write user documents
     match /users/{userId} {
       allow read, write: if isAdmin();
     }
 
+    // Contact Inquiries: Public visitors can submit inquiries matching strict validation schema; Admins only can read/manage
     match /contactMessages/{messageId} {
       allow create: if request.resource.data.keys().hasAll(['id', 'name', 'email', 'subject', 'message', 'status', 'createdAt', 'updatedAt'])
                     && request.resource.data.keys().hasOnly(['id', 'name', 'email', 'subject', 'message', 'status', 'createdAt', 'updatedAt'])
@@ -93,5 +105,3 @@ service cloud.firestore {
     }
   }
 }
-
-

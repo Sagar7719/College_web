@@ -66,9 +66,9 @@ export default async function HomePage() {
       noticesService.getPublished(6),
       eventsService.getUpcoming(),
       departmentsService.getPublished(),
-      coursesService.getAll(),
+      coursesService.getPublished(),
       galleryService.getPublished(),
-      facultyService.getAll(),
+      facultyService.getPublished(),
       downloadsService.getPublished(),
     ]);
 

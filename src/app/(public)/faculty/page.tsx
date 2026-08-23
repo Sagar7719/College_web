@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 
 export default async function FacultyPage() {
-  const members = await facultyService.getAll();
+  const members = await facultyService.getPublished();
 
   return (
     <div className="container" style={{ padding: '3rem 1.5rem' }}>

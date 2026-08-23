@@ -76,6 +76,7 @@ export const departmentsService = {
 // 2. Courses Service
 export const coursesService = {
   getAll: () => fetchDocs<Course>('courses', [orderBy('title', 'asc')]),
+  getPublished: () => fetchDocs<Course>('courses', [where('status', '==', 'published')]),
   getByDepartment: (deptId: string) => fetchDocs<Course>('courses', [where('departmentId', '==', deptId)]),
   save: async (course: Partial<Course> & { title: string; code: string; departmentId: string }): Promise<string> => {
     const id = course.id || doc(collection(db, 'courses')).id;
@@ -106,6 +107,7 @@ export const coursesService = {
 // 3. Faculty Service
 export const facultyService = {
   getAll: () => fetchDocs<Faculty>('faculty', [orderBy('order', 'asc')]),
+  getPublished: () => fetchDocs<Faculty>('faculty', [where('status', '==', 'published'), orderBy('order', 'asc')]),
   getByDepartment: (deptId: string) => fetchDocs<Faculty>('faculty', [where('departmentId', '==', deptId), orderBy('order', 'asc')]),
   save: async (fac: Partial<Faculty> & { name: string; designation: string; departmentId: string }): Promise<string> => {
     const id = fac.id || doc(collection(db, 'faculty')).id;

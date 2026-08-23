@@ -117,7 +117,7 @@ export const navigationService = {
    */
   getNavigationItems: cache(async (): Promise<NavigationItem[]> => {
     try {
-      const q = query(collection(db, COLLECTION_NAME), orderBy('order', 'asc'));
+      const q = query(collection(db, COLLECTION_NAME), where('visible', '==', true));
       const snapshot = await getDocs(q);
       const items: NavigationItem[] = [];
 

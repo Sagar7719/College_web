@@ -53,12 +53,12 @@ export function SearchClient() {
         allNews,
         allEvents
       ] = await Promise.all([
-        coursesService.getAll().catch(() => []),
+        coursesService.getPublished().catch(() => []),
         departmentsService.getPublished().catch(() => []),
-        facultyService.getAll().catch(() => []),
-        noticesService.getAll().catch(() => []),
-        newsService.getAll().catch(() => []),
-        eventsService.getAll().catch(() => []),
+        facultyService.getPublished().catch(() => []),
+        noticesService.getPublished().catch(() => []),
+        newsService.getPublished().catch(() => []),
+        eventsService.getUpcoming().catch(() => []),
       ]);
 
       // Filter courses

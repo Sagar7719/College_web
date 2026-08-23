@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function CoursesPage() {
-  const courses = await coursesService.getAll();
+  const courses = await coursesService.getPublished();
   const settings = await siteSettingsService.getSettings();
   const collegeName = settings.collegeInfo?.name || 'Jaysingpur College, Jaysingpur';
 
