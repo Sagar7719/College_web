@@ -6,16 +6,16 @@ import { useAuth } from '@/context/AuthContext';
 import { Skeleton } from '@/components/ui';
 
 export const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAuth();
-  const router = Router();
+  const { user, isAdmin, loading } = useAuth();
+  const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    // If auth state resolved and no user logged in, redirect to login page
-    if (!loading && !user && pathname !== '/admin/login') {
+    // If auth state resolved and no user or not admin, redirect to login page
+    if (!loading && (!user || !isAdmin) && pathname !== '/admin/login') {
       router.push('/admin/login');
     }
-  }, [user, loading, pathname, router]);
+  }, [user, isAdmin, loading, pathname, router]);
 
   // Allow login page render without redirect loop
   if (pathname === '/admin/login') {
@@ -45,13 +45,9 @@ export const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children })
     );
   }
 
-  if (!user) {
+  if (!user || !isAdmin) {
     return null;
   }
 
   return <>{children}</>;
 };
-
-function Router() {
-  return useRouter();
-}
