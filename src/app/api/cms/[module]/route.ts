@@ -14,6 +14,16 @@ import {
   verifyFirebaseSessionCookie,
   handleApiAuthError,
 } from '@/lib/firebase/session';
+import {
+  departmentSchema,
+  courseSchema,
+  facultySchema,
+  noticeSchema,
+  newsSchema,
+  eventSchema,
+  gallerySchema,
+  downloadSchema,
+} from '@/validations/cms-modules.schema';
 
 interface Context {
   params: Promise<{
@@ -45,6 +55,18 @@ const moduleServices: Record<ValidModule, any> = {
   downloads: downloadsService,
 };
 
+// Zod schema lookup — one schema per valid module
+const moduleSchemas: Record<ValidModule, { safeParse: (data: unknown) => { success: boolean; data?: any; error?: any } }> = {
+  notices: noticeSchema,
+  news: newsSchema,
+  events: eventSchema,
+  courses: courseSchema,
+  departments: departmentSchema,
+  faculty: facultySchema,
+  gallery: gallerySchema,
+  downloads: downloadSchema,
+};
+
 function isValidModule(module: string): module is ValidModule {
   return VALID_CMS_MODULES.includes(module as ValidModule);
 }
@@ -63,8 +85,11 @@ export async function GET(req: NextRequest, { params }: Context) {
     const service = moduleServices[module];
     const { searchParams } = new URL(req.url);
     const publishedOnly = searchParams.get('published') === 'true';
-    const limitCount = searchParams.get('limit')
-      ? parseInt(searchParams.get('limit')!, 10)
+
+    // Clamp limit to [1, 100] to prevent unbounded or zero-cost queries
+    const rawLimit = searchParams.get('limit');
+    const limitCount: number | undefined = rawLimit !== null
+      ? Math.min(100, Math.max(1, parseInt(rawLimit, 10) || 1))
       : undefined;
 
     // Helper to retrieve published-only records safely
@@ -122,8 +147,17 @@ export async function POST(req: NextRequest, { params }: Context) {
     }
 
     const service = moduleServices[module];
-    const body = await req.json();
-    const savedId = await service.save(body);
+    const raw = await req.json();
+
+    // 2. Runtime schema validation — select the correct schema for the validated module
+    const schema = moduleSchemas[module];
+    const parsed = schema.safeParse(raw);
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message ?? 'Invalid module data.';
+      return NextResponse.json({ success: false, error: firstError }, { status: 400 });
+    }
+
+    const savedId = await service.save(parsed.data);
 
     return NextResponse.json({
       success: true,

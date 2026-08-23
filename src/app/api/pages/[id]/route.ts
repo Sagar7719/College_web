@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { pagesService } from '@/services/pages.service';
 import { requireAdmin, handleApiAuthError } from '@/lib/firebase/session';
+import { pageFormSchema } from '@/validations/page.schema';
 
 interface Context {
   params: Promise<{
@@ -39,15 +40,23 @@ export async function PUT(req: NextRequest, { params }: Context) {
     await requireAdmin();
 
     const { id } = await params;
-    const body = await req.json();
-    if (!body.title || !body.slug) {
-      return NextResponse.json({ success: false, error: 'Page title and slug are required.' }, { status: 400 });
+    const raw = await req.json();
+
+    // 2. Runtime schema validation — pageFormSchema.partial() allows update payloads
+    //    that omit optional fields while still enforcing enum values, slug format, and string lengths.
+    const parsed = pageFormSchema.partial().safeParse(raw);
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message ?? 'Invalid page data.';
+      return NextResponse.json({ success: false, error: firstError }, { status: 400 });
     }
+
     const savedId = await pagesService.savePage({
-      ...body,
+      ...parsed.data,
       id,
-      title: body.title,
-      slug: body.slug,
+      // savePage() requires { title: string; slug: string }; provide '' defaults
+      // so the service can merge with the existing Firestore document values.
+      title: parsed.data.title ?? '',
+      slug: parsed.data.slug ?? '',
     });
     return NextResponse.json({ success: true, id: savedId, message: 'Page updated successfully.' });
   } catch (error: unknown) {

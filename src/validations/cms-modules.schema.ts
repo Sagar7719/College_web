@@ -65,3 +65,23 @@ export const eventSchema = z.object({
   registrationUrl: z.string().optional(),
   status: z.enum(['draft', 'published', 'archived']),
 });
+
+export const gallerySchema = z.object({
+  title: z.string().min(2, 'Gallery album title required').max(150),
+  coverImageUrl: z.string().optional(),
+  images: z.array(z.string()).optional(),
+  category: z.string().optional(),
+  status: z.enum(['draft', 'published', 'archived']),
+});
+
+export const downloadSchema = z.object({
+  title: z.string().min(2, 'Download title required').max(150),
+  fileUrl: z.string().min(1, 'File URL is required'),
+  fileName: z.string().min(1, 'File name is required'),
+  category: z.string().optional(),
+  tag: z.string().optional(),
+  fileSizeFormatted: z.string().optional(),
+  fileType: z.string().optional(),
+  description: z.string().optional(),
+  status: z.enum(['draft', 'published', 'archived']),
+});

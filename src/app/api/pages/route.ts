@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { pagesService } from '@/services/pages.service';
-import { Page } from '@/types';
 import {
   requireAdmin,
   verifyFirebaseSessionCookie,
   handleApiAuthError,
 } from '@/lib/firebase/session';
+import { pageFormSchema } from '@/validations/page.schema';
 
 export async function GET(req: NextRequest) {
   try {
@@ -59,14 +59,17 @@ export async function POST(req: NextRequest) {
     // 1. Enforce server-side administrator authorization
     await requireAdmin();
 
-    const body: Partial<Page> = await req.json();
-    if (!body.title || !body.slug) {
-      return NextResponse.json({ success: false, error: 'Page title and slug are required.' }, { status: 400 });
+    const raw = await req.json();
+
+    // 2. Runtime schema validation — rejects malformed, incomplete, or invalid-status payloads
+    const parsed = pageFormSchema.safeParse(raw);
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message ?? 'Invalid page data.';
+      return NextResponse.json({ success: false, error: firstError }, { status: 400 });
     }
+
     const savedId = await pagesService.savePage({
-      ...body,
-      title: body.title,
-      slug: body.slug,
+      ...parsed.data,
     });
     return NextResponse.json({ success: true, id: savedId, message: 'Page saved successfully.' });
   } catch (error: unknown) {
