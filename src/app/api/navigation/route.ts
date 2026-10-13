@@ -62,6 +62,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid items array.' }, { status: 400 });
     }
 
+    // Validate that no duplicate cmsPageId exists among non-system CMS items
+    const seenCmsIds = new Set<string>();
+    for (const item of items) {
+      if (item && item.cmsPageId && !item.isSystemPage) {
+        if (seenCmsIds.has(item.cmsPageId)) {
+          return NextResponse.json(
+            { success: false, error: `Duplicate navigation assignment detected for page ${item.label || item.cmsPageId}.` },
+            { status: 400 }
+          );
+        }
+        seenCmsIds.add(item.cmsPageId);
+      }
+    }
+
     await navigationService.saveNavigationItems(items);
     return NextResponse.json({ success: true, message: 'Navigation saved successfully.' });
   } catch (error: unknown) {

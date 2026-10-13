@@ -33,8 +33,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, data: page });
     }
 
-    // Broad query without slug or id: check administrator claims
-    const claims = await verifyFirebaseSessionCookie();
+    // Broad query without slug or id: check administrator claims (fast local JWT verification for read-only check)
+    const claims = await verifyFirebaseSessionCookie(undefined, false);
     if (claims && claims.admin === true) {
       const allPages = await pagesService.getAllPages();
       return NextResponse.json({ success: true, data: allPages });

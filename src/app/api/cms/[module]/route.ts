@@ -9,6 +9,7 @@ import {
   galleryService,
   downloadsService,
 } from '@/services/cms-modules.service';
+import { getAdminDb } from '@/lib/firebase/admin';
 import {
   requireAdmin,
   verifyFirebaseSessionCookie,
@@ -44,31 +45,105 @@ const VALID_CMS_MODULES = [
 
 type ValidModule = (typeof VALID_CMS_MODULES)[number];
 
-const moduleServices: Record<ValidModule, any> = {
-  notices: noticesService,
-  news: newsService,
-  events: eventsService,
-  courses: coursesService,
-  departments: departmentsService,
-  faculty: facultyService,
-  gallery: galleryService,
-  downloads: downloadsService,
+/**
+ * Per-module read configuration for the Admin SDK path.
+ * orderField: field to sort by server-side (must match existing index).
+ * orderDir: 'asc' | 'desc'
+ * statusField: field name used to filter published items (undefined = no status field / always visible).
+ * eventsOrderField: events sort by eventDate ascending.
+ */
+const MODULE_READ_CONFIG: Record<
+  ValidModule,
+  { orderField: string; orderDir: 'asc' | 'desc'; statusField: string }
+> = {
+  notices:     { orderField: 'publishDate', orderDir: 'desc', statusField: 'status' },
+  news:        { orderField: 'publishDate', orderDir: 'desc', statusField: 'status' },
+  events:      { orderField: 'eventDate',   orderDir: 'asc',  statusField: 'status' },
+  courses:     { orderField: 'title',       orderDir: 'asc',  statusField: 'status' },
+  departments: { orderField: 'order',       orderDir: 'asc',  statusField: 'status' },
+  faculty:     { orderField: 'order',       orderDir: 'asc',  statusField: 'status' },
+  gallery:     { orderField: 'createdAt',   orderDir: 'desc', statusField: 'status' },
+  downloads:   { orderField: 'createdAt',   orderDir: 'desc', statusField: 'status' },
 };
 
-// Zod schema lookup — one schema per valid module
-const moduleSchemas: Record<ValidModule, { safeParse: (data: unknown) => { success: boolean; data?: any; error?: any } }> = {
-  notices: noticeSchema,
-  news: newsSchema,
-  events: eventSchema,
-  courses: courseSchema,
+// Zod schema lookup — one schema per valid module (used for POST validation)
+const moduleSchemas: Record<
+  ValidModule,
+  { safeParse: (data: unknown) => { success: boolean; data?: any; error?: any } }
+> = {
+  notices:     noticeSchema,
+  news:        newsSchema,
+  events:      eventSchema,
+  courses:     courseSchema,
   departments: departmentSchema,
-  faculty: facultySchema,
-  gallery: gallerySchema,
-  downloads: downloadSchema,
+  faculty:     facultySchema,
+  gallery:     gallerySchema,
+  downloads:   downloadSchema,
+};
+
+// Service lookup — used for POST/DELETE (write operations via client SDK, server-side is fine for writes)
+const moduleServices: Record<ValidModule, any> = {
+  notices:     noticesService,
+  news:        newsService,
+  events:      eventsService,
+  courses:     coursesService,
+  departments: departmentsService,
+  faculty:     facultyService,
+  gallery:     galleryService,
+  downloads:   downloadsService,
 };
 
 function isValidModule(module: string): module is ValidModule {
   return VALID_CMS_MODULES.includes(module as ValidModule);
+}
+
+/**
+ * Reads all documents from a CMS collection using Firebase Admin SDK (server-side gRPC).
+ * This is significantly faster than the Web Client SDK in Node.js because Admin SDK
+ * uses native gRPC transport instead of WebChannel HTTP long-polling.
+ *
+ * Results are sorted in-memory after fetch to avoid composite index requirements.
+ */
+async function adminReadCollection(
+  collectionName: string,
+  config: { orderField: string; orderDir: 'asc' | 'desc'; statusField: string },
+  publishedOnly: boolean,
+  maxItems?: number
+): Promise<Record<string, unknown>[]> {
+  const adminDb = getAdminDb();
+  const snapshot = await adminDb.collection(collectionName).get();
+
+  let docs = snapshot.docs.map((docSnap) => ({
+    id: docSnap.id,
+    ...docSnap.data(),
+  }));
+
+  // Filter published items if requested
+  if (publishedOnly && config.statusField) {
+    docs = docs.filter((d) => {
+      const status = (d as any)[config.statusField];
+      // Include items without a status field (treated as published) or explicitly published
+      return status === 'published' || status === undefined;
+    });
+  }
+
+  // Sort in-memory using the configured field
+  docs.sort((a, b) => {
+    const aVal = (a as any)[config.orderField] ?? '';
+    const bVal = (b as any)[config.orderField] ?? '';
+    if (config.orderDir === 'asc') {
+      return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+    } else {
+      return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+    }
+  });
+
+  // Apply limit if specified
+  if (maxItems !== undefined) {
+    docs = docs.slice(0, maxItems);
+  }
+
+  return docs;
 }
 
 export async function GET(req: NextRequest, { params }: Context) {
@@ -82,45 +157,41 @@ export async function GET(req: NextRequest, { params }: Context) {
       );
     }
 
-    const service = moduleServices[module];
     const { searchParams } = new URL(req.url);
     const publishedOnly = searchParams.get('published') === 'true';
 
-    // Clamp limit to [1, 100] to prevent unbounded or zero-cost queries
+    // Clamp limit to [1, 100] to prevent unbounded or zero-result queries
     const rawLimit = searchParams.get('limit');
-    const limitCount: number | undefined = rawLimit !== null
-      ? Math.min(100, Math.max(1, parseInt(rawLimit, 10) || 1))
-      : undefined;
+    const limitCount: number | undefined =
+      rawLimit !== null
+        ? Math.min(100, Math.max(1, parseInt(rawLimit, 10) || 1))
+        : undefined;
 
-    // Helper to retrieve published-only records safely
-    const fetchPublishedOnly = async () => {
-      if (typeof service.getPublished === 'function') {
-        return await service.getPublished(limitCount);
-      }
-      if (typeof service.getUpcoming === 'function') {
-        return await service.getUpcoming();
-      }
-      const all = await service.getAll();
-      const published = all.filter(
-        (item: any) => item.status === 'published' || item.status === undefined
-      );
-      return limitCount ? published.slice(0, limitCount) : published;
-    };
+    const config = MODULE_READ_CONFIG[module];
 
     if (publishedOnly) {
-      const data = await fetchPublishedOnly();
+      // Public published-only request: no auth required, fetch published items only
+      const data = await adminReadCollection(module, config, true, limitCount);
       return NextResponse.json({ success: true, data });
     }
 
-    // Broad request without ?published=true: verify if caller is an administrator
-    const claims = await verifyFirebaseSessionCookie();
+    // Broad request without ?published=true: check if admin to decide all vs published.
+    // Fast local JWT verification (checkRevoked=false) is appropriate here because:
+    //   - This is a read-only operation — no mutation, no security-sensitive action.
+    //   - Even if a token were somehow revoked between requests, the worst outcome is
+    //     the admin temporarily sees draft items. The next mutation call uses requireAdmin()
+    //     which retains strict checkRevoked=true.
+    //   - checkRevoked=true adds an external HTTPS round-trip to Google on every read request,
+    //     which is the primary performance bottleneck for admin pages.
+    const claims = await verifyFirebaseSessionCookie(undefined, false);
     if (claims && claims.admin === true) {
-      const data = await service.getAll();
+      // Authenticated admin: return all documents regardless of status
+      const data = await adminReadCollection(module, config, false, limitCount);
       return NextResponse.json({ success: true, data });
     }
 
-    // Unauthenticated or non-admin requests receive only published items to prevent draft leakage
-    const data = await fetchPublishedOnly();
+    // Unauthenticated or non-admin: return only published items to prevent draft leakage
+    const data = await adminReadCollection(module, config, true, limitCount);
     return NextResponse.json({ success: true, data });
   } catch (error: unknown) {
     const authResponse = handleApiAuthError(error);
@@ -135,7 +206,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 
 export async function POST(req: NextRequest, { params }: Context) {
   try {
-    // 1. Enforce server-side administrator authorization first
+    // 1. Enforce server-side administrator authorization first (strict checkRevoked for mutations)
     await requireAdmin();
 
     const { module } = await params;
@@ -177,7 +248,7 @@ export async function POST(req: NextRequest, { params }: Context) {
 
 export async function DELETE(req: NextRequest, { params }: Context) {
   try {
-    // 1. Enforce server-side administrator authorization first
+    // 1. Enforce server-side administrator authorization first (strict checkRevoked for mutations)
     await requireAdmin();
 
     const { module } = await params;

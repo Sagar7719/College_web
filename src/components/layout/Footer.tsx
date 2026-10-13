@@ -31,10 +31,15 @@ const FALLBACK_COLUMNS = [
   },
 ];
 
-export const Footer: React.FC = () => {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+export interface FooterProps {
+  initialSettings?: SiteSettings | null;
+}
+
+export const Footer: React.FC<FooterProps> = ({ initialSettings }) => {
+  const [settings, setSettings] = useState<SiteSettings | null>(initialSettings ?? null);
 
   useEffect(() => {
+    if (initialSettings) return;
     let alive = true;
     siteSettingsService
       .getSettings()
@@ -45,7 +50,7 @@ export const Footer: React.FC = () => {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [initialSettings]);
 
   const collegeInfo = settings?.collegeInfo || defaultSettings.collegeInfo;
   const footerConfig = settings?.footerConfig || defaultSettings.footerConfig;

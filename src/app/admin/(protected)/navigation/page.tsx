@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { NavigationItem, Page } from '@/types';
-import { navigationService, buildNavigationTree } from '@/services/navigation.service';
+import { navigationService, buildNavigationTree, reorderTreeAndFlatten } from '@/services/navigation.service';
 import { pagesService } from '@/services/pages.service';
 import { selectablePagesService, SelectablePageOption } from '@/services/selectable-pages.service';
 import { siteSettingsService } from '@/services/site-settings.service';
@@ -123,19 +123,59 @@ export default function AdminNavigationManagerScreen() {
     return true;
   });
 
-  // Save full reordered navigation items back to Firestore
+  // Snapshot ref for rollback on error
+  const previousTreeRef = useRef<NavigationItem[]>([]);
+  // Mutex / save queue refs
+  const isSavingRef = useRef(false);
+  const pendingItemsQueueRef = useRef<NavigationItem[] | null>(null);
+
+  // Save authoritative tree navigation state back to Firestore
   const persistNavigationState = async (updatedItems: NavigationItem[]) => {
+    // If a write is currently in progress, store latest state in pending queue
+    if (isSavingRef.current) {
+      pendingItemsQueueRef.current = updatedItems;
+      return;
+    }
+
+    isSavingRef.current = true;
     setIsSaving(true);
     setSaveStatus('Saving reorder to live database...');
+
     try {
       await navigationService.saveNavigationItems(updatedItems);
       setSaveStatus('✓ Live Website Header Updated Successfully!');
-      setTimeout(() => setSaveStatus(''), 3000);
+      setTimeout(() => setSaveStatus(''), 2500);
+
+      // Check if newer state arrived while saving
+      if (pendingItemsQueueRef.current) {
+        const nextItems = pendingItemsQueueRef.current;
+        pendingItemsQueueRef.current = null;
+        isSavingRef.current = false;
+        await persistNavigationState(nextItems);
+        return;
+      }
     } catch (err) {
-      setSaveStatus('✕ Failed to save reorder. Please try again.');
+      console.error('Failed to save navigation reorder:', err);
+      setSaveStatus('✕ Failed to save navigation order. Your changes were reverted.');
+      setTimeout(() => setSaveStatus(''), 4000);
+      // Rollback: Reload authoritative Firestore state
+      await loadData();
     } finally {
+      isSavingRef.current = false;
       setIsSaving(false);
     }
+  };
+
+  /**
+   * Applies an in-memory tree modification, flattens deterministically,
+   * updates UI state immediately, and triggers sequential persistence.
+   */
+  const applyTreeUpdate = async (newTree: NavigationItem[]) => {
+    previousTreeRef.current = treeItems;
+    const flattened = reorderTreeAndFlatten(newTree);
+    setTreeItems(newTree);
+    setNavItems(flattened);
+    await persistNavigationState(flattened);
   };
 
   /* ------------------------------------------------------------------ */
@@ -196,7 +236,7 @@ export default function AdminNavigationManagerScreen() {
   };
 
   /* ------------------------------------------------------------------ */
-  /*  100% ROBUST HTML5 DRAG AND DROP HANDLERS WITH STATE FALLBACKS      */
+  /*  TREE-AWARE HTML5 DRAG AND DROP HANDLERS                          */
   /* ------------------------------------------------------------------ */
 
   // Drag Start for Top-Level Navbar Tab (Suppresses Hover Boxes while Dragging)
@@ -250,7 +290,15 @@ export default function AdminNavigationManagerScreen() {
     setHoveredItemId(null);
   };
 
-  // Drop Handler on Top-Level Header Tab
+  // Deep clone tree helper to avoid mutating React state in place
+  const cloneTree = (tree: NavigationItem[]): NavigationItem[] => {
+    return tree.map((parent) => ({
+      ...parent,
+      children: parent.children ? parent.children.map((c) => ({ ...c })) : [],
+    }));
+  };
+
+  // Drop Handler on Top-Level Category Card / Tab
   const handleDropOnParentTab = async (e: React.DragEvent, targetParentId: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -271,50 +319,58 @@ export default function AdminNavigationManagerScreen() {
 
     // Scenario 1: Reordering Top-Level Tabs (Left to Right)
     if (type === 'top' && sourceId !== targetParentId) {
-      const topLevelOnly = navItems.filter((i) => !i.parentId);
-      const sourceIdx = topLevelOnly.findIndex((i) => i.id === sourceId);
-      const targetIdx = topLevelOnly.findIndex((i) => i.id === targetParentId);
+      const newTree = cloneTree(treeItems);
+      const sourceIdx = newTree.findIndex((i) => i.id === sourceId);
+      const targetIdx = newTree.findIndex((i) => i.id === targetParentId);
       if (sourceIdx === -1 || targetIdx === -1) return;
 
-      const reorderedTop = [...topLevelOnly];
-      const [moved] = reorderedTop.splice(sourceIdx, 1);
-      reorderedTop.splice(targetIdx, 0, moved);
+      const [moved] = newTree.splice(sourceIdx, 1);
+      newTree.splice(targetIdx, 0, moved);
 
-      // Re-index order for all items
-      let currentOrder = 0;
-      const updatedNavItems: NavigationItem[] = [];
-
-      reorderedTop.forEach((topItem) => {
-        updatedNavItems.push({ ...topItem, order: currentOrder++ });
-        const children = navItems.filter((c) => c.parentId === topItem.id);
-        children.forEach((child) => {
-          updatedNavItems.push({ ...child, order: currentOrder++ });
-        });
-      });
-
-      setNavItems(updatedNavItems);
-      await persistNavigationState(updatedNavItems);
+      await applyTreeUpdate(newTree);
       return;
     }
 
-    // Scenario 2: Move Child Sub-Page into another Parent Tab Category
-    if (type === 'child' && sourceId && sourceId !== targetParentId) {
-      const updatedNavItems = navItems.map((item) => {
-        if (item.id === sourceId) {
-          return { ...item, parentId: targetParentId };
+    // Scenario 2: Move Child Sub-Page into another Category Card (Appended to bottom of category)
+    if (type === 'child') {
+      const newTree = cloneTree(treeItems);
+      let movedChild: NavigationItem | null = null;
+
+      // Find and remove child from its previous parent
+      for (const parent of newTree) {
+        if (parent.children) {
+          const cIdx = parent.children.findIndex((c) => c.id === sourceId);
+          if (cIdx !== -1) {
+            const [extracted] = parent.children.splice(cIdx, 1);
+            movedChild = extracted;
+            break;
+          }
         }
-        return item;
-      });
+      }
 
-      setNavItems(updatedNavItems);
-      await persistNavigationState(updatedNavItems);
+      if (!movedChild) return;
+
+      // Find target parent and append child
+      const targetParent = newTree.find((p) => p.id === targetParentId);
+      if (!targetParent) return;
+
+      targetParent.children = targetParent.children || [];
+      movedChild.parentId = targetParentId;
+      delete movedChild.children;
+      targetParent.children.push(movedChild);
+
+      await applyTreeUpdate(newTree);
       return;
     }
 
-    // Scenario 3: Insert Unlinked Page Chip directly into a Parent Tab
+    // Scenario 3: Insert Unlinked Page Chip directly into a Category Tab
     if (type === 'page' && sourceId) {
       const matchedPageOpt = selectablePages.find((p) => p.id === sourceId);
       if (!matchedPageOpt) return;
+
+      const newTree = cloneTree(treeItems);
+      const targetParent = newTree.find((p) => p.id === targetParentId);
+      if (!targetParent) return;
 
       const newNavItem: NavigationItem = {
         id: `nav_cms_${matchedPageOpt.pageId || Date.now()}`,
@@ -325,17 +381,21 @@ export default function AdminNavigationManagerScreen() {
         cmsPageId: matchedPageOpt.pageId,
         isSystemPage: matchedPageOpt.isSystemPage,
         systemKey: matchedPageOpt.systemKey as any,
-        order: navItems.length,
+        order: 999,
         visible: true,
       };
 
-      const updatedNavItems = [...navItems, newNavItem];
-      setNavItems(updatedNavItems);
-      await persistNavigationState(updatedNavItems);
+      targetParent.children = targetParent.children || [];
+      // Prevent duplicate insertion
+      if (!targetParent.children.some((c) => c.cmsPageId === newNavItem.cmsPageId || c.id === newNavItem.id)) {
+        targetParent.children.push(newNavItem);
+      }
+
+      await applyTreeUpdate(newTree);
     }
   };
 
-  // Drop Handler directly onto a Sub-Item slot (Reordering within or across dropdowns)
+  // Drop Handler directly onto a Sub-Item row (Precise Sibling Index Drop)
   const handleDropOnChildItem = async (e: React.DragEvent, targetChildId: string, targetParentId: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -354,42 +414,54 @@ export default function AdminNavigationManagerScreen() {
 
     if (!type || !sourceId || sourceId === targetChildId) return;
 
-    // Scenario 4: Reordering Sub-Pages within a Dropdown Menu
+    const newTree = cloneTree(treeItems);
+    const targetParent = newTree.find((p) => p.id === targetParentId);
+    if (!targetParent) return;
+
+    targetParent.children = targetParent.children || [];
+
+    // Scenario 4: Reordering Sub-Page onto a specific target sibling position
     if (type === 'child') {
-      const parentChildren = navItems.filter((i) => i.parentId === targetParentId);
-      const sourceIdx = parentChildren.findIndex((i) => i.id === sourceId);
-      const targetIdx = parentChildren.findIndex((i) => i.id === targetChildId);
+      let movedChild: NavigationItem | null = null;
 
-      if (sourceIdx !== -1 && targetIdx !== -1) {
-        const reorderedChildren = [...parentChildren];
-        const [moved] = reorderedChildren.splice(sourceIdx, 1);
-        reorderedChildren.splice(targetIdx, 0, moved);
-
-        const otherNavItems = navItems.filter((i) => i.parentId !== targetParentId && i.id !== sourceId);
-        const updatedNavItems = [...otherNavItems, ...reorderedChildren];
-
-        setNavItems(updatedNavItems);
-        await persistNavigationState(updatedNavItems);
-        return;
-      } else {
-        // Source came from a different dropdown category
-        const updatedNavItems = navItems.map((item) => {
-          if (item.id === sourceId) {
-            return { ...item, parentId: targetParentId };
+      // 1. Remove from source parent
+      for (const parent of newTree) {
+        if (parent.children) {
+          const cIdx = parent.children.findIndex((c) => c.id === sourceId);
+          if (cIdx !== -1) {
+            const [extracted] = parent.children.splice(cIdx, 1);
+            movedChild = extracted;
+            break;
           }
-          return item;
-        });
-
-        setNavItems(updatedNavItems);
-        await persistNavigationState(updatedNavItems);
-        return;
+        }
       }
+
+      if (!movedChild) return;
+
+      // 2. Locate target index in target parent
+      let targetIdx = targetParent.children.findIndex((c) => c.id === targetChildId);
+      if (targetIdx === -1) {
+        targetIdx = targetParent.children.length;
+      }
+
+      // 3. Insert at target position with updated parentId
+      movedChild.parentId = targetParentId;
+      delete movedChild.children;
+      targetParent.children.splice(targetIdx, 0, movedChild);
+
+      await applyTreeUpdate(newTree);
+      return;
     }
 
-    // Drop Unlinked Page Chip directly on a specific Sub-Page slot
+    // Scenario 5: Drop Unlinked Page Chip directly onto a specific Sub-Page slot
     if (type === 'page' && sourceId) {
       const matchedPageOpt = selectablePages.find((p) => p.id === sourceId);
       if (!matchedPageOpt) return;
+
+      let targetIdx = targetParent.children.findIndex((c) => c.id === targetChildId);
+      if (targetIdx === -1) {
+        targetIdx = targetParent.children.length;
+      }
 
       const newNavItem: NavigationItem = {
         id: `nav_cms_${matchedPageOpt.pageId || Date.now()}`,
@@ -400,13 +472,19 @@ export default function AdminNavigationManagerScreen() {
         cmsPageId: matchedPageOpt.pageId,
         isSystemPage: matchedPageOpt.isSystemPage,
         systemKey: matchedPageOpt.systemKey as any,
-        order: navItems.length,
+        order: 999,
         visible: true,
       };
 
-      const updatedNavItems = [...navItems, newNavItem];
-      setNavItems(updatedNavItems);
-      await persistNavigationState(updatedNavItems);
+      // Remove from any other location first if already present
+      for (const parent of newTree) {
+        if (parent.children) {
+          parent.children = parent.children.filter((c) => c.cmsPageId !== newNavItem.cmsPageId && c.id !== newNavItem.id);
+        }
+      }
+
+      targetParent.children.splice(targetIdx, 0, newNavItem);
+      await applyTreeUpdate(newTree);
     }
   };
 

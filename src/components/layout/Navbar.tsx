@@ -23,12 +23,16 @@ export interface NavbarProps {
 }
 
 function getItemPath(item: NavigationItem): string {
-  if (item.path && item.path !== '#' && item.path.trim() !== '') {
-    return item.path;
-  }
   const labelLower = (item.label || '').toLowerCase();
   const keyLower = (item.systemKey || '').toLowerCase();
   const idLower = (item.id || '').toLowerCase();
+
+  if (keyLower === 'more' || idLower.includes('more') || labelLower === 'more') {
+    return '#';
+  }
+  if (item.path && item.path !== '#' && item.path.trim() !== '' && item.path !== '/more') {
+    return item.path;
+  }
 
   if (keyLower === 'about' || idLower.includes('about') || labelLower.includes('about')) {
     return '/about';
@@ -46,6 +50,17 @@ function getItemPath(item: NavigationItem): string {
     return '/contact';
   }
   return '/';
+}
+
+function hasValidPath(item: NavigationItem): boolean {
+  const p = (item.path || '').trim().toLowerCase();
+  const key = (item.systemKey || '').trim().toLowerCase();
+  const label = (item.label || '').trim().toLowerCase();
+
+  if (p === '' || p === '#' || p === '/more' || p === 'more' || key === 'more' || label === 'more') {
+    return false;
+  }
+  return true;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
@@ -96,7 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
     setOpenDropdownId(null);
   }, [pathname]);
 
-  const handleDropdownKeyDown = (e: React.KeyboardEvent, itemId: string) => {
+  const handleChevronKeyDown = (e: React.KeyboardEvent, itemId: string) => {
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
       e.preventDefault();
       setOpenDropdownId(openDropdownId === itemId ? null : itemId);
@@ -116,11 +131,12 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
                 const targetPath = getItemPath(item);
                 const hasChildren = Boolean(item.children && item.children.length > 0);
                 const isChildActive = Boolean(hasChildren && item.children?.some((child) => pathname === child.path));
-                const isSelfActive = pathname === targetPath;
+                const isSelfActive = targetPath !== '#' && targetPath !== '' && pathname === targetPath;
                 const isActive = isSelfActive || isChildActive;
                 const isDropdownOpen = openDropdownId === item.id;
 
                 if (hasChildren) {
+                  const parentHasValidPath = hasValidPath(item);
                   return (
                     <li
                       key={item.id}
@@ -128,36 +144,54 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
                       onMouseEnter={() => setOpenDropdownId(item.id)}
                       onMouseLeave={() => setOpenDropdownId(null)}
                     >
-                      <Link
-                        href={targetPath}
-                        className={`${styles.navItemLink} ${styles.navItemWithDropdown} ${isActive ? styles.navItemActive : ''}`}
-                        onClick={() => setOpenDropdownId(null)}
-                      >
-                        <span>{item.label}</span>
-                        <span
-                          className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.dropdownArrowOpen : ''}`}
+                      {/* Parent row: Link (navigate) or Button (toggle) + chevron Button (toggle) */}
+                      <div className={`${styles.navParentRow} ${isActive ? styles.navItemActive : ''}`}>
+                        {parentHasValidPath ? (
+                          <Link
+                            href={targetPath}
+                            className={`${styles.navItemLink} ${styles.navParentLink} ${isActive ? styles.navItemActive : ''}`}
+                            onClick={() => setOpenDropdownId(null)}
+                          >
+                            {item.label}
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            className={`${styles.navItemLink} ${styles.navParentLabel} ${isActive ? styles.navItemActive : ''}`}
+                            aria-expanded={isDropdownOpen}
+                            aria-haspopup="menu"
+                            aria-label={`${isDropdownOpen ? 'Close' : 'Open'} ${item.label} submenu`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenDropdownId(isDropdownOpen ? null : item.id);
+                            }}
+                            onKeyDown={(e) => handleChevronKeyDown(e, item.id)}
+                          >
+                            {item.label}
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className={`${styles.dropdownToggleBtn} ${isDropdownOpen ? styles.dropdownToggleBtnOpen : ''}`}
+                          aria-expanded={isDropdownOpen}
+                          aria-haspopup="menu"
+                          aria-label={`${isDropdownOpen ? 'Close' : 'Open'} ${item.label} submenu`}
                           onClick={(e) => {
-                            e.preventDefault();
                             e.stopPropagation();
                             setOpenDropdownId(isDropdownOpen ? null : item.id);
                           }}
+                          onKeyDown={(e) => handleChevronKeyDown(e, item.id)}
                         >
-                          ▼
-                        </span>
-                      </Link>
+                          <span
+                            className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.dropdownArrowOpen : ''}`}
+                            aria-hidden="true"
+                          >
+                            ▼
+                          </span>
+                        </button>
+                      </div>
                       {isDropdownOpen && (
                         <ul className={styles.dropdownMenu} role="menu">
-                          {targetPath && targetPath !== '#' && !item.children?.some((c) => c.path === targetPath) && (
-                            <li role="menuitem">
-                              <Link
-                                href={targetPath}
-                                className={`${styles.dropdownItemLink} ${pathname === targetPath ? styles.dropdownItemActive : ''}`}
-                                onClick={() => setOpenDropdownId(null)}
-                              >
-                                Overview ({item.label})
-                              </Link>
-                            </li>
-                          )}
                           {item.children?.map((child) => {
                             const isChildItemActive = pathname === child.path;
                             const isExt =
@@ -185,6 +219,7 @@ export const Navbar: React.FC<NavbarProps> = ({ initialNavItems }) => {
                                 <Link
                                   href={child.path}
                                   className={`${styles.dropdownItemLink} ${isChildItemActive ? styles.dropdownItemActive : ''}`}
+                                  onClick={() => setOpenDropdownId(null)}
                                 >
                                   {child.label}
                                 </Link>

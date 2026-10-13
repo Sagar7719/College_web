@@ -2,7 +2,6 @@ import {
   collection,
   doc,
   getDocs,
-  getDoc,
   setDoc,
   updateDoc,
   deleteDoc,
@@ -10,6 +9,7 @@ import {
   where,
   orderBy,
   writeBatch,
+  getDoc,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Page, PageStatus } from '@/types';
@@ -28,15 +28,21 @@ const COLLECTION_NAME = 'pages';
  * - Creates only missing system page documents (using sys_page_<key> ID).
  * - Never overwrites existing page content if doc already exists.
  * - Never duplicates records.
+ *
+ * Performance note: Uses a single getDocs() collection scan to serve both
+ * purposes (system page lookup and duplicate Home detection), eliminating
+ * the 6 redundant individual getDoc() calls that were made previously.
  */
 async function ensureSystemPages(): Promise<void> {
   try {
-    const snapshots = await Promise.all(
-      SYSTEM_PAGES_CONFIG.map((p) => getDoc(doc(db, COLLECTION_NAME, p.id)))
+    // Single collection scan serves both system-page lookup and duplicate detection.
+    // Previously this was 6 individual getDoc() calls + 1 getDocs() = 7 round-trips.
+    // Now it is 1 getDocs() round-trip total.
+    const allPagesSnap = await getDocs(collection(db, COLLECTION_NAME));
+    const allDocsById = new Map(
+      allPagesSnap.docs.map((d) => [d.id, d])
     );
 
-    // Query all pages to inspect and remove legacy/duplicate Home documents safely
-    const allPagesSnap = await getDocs(collection(db, COLLECTION_NAME));
     const duplicateHomeDocs = allPagesSnap.docs.filter((d) => {
       if (d.id === 'sys_page_home') return false;
       const data = d.data();
@@ -54,9 +60,9 @@ async function ensureSystemPages(): Promise<void> {
     let hasChanges = false;
     const now = new Date().toISOString();
 
-    // Check if canonical Home doc sys_page_home exists
-    const canonicalHomeSnap = snapshots[0];
-    let canonicalHomeData = canonicalHomeSnap.exists() ? canonicalHomeSnap.data() as Page : null;
+    // Determine preserved sections for canonical Home page
+    const canonicalHomeDoc = allDocsById.get('sys_page_home');
+    const canonicalHomeData = canonicalHomeDoc?.exists() ? canonicalHomeDoc.data() as Page : null;
     let preservedSections = canonicalHomeData?.sections || [];
 
     // If canonical home has empty sections, preserve sections from duplicate home docs if present
@@ -76,10 +82,10 @@ async function ensureSystemPages(): Promise<void> {
       hasChanges = true;
     });
 
-    // Ensure all 6 system pages exist with canonical identity
-    snapshots.forEach((snap, idx) => {
-      const sysDef = SYSTEM_PAGES_CONFIG[idx];
-      if (!snap.exists()) {
+    // Ensure all 6 system pages exist with canonical identity (using snapshot data)
+    SYSTEM_PAGES_CONFIG.forEach((sysDef) => {
+      const existingDoc = allDocsById.get(sysDef.id);
+      if (!existingDoc || !existingDoc.exists()) {
         const payload: Page = {
           id: sysDef.id,
           title: sysDef.title,
@@ -102,7 +108,7 @@ async function ensureSystemPages(): Promise<void> {
         batch.set(doc(db, COLLECTION_NAME, sysDef.id), sanitizeForFirestore(payload));
         hasChanges = true;
       } else {
-        const data = snap.data();
+        const data = existingDoc.data();
         const updates: Record<string, unknown> = {};
 
         if (!data?.isSystemPage) updates.isSystemPage = true;

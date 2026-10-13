@@ -14,13 +14,16 @@ export interface MobileDrawerProps {
 }
 
 function getItemPath(item: NavigationItem): string {
-  if (item.path && item.path !== '#' && item.path.trim() !== '') {
-    return item.path;
-  }
   const labelLower = (item.label || '').toLowerCase();
   const keyLower = (item.systemKey || '').toLowerCase();
   const idLower = (item.id || '').toLowerCase();
 
+  if (keyLower === 'more' || idLower.includes('more') || labelLower === 'more') {
+    return '#';
+  }
+  if (item.path && item.path !== '#' && item.path.trim() !== '' && item.path !== '/more') {
+    return item.path;
+  }
   if (keyLower === 'about' || idLower.includes('about') || labelLower.includes('about')) {
     return '/about';
   }
@@ -37,6 +40,17 @@ function getItemPath(item: NavigationItem): string {
     return '/contact';
   }
   return '/';
+}
+
+function hasValidPath(item: NavigationItem): boolean {
+  const p = (item.path || '').trim().toLowerCase();
+  const key = (item.systemKey || '').trim().toLowerCase();
+  const label = (item.label || '').trim().toLowerCase();
+
+  if (p === '' || p === '#' || p === '/more' || p === 'more' || key === 'more' || label === 'more') {
+    return false;
+  }
+  return true;
 }
 
 export const MobileDrawer: React.FC<MobileDrawerProps> = ({
@@ -145,37 +159,55 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               const hasChildren = Boolean(item.children && item.children.length > 0);
               const isExpanded = Boolean(expandedItems[item.id]);
               const isChildActive = Boolean(hasChildren && item.children?.some((child) => pathname === child.path));
-              const isSelfActive = pathname === targetPath;
+              const isSelfActive = targetPath !== '#' && targetPath !== '' && pathname === targetPath;
               const isActive = isSelfActive || isChildActive;
 
               if (hasChildren) {
+                const parentHasValidPath = hasValidPath(item);
+
                 return (
                   <li key={item.id}>
-                    <button
-                      type="button"
-                      onClick={(e) => toggleAccordion(item.id, e)}
-                      className={`${styles.drawerAccordionToggle} ${isActive ? styles.drawerNavLinkActive : ''}`}
-                      aria-expanded={isExpanded}
-                    >
-                      <span>{item.label}</span>
-                      <span className={`${styles.dropdownArrow} ${isExpanded ? styles.dropdownArrowOpen : ''}`}>
-                        ▼
-                      </span>
-                    </button>
+                    {/* Mobile parent row: Link (navigate) or Button (expand) + chevron button (expand) */}
+                    <div className={`${styles.drawerAccordionRow} ${isActive ? styles.drawerNavLinkActive : ''}`}>
+                      {parentHasValidPath ? (
+                        <Link
+                          href={targetPath}
+                          className={`${styles.drawerAccordionParentLink} ${isActive ? styles.drawerNavLinkActive : ''}`}
+                          onClick={onClose}
+                        >
+                          {item.label}
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          className={`${styles.drawerAccordionParentLabel} ${isActive ? styles.drawerNavLinkActive : ''}`}
+                          onClick={(e) => toggleAccordion(item.id, e)}
+                          aria-expanded={isExpanded}
+                          aria-haspopup="menu"
+                          aria-label={`${isExpanded ? 'Collapse' : 'Expand'} ${item.label} menu`}
+                        >
+                          {item.label}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className={styles.drawerAccordionChevronBtn}
+                        onClick={(e) => toggleAccordion(item.id, e)}
+                        aria-expanded={isExpanded}
+                        aria-haspopup="menu"
+                        aria-label={`${isExpanded ? 'Collapse' : 'Expand'} ${item.label} menu`}
+                      >
+                        <span
+                          className={`${styles.dropdownArrow} ${isExpanded ? styles.dropdownArrowOpen : ''}`}
+                          aria-hidden="true"
+                        >
+                          ▼
+                        </span>
+                      </button>
+                    </div>
 
                     {isExpanded && (
                       <ul className={styles.drawerSubNavList}>
-                        {targetPath && targetPath !== '#' && (
-                          <li>
-                            <Link
-                              href={targetPath}
-                              className={`${styles.drawerSubNavLink} ${isSelfActive ? styles.drawerSubNavLinkActive : ''}`}
-                              onClick={onClose}
-                            >
-                              Overview ({item.label})
-                            </Link>
-                          </li>
-                        )}
                         {item.children?.map((child) => {
                           const isSubActive = pathname === child.path;
                           return (

@@ -74,7 +74,7 @@ export default async function PublicLayout({
       <main style={{ flex: 1 }}>
         {children}
       </main>
-      <Footer />
+      <Footer initialSettings={settings} />
       <WebsitePopupModal notice={popupNotice} />
     </div>
   );

@@ -19,6 +19,47 @@ const defaultFallbackNav: NavigationItem[] = [
   { id: 'nav_sys_about', label: 'About Us', path: '/about', isCMSPage: true, isSystemPage: true, systemKey: 'about', order: 5, visible: true },
 ];
 
+function getItemPath(item: NavigationItem): string {
+  const labelLower = (item.label || '').toLowerCase();
+  const keyLower = (item.systemKey || '').toLowerCase();
+  const idLower = (item.id || '').toLowerCase();
+
+  if (keyLower === 'more' || idLower.includes('more') || labelLower === 'more') {
+    return '#';
+  }
+  if (item.path && item.path !== '#' && item.path.trim() !== '' && item.path !== '/more') {
+    return item.path;
+  }
+
+  if (keyLower === 'about' || idLower.includes('about') || labelLower.includes('about')) {
+    return '/about';
+  }
+  if (keyLower === 'academics' || idLower.includes('academics') || labelLower.includes('course') || labelLower.includes('department')) {
+    return '/departments';
+  }
+  if (keyLower === 'admissions' || idLower.includes('admissions') || labelLower.includes('admission')) {
+    return '/admissions';
+  }
+  if (keyLower === 'notices' || idLower.includes('notices') || labelLower.includes('notice') || labelLower.includes('circular')) {
+    return '/notices';
+  }
+  if (keyLower === 'contact' || idLower.includes('contact') || labelLower.includes('contact')) {
+    return '/contact';
+  }
+  return '/';
+}
+
+function hasValidPath(item: NavigationItem): boolean {
+  const p = (item.path || '').trim().toLowerCase();
+  const key = (item.systemKey || '').trim().toLowerCase();
+  const label = (item.label || '').trim().toLowerCase();
+
+  if (p === '' || p === '#' || p === '/more' || p === 'more' || key === 'more' || label === 'more') {
+    return false;
+  }
+  return true;
+}
+
 export interface HeaderProps {
   initialSettings?: SiteSettings | null;
   initialNavItems?: NavigationItem[];
@@ -98,7 +139,7 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
   const tagline = collegeInfo.tagline || 'Empowering Education & Innovation';
   const logoSrc = collegeInfo.logoUrl || '/images/college_emblem.png';
 
-  const handleDropdownKeyDown = (e: React.KeyboardEvent, itemId: string) => {
+  const handleChevronKeyDown = (e: React.KeyboardEvent, itemId: string) => {
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
       e.preventDefault();
       setOpenDropdownId(openDropdownId === itemId ? null : itemId);
@@ -133,13 +174,15 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
             <div className={styles.navAndCtaGroup}>
               <ul className={styles.navList}>
                 {navItems.map((item) => {
+                  const targetPath = getItemPath(item);
                   const hasChildren = Boolean(item.children && item.children.length > 0);
                   const isChildActive = Boolean(hasChildren && item.children?.some((child) => pathname === child.path));
-                  const isSelfActive = pathname === item.path;
+                  const isSelfActive = targetPath !== '#' && targetPath !== '' && pathname === targetPath;
                   const isActive = isSelfActive || isChildActive;
                   const isDropdownOpen = openDropdownId === item.id;
 
                   if (hasChildren) {
+                    const parentHasValidPath = hasValidPath(item);
                     return (
                       <li
                         key={item.id}
@@ -147,17 +190,52 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
                         onMouseEnter={() => setOpenDropdownId(item.id)}
                         onMouseLeave={() => setOpenDropdownId(null)}
                       >
-                        <button
-                          type="button"
-                          className={`${styles.navItemLink} ${styles.navItemWithDropdown} ${isActive ? styles.navItemActive : ''}`}
-                          aria-expanded={isDropdownOpen}
-                          aria-haspopup="true"
-                          onClick={() => setOpenDropdownId(isDropdownOpen ? null : item.id)}
-                          onKeyDown={(e) => handleDropdownKeyDown(e, item.id)}
-                        >
-                          <span>{item.label}</span>
-                          <span className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.dropdownArrowOpen : ''}`}>▼</span>
-                        </button>
+                        {/* Parent row: Link (navigate) or Button (toggle) + chevron Button (toggle) */}
+                        <div className={`${styles.navParentRow} ${isActive ? styles.navItemActive : ''}`}>
+                          {parentHasValidPath ? (
+                            <Link
+                              href={targetPath}
+                              className={`${styles.navItemLink} ${styles.navParentLink} ${isActive ? styles.navItemActive : ''}`}
+                              onClick={() => setOpenDropdownId(null)}
+                            >
+                              {item.label}
+                            </Link>
+                          ) : (
+                            <button
+                              type="button"
+                              className={`${styles.navItemLink} ${styles.navParentLabel} ${isActive ? styles.navItemActive : ''}`}
+                              aria-expanded={isDropdownOpen}
+                              aria-haspopup="menu"
+                              aria-label={`${isDropdownOpen ? 'Close' : 'Open'} ${item.label} submenu`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenDropdownId(isDropdownOpen ? null : item.id);
+                              }}
+                              onKeyDown={(e) => handleChevronKeyDown(e, item.id)}
+                            >
+                              {item.label}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            className={`${styles.dropdownToggleBtn} ${isDropdownOpen ? styles.dropdownToggleBtnOpen : ''}`}
+                            aria-expanded={isDropdownOpen}
+                            aria-haspopup="menu"
+                            aria-label={`${isDropdownOpen ? 'Close' : 'Open'} ${item.label} submenu`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenDropdownId(isDropdownOpen ? null : item.id);
+                            }}
+                            onKeyDown={(e) => handleChevronKeyDown(e, item.id)}
+                          >
+                            <span
+                              className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.dropdownArrowOpen : ''}`}
+                              aria-hidden="true"
+                            >
+                              ▼
+                            </span>
+                          </button>
+                        </div>
                         {isDropdownOpen && (
                           <ul className={styles.dropdownMenu} role="menu">
                             {item.children?.map((child) => {
@@ -187,6 +265,7 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
                                   <Link
                                     href={child.path}
                                     className={`${styles.dropdownItemLink} ${isChildItemActive ? styles.dropdownItemActive : ''}`}
+                                    onClick={() => setOpenDropdownId(null)}
                                   >
                                     {child.label}
                                   </Link>
@@ -222,7 +301,7 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
                   return (
                     <li key={item.id}>
                       <Link
-                        href={item.path}
+                        href={targetPath}
                         className={`${styles.navItemLink} ${isActive ? styles.navItemActive : ''}`}
                       >
                         {item.label}

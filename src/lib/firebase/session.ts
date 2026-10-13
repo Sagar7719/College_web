@@ -31,10 +31,17 @@ export async function createFirebaseSessionCookie(idToken: string): Promise<void
 
 /**
  * Verifies the HttpOnly session cookie using Firebase Admin SDK.
- * Returns decoded token claims if valid and unrevoked; null otherwise.
+ * Returns decoded token claims if valid; null otherwise.
+ *
+ * @param sessionCookie - Optional raw cookie value. If omitted, reads from request cookies.
+ * @param checkRevoked - When true (default), performs a live revocation check via Google's
+ *   identity servers. When false, performs fast local cryptographic JWT verification only
+ *   (no network round-trip). Use false only for read-only operations where the security
+ *   trade-off is acceptable (see requireAdmin for mutation/sensitive operations).
  */
 export async function verifyFirebaseSessionCookie(
-  sessionCookie?: string
+  sessionCookie?: string,
+  checkRevoked = true
 ): Promise<DecodedIdToken | null> {
   try {
     let token = sessionCookie;
@@ -48,8 +55,8 @@ export async function verifyFirebaseSessionCookie(
     }
 
     const adminAuth = getAdminAuth();
-    // Verify session cookie and check if revoked (checkRevoked = true)
-    const decodedClaims = await adminAuth.verifySessionCookie(token, true);
+    // Verify session cookie; checkRevoked controls whether we hit Google's servers
+    const decodedClaims = await adminAuth.verifySessionCookie(token, checkRevoked);
     return decodedClaims;
   } catch {
     return null;
@@ -99,14 +106,18 @@ export class AdminRequiredError extends Error {
 }
 
 /**
- * Server-only authorization helper.
- * Verifies the HttpOnly session cookie via Firebase Admin SDK and strictly validates custom claim `admin === true`.
+ * Server-only authorization helper for mutations and sensitive operations.
+ * Verifies the HttpOnly session cookie via Firebase Admin SDK with strict revocation
+ * checking (checkRevoked=true) to ensure tokens cannot be reused after logout.
  * Returns decoded session claims if authorized.
  * Throws `AuthenticationRequiredError` (401) if unauthenticated/invalid session.
  * Throws `AdminRequiredError` (403) if authenticated user lacks admin claim.
  */
 export async function requireAdmin(sessionCookie?: string): Promise<DecodedIdToken> {
-  const claims = await verifyFirebaseSessionCookie(sessionCookie);
+  // Always use checkRevoked=true for requireAdmin — this guards all mutations and
+  // security-sensitive operations. The performance cost (~300-500ms external round-trip)
+  // is acceptable and necessary to ensure revoked sessions cannot perform writes.
+  const claims = await verifyFirebaseSessionCookie(sessionCookie, true);
 
   if (!claims) {
     throw new AuthenticationRequiredError();
@@ -139,4 +150,3 @@ export function handleApiAuthError(error: unknown): NextResponse | null {
   }
   return null;
 }
-

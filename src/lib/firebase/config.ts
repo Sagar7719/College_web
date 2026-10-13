@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
+import { initializeAuth, browserLocalPersistence, getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -12,22 +12,23 @@ const firebaseConfig = {
 };
 
 const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const auth: Auth = getAuth(app);
-const db: Firestore = getFirestore(app);
 
+// Explicitly initialize Auth with browserLocalPersistence (localStorage) on the client
+// to prevent IndexedDBLocalPersistence lifecycle closing errors ("Database is closing/hidden")
+// when switching tabs or navigating pages.
+let auth: Auth;
 if (typeof window !== 'undefined') {
-  window.addEventListener('unhandledrejection', (event) => {
-    const reason = event.reason;
-    const msg = reason?.message || String(reason || '');
-    if (
-      msg.includes('Database is closing') ||
-      msg.includes('Database is hidden') ||
-      msg.includes('IndexedDB') ||
-      msg.includes('client is offline')
-    ) {
-      event.preventDefault();
-    }
-  });
+  try {
+    auth = initializeAuth(app, {
+      persistence: browserLocalPersistence,
+    });
+  } catch {
+    auth = getAuth(app);
+  }
+} else {
+  auth = getAuth(app);
 }
+
+const db: Firestore = getFirestore(app);
 
 export { app, auth, db };

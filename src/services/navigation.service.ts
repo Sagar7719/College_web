@@ -36,15 +36,20 @@ const CANONICAL_SYSTEM_NAV_ITEMS: NavigationItem[] = SYSTEM_PAGES_CONFIG.map((p)
 /**
  * Ensures the 6 required institutional system navigation items exist in Firestore.
  * Idempotent: Only creates missing documents and cleans up legacy duplicate nav keys.
+ *
+ * Performance note: Uses a single getDocs() collection scan for all lookups,
+ * eliminating the 6 individual getDoc() calls for system items + 6 for legacy IDs
+ * that were made previously (13+ round-trips reduced to 1).
  */
 async function ensureSystemNavigationItems(): Promise<void> {
   try {
-    const snapshots = await Promise.all(
-      CANONICAL_SYSTEM_NAV_ITEMS.map((item) => getDoc(doc(db, COLLECTION_NAME, item.id)))
+    // Single collection scan serves all purposes:
+    // system item lookup, duplicate detection, and legacy ID cleanup.
+    const allNavSnap = await getDocs(collection(db, COLLECTION_NAME));
+    const allDocsById = new Map(
+      allNavSnap.docs.map((d) => [d.id, d])
     );
 
-    // Query all nav items to find duplicate/legacy Home nav entries
-    const allNavSnap = await getDocs(collection(db, COLLECTION_NAME));
     const duplicateHomeNavDocs = allNavSnap.docs.filter((d) => {
       if (d.id === 'nav_sys_home') return false;
       const data = d.data();
@@ -65,13 +70,29 @@ async function ensureSystemNavigationItems(): Promise<void> {
       hasChanges = true;
     });
 
-    snapshots.forEach((snap, idx) => {
-      const canonical = CANONICAL_SYSTEM_NAV_ITEMS[idx];
-      if (!snap.exists()) {
+    // Detect duplicate non-system navigation docs with same cmsPageId
+    const seenCmsIds = new Set<string>();
+    allNavSnap.docs.forEach((d) => {
+      const data = d.data();
+      if (data?.isSystemPage) return;
+      if (data?.cmsPageId) {
+        if (seenCmsIds.has(data.cmsPageId)) {
+          batch.delete(d.ref);
+          hasChanges = true;
+        } else {
+          seenCmsIds.add(data.cmsPageId);
+        }
+      }
+    });
+
+    // Ensure each system nav item exists (using the snapshot Map for O(1) lookup)
+    CANONICAL_SYSTEM_NAV_ITEMS.forEach((canonical) => {
+      const existingDoc = allDocsById.get(canonical.id);
+      if (!existingDoc || !existingDoc.exists()) {
         batch.set(doc(db, COLLECTION_NAME, canonical.id), sanitizeForFirestore(canonical));
         hasChanges = true;
       } else {
-        const data = snap.data();
+        const data = existingDoc.data();
         const updates: Record<string, unknown> = {};
 
         if (!data?.isSystemPage) updates.isSystemPage = true;
@@ -89,14 +110,12 @@ async function ensureSystemNavigationItems(): Promise<void> {
       }
     });
 
-    // Migrate legacy IDs if present
+    // Delete legacy IDs if present (using snapshot Map for O(1) lookup — no extra round-trips)
     const legacyIds = ['nav_home', 'nav_about', 'nav_academics', 'nav_admissions', 'nav_notices', 'nav_contact'];
-    const legacySnaps = await Promise.all(
-      legacyIds.map((id) => getDoc(doc(db, COLLECTION_NAME, id)))
-    );
-    legacySnaps.forEach((snap) => {
-      if (snap.exists()) {
-        batch.delete(snap.ref);
+    legacyIds.forEach((legacyId) => {
+      const legacyDoc = allDocsById.get(legacyId);
+      if (legacyDoc && legacyDoc.exists()) {
+        batch.delete(legacyDoc.ref);
         hasChanges = true;
       }
     });
@@ -211,7 +230,7 @@ export const navigationService = {
   /**
    * Saves complete unified navigation sequence (reordering).
    * Writes sequential order values (0, 1, 2, 3... N) for all items.
-   * Filters out any transient placeholder items.
+   * Performs deduplication on cmsPageId and purges stale duplicate docs from Firestore.
    */
   async saveNavigationItems(items: NavigationItem[]): Promise<void> {
     if (typeof window !== 'undefined') {
@@ -228,12 +247,42 @@ export const navigationService = {
       }
     }
 
-    const validItems = items.filter((item) => {
-      if (!item.id || !item.label) return false;
-      return true;
+    // Deduplicate items in memory (1 entry per cmsPageId, 1 entry per ID)
+    const seenCmsIds = new Set<string>();
+    const seenIds = new Set<string>();
+    const validItems: NavigationItem[] = [];
+
+    items.forEach((item) => {
+      if (!item.id || !item.label) return;
+      if (seenIds.has(item.id)) return;
+      seenIds.add(item.id);
+
+      if (item.cmsPageId && !item.isSystemPage) {
+        if (seenCmsIds.has(item.cmsPageId)) return;
+        seenCmsIds.add(item.cmsPageId);
+      }
+      validItems.push(item);
     });
 
     const batch = writeBatch(db);
+
+    // Query existing Firestore docs to delete stale duplicates not present in validItems
+    try {
+      const allExistingSnap = await getDocs(collection(db, COLLECTION_NAME));
+      const validIdSet = new Set(validItems.map((v) => v.id));
+      const validCmsIdSet = new Set(validItems.map((v) => v.cmsPageId).filter(Boolean));
+
+      allExistingSnap.docs.forEach((docSnap) => {
+        const data = docSnap.data();
+        // If an existing doc has a cmsPageId that is in our valid set but doc ID is different, delete stale doc
+        if (data?.cmsPageId && validCmsIdSet.has(data.cmsPageId) && !validIdSet.has(docSnap.id) && !data.isSystemPage) {
+          batch.delete(docSnap.ref);
+        }
+      });
+    } catch (err) {
+      console.warn('Stale nav cleanup query warning:', err);
+    }
+
     for (let i = 0; i < validItems.length; i++) {
       const item = { ...validItems[i], order: i };
       const rawPayload: Record<string, unknown> = { ...item };
@@ -295,6 +344,7 @@ export const navigationService = {
 
   /**
    * Syncs a CMS page's title, slug, and visibility to the navigation collection.
+   * Ensures exactly ONE navigation document exists per cmsPageId and removes stale duplicates.
    */
   async syncPageToNavigation(
     cmsPageId: string,
@@ -308,22 +358,45 @@ export const navigationService = {
   ): Promise<void> {
     try {
       const isSys = Boolean(isSystemPage && systemKey);
-      const navItemId = isSys ? `nav_sys_${systemKey}` : `nav_cms_${cmsPageId}`;
-      const navRef = doc(db, COLLECTION_NAME, navItemId);
+      const canonicalDocId = isSys ? `nav_sys_${systemKey}` : `nav_cms_${cmsPageId}`;
 
-      const navSnap = await getDoc(navRef);
+      // Search for any existing nav document for this page
+      const allNavSnap = await getDocs(collection(db, COLLECTION_NAME));
+      const matchingDocs = allNavSnap.docs.filter((d) => {
+        if (d.id === canonicalDocId) return true;
+        const data = d.data();
+        return data?.cmsPageId === cmsPageId || (isSys && data?.systemKey === systemKey);
+      });
+
+      let targetDocId = canonicalDocId;
       let currentOrder = order;
-      if (navSnap.exists() && navSnap.data()?.order !== undefined) {
-        currentOrder = navSnap.data().order;
+
+      if (matchingDocs.length > 0) {
+        const primaryDoc = matchingDocs.find((d) => d.id === canonicalDocId) || matchingDocs[0];
+        targetDocId = primaryDoc.id;
+        const primaryData = primaryDoc.data();
+        if (typeof primaryData?.order === 'number') {
+          currentOrder = primaryData.order;
+        }
+
+        // Clean up any other duplicate documents for this page
+        if (matchingDocs.length > 1) {
+          const batch = writeBatch(db);
+          matchingDocs.forEach((d) => {
+            if (d.id !== targetDocId && !d.data()?.isSystemPage) {
+              batch.delete(d.ref);
+            }
+          });
+          await batch.commit();
+        }
       } else if (!order) {
-        const allNavSnap = await getDocs(collection(db, COLLECTION_NAME));
         currentOrder = allNavSnap.docs.length;
       }
 
       const cleanPath = isSys && systemKey === 'home' ? '/' : `/${slug.toLowerCase().replace(/^\//, '')}`;
 
       const navPayload: Record<string, unknown> = {
-        id: navItemId,
+        id: targetDocId,
         label: title,
         path: cleanPath,
         isCMSPage: true,
@@ -332,7 +405,6 @@ export const navigationService = {
         visible: showInNavigation,
       };
 
-      // Custom pages default to being nested inside a dropdown menu (e.g. About Us) so they only show in dropdown menus, not top-level main nav
       const effectiveParentId = parentId || (!isSys ? 'nav_sys_about' : undefined);
       if (effectiveParentId) {
         navPayload.parentId = effectiveParentId;
@@ -344,7 +416,7 @@ export const navigationService = {
       }
 
       const sanitized = sanitizeForFirestore(navPayload);
-      await setDoc(navRef, sanitized, { merge: true });
+      await setDoc(doc(db, COLLECTION_NAME, targetDocId), sanitized, { merge: true });
     } catch (err) {
       console.warn('syncPageToNavigation warning:', err);
     }
@@ -386,7 +458,7 @@ export const navigationService = {
 };
 
 /**
- * Builds a 2-level navigation tree from flat navigation items.
+ * Builds a 2-level navigation tree from flat navigation items with strict deduplication.
  * Level 1: Core 5 System Tabs + More (Total 6 items max)
  * Level 2: All other pages/links nested as dropdown sub-items
  * Enforces that only 6 items max sit on the top-level main bar.
@@ -398,8 +470,19 @@ export function buildNavigationTree(flatItems: NavigationItem[]): NavigationItem
   const topLevelItems: NavigationItem[] = [];
   const orphanChildren: NavigationItem[] = [];
   const seenTopLevelKeys = new Set<string>();
+  const seenCmsPageIds = new Set<string>();
+  const seenItemIds = new Set<string>();
 
   sorted.forEach((item) => {
+    if (seenItemIds.has(item.id)) return;
+    seenItemIds.add(item.id);
+
+    // Strict CMS page deduplication across the tree
+    if (item.cmsPageId && !item.isSystemPage) {
+      if (seenCmsPageIds.has(item.cmsPageId)) return;
+      seenCmsPageIds.add(item.cmsPageId);
+    }
+
     const itemCopy: NavigationItem = { ...item };
     delete itemCopy.children;
 
@@ -430,16 +513,19 @@ export function buildNavigationTree(flatItems: NavigationItem[]): NavigationItem
     topLevelMap.set(canonicalMore.id, canonicalMore);
   }
 
-  // Nest child items under their designated parents
+  // Nest child items under their designated parents with deduplication
+  const seenChildKeys = new Set<string>();
   orphanChildren.forEach((child) => {
     const parent = (child.parentId ? topLevelMap.get(child.parentId) : undefined) || canonicalMore;
     child.parentId = parent.id;
     parent.children = parent.children || [];
-    const childKey = `${(child.path || '').toLowerCase()}_${(child.label || '').toLowerCase()}`;
-    const isAlreadyAdded = parent.children.some(
-      (c) => `${(c.path || '').toLowerCase()}_${(c.label || '').toLowerCase()}` === childKey
-    );
-    if (!isAlreadyAdded) {
+
+    const childIdentityKey = child.cmsPageId
+      ? `cms_${child.cmsPageId}`
+      : `${(child.path || '').toLowerCase()}_${(child.label || '').toLowerCase()}`;
+
+    if (!seenChildKeys.has(childIdentityKey)) {
+      seenChildKeys.add(childIdentityKey);
       delete child.children;
       parent.children.push(child);
     }
@@ -464,9 +550,11 @@ export function buildNavigationTree(flatItems: NavigationItem[]): NavigationItem
   // Add overflow items into More dropdown
   canonicalMore.children = canonicalMore.children || [];
   overflowItems.forEach((overflow) => {
-    const key = `${(overflow.path || '').toLowerCase()}_${(overflow.label || '').toLowerCase()}`;
-    if (!canonicalMore.children!.some((c) => `${(c.path || '').toLowerCase()}_${(c.label || '').toLowerCase()}` === key)) {
+    const key = overflow.cmsPageId ? `cms_${overflow.cmsPageId}` : `${(overflow.path || '').toLowerCase()}_${(overflow.label || '').toLowerCase()}`;
+    if (!seenChildKeys.has(key)) {
+      seenChildKeys.add(key);
       overflow.parentId = canonicalMore.id;
+      delete overflow.children;
       canonicalMore.children!.push(overflow);
     }
   });
@@ -478,17 +566,44 @@ export function buildNavigationTree(flatItems: NavigationItem[]): NavigationItem
 }
 
 /**
+ * Deterministically flattens a 2-level navigation tree in topological order:
+ * Parent 1 -> Parent 1's Children (in exact sibling order) -> Parent 2 -> Parent 2's Children...
+ * Assigns sequential global order indexes: 0, 1, 2, 3... N.
+ */
+export function reorderTreeAndFlatten(tree: NavigationItem[]): NavigationItem[] {
+  const result: NavigationItem[] = [];
+  let currentOrder = 0;
+
+  tree.forEach((parentItem) => {
+    const parentCopy: NavigationItem = {
+      ...parentItem,
+      order: currentOrder++,
+    };
+    delete parentCopy.parentId;
+    delete parentCopy.children;
+    result.push(parentCopy);
+
+    if (parentItem.children && parentItem.children.length > 0) {
+      parentItem.children.forEach((childItem) => {
+        const childCopy: NavigationItem = {
+          ...childItem,
+          parentId: parentItem.id,
+          order: currentOrder++,
+        };
+        delete childCopy.children;
+        result.push(childCopy);
+      });
+    }
+  });
+
+  return result;
+}
+
+/**
  * Flattens a 2-level navigation tree back into a linear sequence for indexing.
  */
 export function flattenNavigationItems(items: NavigationItem[]): NavigationItem[] {
-  const result: NavigationItem[] = [];
-  items.forEach((item) => {
-    result.push(item);
-    if (item.children && item.children.length > 0) {
-      item.children.forEach((child) => result.push(child));
-    }
-  });
-  return result;
+  return reorderTreeAndFlatten(items);
 }
 
 export interface NavPagePositionInfo {

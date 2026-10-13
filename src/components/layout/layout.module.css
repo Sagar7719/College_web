@@ -133,26 +133,56 @@
 }
 
 .heroTransparentNav .navItemLink,
-.heroNavScrolled .navItemLink {
+.heroNavScrolled .navItemLink,
+.heroTransparentNav .navParentLink,
+.heroNavScrolled .navParentLink,
+.heroTransparentNav .navParentLabel,
+.heroNavScrolled .navParentLabel {
   color: rgba(255, 255, 255, 0.88) !important;
   padding: 8px 16px !important;
-  border-radius: 8px !important;
-  border: 1px solid transparent !important;
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Chevron button inherits only the color; padding stays compact */
+.heroTransparentNav .dropdownToggleBtn,
+.heroNavScrolled .dropdownToggleBtn {
+  color: rgba(255, 255, 255, 0.88) !important;
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Tighten right padding for parent link so chevron sits snug */
+.heroTransparentNav .navParentLink,
+.heroNavScrolled .navParentLink {
+  padding-right: 4px !important;
+}
+
 .heroTransparentNav .navItemLink:hover,
-.heroNavScrolled .navItemLink:hover {
+.heroNavScrolled .navItemLink:hover,
+.heroTransparentNav .navParentLink:hover,
+.heroNavScrolled .navParentLink:hover,
+.heroTransparentNav .navParentLabel:hover,
+.heroNavScrolled .navParentLabel:hover {
   color: #FFFFFF !important;
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  border-bottom: 1px solid transparent !important;
+  background-color: transparent !important;
+  background: transparent !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4) !important;
 }
 
 .heroTransparentNav .navItemActive,
 .heroNavScrolled .navItemActive {
   color: #FFFFFF !important;
-  background-color: rgba(255, 255, 255, 0.12) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid var(--color-accent) !important;
+  border-radius: 0 !important;
+  font-weight: 700;
 }
 
 .heroTransparentNav .mobileToggleBtn,
@@ -337,6 +367,95 @@
 
 .dropdownArrowOpen {
   transform: rotate(180deg);
+  opacity: 1;
+}
+
+/* ── Desktop: parent row with separate Link + chevron button ──────────────── */
+.navParentRow {
+  display: inline-flex;
+  align-items: stretch;
+  position: relative;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--transition-fast);
+}
+
+.navParentRow.navItemActive {
+  border-bottom-color: var(--color-accent) !important;
+}
+
+.navParentLink {
+  /* inherits navItemLink; removes right padding so chevron sits tight */
+  padding-right: 4px !important;
+  border-bottom: 2px solid transparent;
+}
+
+.navParentLabel {
+  /* non-navigable parent button (like More): visually matches navItemLink */
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 4px 8px 14px;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color var(--transition-fast);
+}
+
+.navParentLabel:hover {
+  color: var(--color-accent);
+}
+
+.dropdownToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px 8px 2px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+  border-radius: 0;
+  transition: color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dropdownToggleBtn:hover {
+  color: var(--color-accent);
+}
+
+.dropdownToggleBtn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Focus & Focus-Visible Handling: Prevent mouse-click grey background, preserve keyboard outline */
+.navItemLink:focus,
+.navParentLink:focus,
+.navParentLabel:focus,
+.dropdownToggleBtn:focus {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.navItemLink:focus-visible,
+.navParentLink:focus-visible,
+.navParentLabel:focus-visible {
+  outline: 2px solid var(--color-accent) !important;
+  outline-offset: 3px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.dropdownToggleBtnOpen .dropdownArrow {
   opacity: 1;
 }
 
@@ -598,6 +717,73 @@
 .drawerAccordionToggle:hover {
   color: #FFFFFF !important;
   background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Mobile: split accordion row — Link (navigate) + chevron button (expand) ── */
+.drawerAccordionRow {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color var(--transition-fast);
+}
+
+.drawerAccordionRow:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.drawerAccordionParentLink {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 14px 8px 14px 24px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  min-width: 0;
+}
+
+.drawerAccordionParentLink:hover {
+  color: #FFFFFF !important;
+}
+
+.drawerAccordionParentLabel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 14px 8px 14px 24px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85) !important;
+  cursor: default;
+  min-width: 0;
+}
+
+.drawerAccordionChevronBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  min-width: 52px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: inherit;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.drawerAccordionChevronBtn:hover {
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.drawerAccordionChevronBtn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
 }
 
 .drawerSubNavList {

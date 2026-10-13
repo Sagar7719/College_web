@@ -1,42 +1,33 @@
 import React from 'react';
 import Link from 'next/link';
-import { pagesService } from '@/services/pages.service';
-import {
-  departmentsService,
-  coursesService,
-  facultyService,
-  noticesService,
-  newsService,
-  eventsService,
-  galleryService,
-  downloadsService,
-} from '@/services/cms-modules.service';
+import { getAdminDb } from '@/lib/firebase/admin';
 import { siteSettingsService } from '@/services/site-settings.service';
-import { Card, CardBody, Button, Badge } from '@/components/ui';
+import { Button, Badge } from '@/components/ui';
 import styles from '@/components/admin/admin.module.css';
 
 export default async function AdminDashboardPage() {
+  const db = getAdminDb();
   const [
-    pages,
-    departments,
-    courses,
-    faculty,
-    notices,
-    news,
-    events,
-    gallery,
-    downloads,
+    pagesCount,
+    departmentsCount,
+    coursesCount,
+    facultyCount,
+    noticesCount,
+    newsCount,
+    eventsCount,
+    galleryCount,
+    downloadsCount,
     settings,
   ] = await Promise.all([
-    pagesService.getAllPages().catch(() => []),
-    departmentsService.getAll().catch(() => []),
-    coursesService.getAll().catch(() => []),
-    facultyService.getAll().catch(() => []),
-    noticesService.getAll().catch(() => []),
-    newsService.getAll().catch(() => []),
-    eventsService.getAll().catch(() => []),
-    galleryService.getAll().catch(() => []),
-    downloadsService.getAll().catch(() => []),
+    db.collection('pages').count().get().then((s) => s.data().count).catch(() => 0),
+    db.collection('departments').count().get().then((s) => s.data().count).catch(() => 0),
+    db.collection('courses').count().get().then((s) => s.data().count).catch(() => 0),
+    db.collection('faculty').count().get().then((s) => s.data().count).catch(() => 0),
+    db.collection('notices').count().get().then((s) => s.data().count).catch(() => 0),
+    db.collection('news').count().get().then((s) => s.data().count).catch(() => 0),
+    db.collection('events').count().get().then((s) => s.data().count).catch(() => 0),
+    db.collection('gallery').count().get().then((s) => s.data().count).catch(() => 0),
+    db.collection('downloads').count().get().then((s) => s.data().count).catch(() => 0),
     siteSettingsService.getSettings().catch(() => null),
   ]);
 
@@ -45,15 +36,15 @@ export default async function AdminDashboardPage() {
   const isMaintenanceActive = Boolean(settings?.maintenanceMode);
 
   const metrics = [
-    { title: 'Dynamic Pages', count: pages.length, icon: '📄', href: '/admin/pages', theme: styles.metricTerracotta },
-    { title: 'Departments', count: departments.length, icon: '🏛️', href: '/admin/departments', theme: styles.metricEmerald },
-    { title: 'Courses & Programs', count: courses.length, icon: '🎓', href: '/admin/courses', theme: styles.metricSapphire },
-    { title: 'Faculty Members', count: faculty.length, icon: '👨‍🏫', href: '/admin/faculty', theme: styles.metricPurple },
-    { title: 'Notices & Circulars', count: notices.length, icon: '📌', href: '/admin/notices', theme: styles.metricGold },
-    { title: 'News Stories', count: news.length, icon: '📰', href: '/admin/news', theme: styles.metricCrimson },
-    { title: 'Campus Events', count: events.length, icon: '📅', href: '/admin/events', theme: styles.metricTeal },
-    { title: 'Photo Albums', count: gallery.length, icon: '🖼️', href: '/admin/gallery', theme: styles.metricIndigo },
-    { title: 'Downloads Center', count: downloads.length, icon: '📥', href: '/admin/downloads', theme: styles.metricTerracotta },
+    { title: 'Dynamic Pages', count: pagesCount, icon: '📄', href: '/admin/pages', theme: styles.metricTerracotta },
+    { title: 'Departments', count: departmentsCount, icon: '🏛️', href: '/admin/departments', theme: styles.metricEmerald },
+    { title: 'Courses & Programs', count: coursesCount, icon: '🎓', href: '/admin/courses', theme: styles.metricSapphire },
+    { title: 'Faculty Members', count: facultyCount, icon: '👨‍🏫', href: '/admin/faculty', theme: styles.metricPurple },
+    { title: 'Notices & Circulars', count: noticesCount, icon: '📌', href: '/admin/notices', theme: styles.metricGold },
+    { title: 'News Stories', count: newsCount, icon: '📰', href: '/admin/news', theme: styles.metricCrimson },
+    { title: 'Campus Events', count: eventsCount, icon: '📅', href: '/admin/events', theme: styles.metricTeal },
+    { title: 'Photo Albums', count: galleryCount, icon: '🖼️', href: '/admin/gallery', theme: styles.metricIndigo },
+    { title: 'Downloads Center', count: downloadsCount, icon: '📥', href: '/admin/downloads', theme: styles.metricTerracotta },
   ];
 
   return (
