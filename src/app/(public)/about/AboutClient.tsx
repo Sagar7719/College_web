@@ -26,16 +26,26 @@ interface AboutClientProps {
 }
 
 export function AboutClient({ collegeInfo, aboutData }: AboutClientProps) {
-  const collegeName = collegeInfo.name || 'Jaysingpur College';
+  const collegeName = collegeInfo.name || 'Shivaji University, Kolhapur';
   const estYear = collegeInfo.establishedYear || '1972';
 
-  const principalName = collegeInfo.principalName || aboutData.principalDesk.name;
-  const principalRole = collegeInfo.principalDesignation || aboutData.principalDesk.designation;
-  const principalPhoto = collegeInfo.principalPhotoUrl || aboutData.principalDesk.photoUrl;
-  const principalMessage = collegeInfo.principalMessage || aboutData.principalDesk.message;
+  const principalName = aboutData.principalDesk?.name || collegeInfo.principalName || 'Mr. Sagar Ulagadde';
+  const principalRole = aboutData.principalDesk?.designation || collegeInfo.principalDesignation || 'Principal';
+  const principalPhoto = aboutData.principalDesk?.photoUrl || collegeInfo.principalPhotoUrl;
+  const principalMessage = aboutData.principalDesk?.message || collegeInfo.principalMessage || 'Hello I am Sagar!';
 
-  const vision = collegeInfo.vision || aboutData.visionMission.vision;
-  const mission = collegeInfo.mission || aboutData.visionMission.mission;
+  const vision = aboutData.visionMission?.vision || collegeInfo.vision;
+  const mission = aboutData.visionMission?.mission || collegeInfo.mission;
+
+  // Make hero title dynamically follow collegeName whenever collegeName is updated
+  const rawHeroTitle = aboutData.hero?.title;
+  const heroTitle = (!rawHeroTitle || rawHeroTitle === 'About Jaysingpur College' || rawHeroTitle === 'About College Name')
+    ? `About ${collegeName}`
+    : rawHeroTitle.replace(/Jaysingpur College/gi, collegeName);
+
+  // Make legacy description dynamically follow collegeName
+  const rawLegacyDesc = aboutData.legacyOverview?.description || collegeInfo.description || '';
+  const legacyDesc = rawLegacyDesc.replace(/Jaysingpur College/gi, collegeName);
 
   return (
     <div className={styles.pageContainer}>
@@ -47,12 +57,12 @@ export function AboutClient({ collegeInfo, aboutData }: AboutClientProps) {
             <div className={styles.innerHeroGlassCard}>
               <div className={styles.heroBadge}>
                 <Sparkles size={16} />
-                <span>{aboutData.hero.badgeText}</span>
+                <span>{aboutData.hero?.badgeText || 'Established Institution of Academic Excellence'}</span>
               </div>
-              <h1 className={styles.heroTitle}>{aboutData.hero.title}</h1>
-              <p className={styles.heroSubtitle}>{aboutData.hero.subtitle}</p>
+              <h1 className={styles.heroTitle}>{heroTitle}</h1>
+              <p className={styles.heroSubtitle}>{aboutData.hero?.subtitle}</p>
               <div className={styles.heroStatsRow}>
-                {aboutData.heroStats.map((stat, idx) => (
+                {(aboutData.heroStats || []).map((stat, idx) => (
                   <div key={idx} className={styles.heroStatItem}>
                     {resolveIcon(stat.iconKey, 20, 1.8, styles.statIcon)}
                     <div>
@@ -75,13 +85,13 @@ export function AboutClient({ collegeInfo, aboutData }: AboutClientProps) {
             <div className={styles.docBox} style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <div className={styles.boxHeader}>
                 <Building2 size={24} className={styles.boxIcon} />
-                <h3>{aboutData.legacyOverview.title}</h3>
+                <h3>{aboutData.legacyOverview?.title || 'Institutional Legacy & Heritage'}</h3>
               </div>
               <p className={styles.boxDesc} style={{ fontSize: '0.96875rem', lineHeight: 1.7, color: '#24221F', fontWeight: 500 }}>
-                {collegeInfo.description || aboutData.legacyOverview.description}
+                {legacyDesc}
               </p>
               <ul className={styles.checklist} style={{ marginTop: 'auto', paddingTop: '20px' }}>
-                {aboutData.legacyOverview.highlights.map((item, idx) => (
+                {(aboutData.legacyOverview?.highlights || []).map((item, idx) => (
                   <li key={idx}>
                     <CheckCircle2 size={16} className={styles.checkIcon} />
                     <span>{item}</span>
@@ -94,18 +104,22 @@ export function AboutClient({ collegeInfo, aboutData }: AboutClientProps) {
             <div className={styles.scheduleBox} style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <div className={styles.boxHeader}>
                 <Target size={24} className={styles.boxIcon} />
-                <h3>Vision & Mission Statement</h3>
+                <h3>{aboutData.visionMission?.title || 'Vision & Mission Statement'}</h3>
               </div>
 
               <div style={{ marginBottom: '24px' }}>
-                <span className={styles.detailLabel} style={{ color: 'var(--color-accent)' }}>OUR VISION</span>
+                <span className={styles.detailLabel} style={{ color: 'var(--color-accent)' }}>
+                  {aboutData.visionMission?.visionLabel || 'OUR VISION'}
+                </span>
                 <p style={{ fontSize: '0.9375rem', color: '#68705A', lineHeight: 1.65, marginTop: '4px' }}>
                   {vision}
                 </p>
               </div>
 
               <div style={{ marginTop: 'auto' }}>
-                <span className={styles.detailLabel} style={{ color: 'var(--color-accent)' }}>OUR MISSION</span>
+                <span className={styles.detailLabel} style={{ color: 'var(--color-accent)' }}>
+                  {aboutData.visionMission?.missionLabel || 'OUR MISSION'}
+                </span>
                 <p style={{ fontSize: '0.9375rem', color: '#68705A', lineHeight: 1.65, marginTop: '4px' }}>
                   {mission}
                 </p>
@@ -122,8 +136,8 @@ export function AboutClient({ collegeInfo, aboutData }: AboutClientProps) {
             <div className={styles.boxHeader} style={{ marginBottom: '24px' }}>
               <Quote size={28} className={styles.boxIcon} />
               <div>
-                <span className={styles.eyebrow}>Leadership Message</span>
-                <h2 style={{ fontSize: '1.75rem', margin: 0 }}>From the Principal&apos;s Desk</h2>
+                <span className={styles.eyebrow}>{aboutData.principalDesk?.badge || 'Leadership Message'}</span>
+                <h2 style={{ fontSize: '1.75rem', margin: 0 }}>{aboutData.principalDesk?.title || "From the Principal's Desk"}</h2>
               </div>
             </div>
 
@@ -156,12 +170,12 @@ export function AboutClient({ collegeInfo, aboutData }: AboutClientProps) {
       <section className={styles.highlightsSection} style={{ backgroundColor: '#FFFFFF', borderTop: 'none', borderBottom: '1px solid rgba(222, 212, 197, 0.6)' }}>
         <div className="container">
           <div className={styles.sectionHeaderCenter}>
-            <span className={styles.eyebrow}>Institutional Core</span>
-            <h2 className={styles.sectionTitle}>{aboutData.pillarsTitle}</h2>
+            <span className={styles.eyebrow}>{aboutData.pillarsEyebrow || 'Institutional Core'}</span>
+            <h2 className={styles.sectionTitle}>{aboutData.pillarsTitle || 'Pillars of Academic Distinction'}</h2>
           </div>
 
           <div className={styles.highlightsGrid}>
-            {aboutData.pillars.map((pillar, idx) => (
+            {(aboutData.pillars || []).map((pillar, idx) => (
               <div key={idx} className={styles.highlightCard}>
                 <div className={styles.highlightIcon}>
                   {resolveIcon(pillar.iconKey, 24)}
@@ -180,19 +194,19 @@ export function AboutClient({ collegeInfo, aboutData }: AboutClientProps) {
           <div className={styles.ctaBannerCard}>
             <div className={styles.ctaBadge}>
               <Sparkles size={16} />
-              <span>Start Your Journey</span>
+              <span>{aboutData.ctaBadge || 'Start Your Journey'}</span>
             </div>
-            <h2>{aboutData.ctaBannerTitle}</h2>
-            <p>{aboutData.ctaBannerDesc}</p>
+            <h2>{aboutData.ctaBannerTitle || 'Become Part of Our Academic Heritage'}</h2>
+            <p>{aboutData.ctaBannerDesc || 'Applications for the 2026–27 academic session are now open across all departments.'}</p>
             <div className={styles.ctaBtns}>
-              <Link href="/admissions" className={homeStyles.btnPrimaryTerracotta}>
+              <Link href={aboutData.ctaPrimaryBtnLink || '/admissions'} className={homeStyles.btnPrimaryTerracotta}>
                 <GraduationCap size={18} />
-                <span>Apply Online Now</span>
+                <span>{aboutData.ctaPrimaryBtnText || 'Apply Online Now'}</span>
                 <ArrowRight size={16} />
               </Link>
-              <Link href="/contact" className={homeStyles.btnOutlineDark}>
+              <Link href={aboutData.ctaSecondaryBtnLink || '/contact'} className={homeStyles.btnOutlineDark}>
                 <Compass size={16} />
-                <span>Contact Campus Helpdesk</span>
+                <span>{aboutData.ctaSecondaryBtnText || 'Contact Campus Helpdesk'}</span>
               </Link>
             </div>
           </div>

@@ -91,20 +91,22 @@ export default async function DynamicCMSPage({ params }: PageProps) {
   }
 
   return (
-    <article className="container" style={{ padding: '3rem 1.5rem' }}>
-      {/* Featured Header if featured image exists */}
-      {page.featuredImage && (
-        <div style={{ marginBottom: '3rem', borderRadius: 'var(--radius-2xl)', overflow: 'hidden', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)' }}>
-          <img
-            src={page.featuredImage}
-            alt={page.title}
-            style={{ width: '100%', maxHeight: '420px', objectFit: 'cover', display: 'block' }}
-          />
-        </div>
-      )}
+    <div className={styles.subpageWrapper}>
+      <article className="container">
+        {/* Featured Header if featured image exists */}
+        {page.featuredImage && (
+          <div style={{ marginBottom: '3rem', borderRadius: 'var(--radius-2xl)', overflow: 'hidden', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)' }}>
+            <img
+              src={page.featuredImage}
+              alt={page.title}
+              style={{ width: '100%', maxHeight: '420px', objectFit: 'cover', display: 'block' }}
+            />
+          </div>
+        )}
 
-      {/* Render 14 modular sections */}
-      <PageSectionRenderer sections={page.sections || []} />
-    </article>
+        {/* Render 14 modular sections */}
+        <PageSectionRenderer sections={page.sections || []} />
+      </article>
+    </div>
   );
 }

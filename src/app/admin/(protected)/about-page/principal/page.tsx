@@ -15,9 +15,9 @@ export default function AdminPrincipalDeskEditor() {
   const [qualification, setQualification] = useState('M.Sc., Ph.D. (Chemistry), FIECS');
   const [experience, setExperience] = useState('28+ Years of Academic & Administrative Excellence');
   const [photoUrl, setPhotoUrl] = useState('https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=800&auto=format&fit=crop');
-  const [welcomeHeading, setWelcomeHeading] = useState("Welcome to Jaysingpur College — Empowering Minds, Shaping Futures");
+  const [welcomeHeading, setWelcomeHeading] = useState("Welcome to Shivaji University, Kolhapur — Empowering Minds, Shaping Futures");
   const [messageBody, setMessageBody] = useState(
-    `Dear Students, Parents, and Visitors,\n\nIt is my distinct honor and privilege to welcome you to Jaysingpur College, Jaysingpur. Established with a vision to impart quality education and foster holistically empowered citizens, our institution stands as a beacon of academic excellence in Western Maharashtra.\n\nOur dedicated faculty, modern laboratory infrastructure, rich digital library resources, and vibrant extracurricular ecosystem ensure every student receives comprehensive development. We strive to nurture critical thinking, ethical leadership, and technological competence.\n\nI invite you to explore our academic programs and join us in our journey towards educational innovation.`
+    `Dear Students, Parents, and Visitors,\n\nIt is my distinct honor and privilege to welcome you to Shivaji University, Kolhapur. Established with a vision to impart quality education and foster holistically empowered citizens, our institution stands as a beacon of academic excellence.\n\nOur dedicated faculty, modern laboratory infrastructure, rich digital library resources, and vibrant extracurricular ecosystem ensure every student receives comprehensive development. We strive to nurture critical thinking, ethical leadership, and technological competence.\n\nI invite you to explore our academic programs and join us in our journey towards educational innovation.`
   );
   const [email, setEmail] = useState('principal@jaysingpurcollege.edu.in');
   const [phone, setPhone] = useState('+91 (02322) 225282');

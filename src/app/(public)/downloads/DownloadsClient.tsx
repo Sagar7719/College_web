@@ -80,16 +80,7 @@ export function DownloadsClient() {
       {/* ==============================================================================
          1. HERO HEADER BANNER (INSTITUTIONAL THEME)
          ============================================================================== */}
-      <section
-        style={{
-          background: 'linear-gradient(135deg, #1F1914 0%, #2D241E 50%, #3D2D24 100%)',
-          color: '#FFFFFF',
-          padding: '4rem 1.5rem 3.5rem 1.5rem',
-          position: 'relative',
-          overflow: 'hidden',
-          borderBottom: '4px solid #C85A32',
-        }}
-      >
+      <section className={styles.innerDarkHeroBanner}>
         <div
           style={{
             position: 'absolute',

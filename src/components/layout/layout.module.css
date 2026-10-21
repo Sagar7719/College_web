@@ -756,8 +756,18 @@
   font-size: 0.9375rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.85) !important;
-  cursor: default;
+  background: transparent !important;
+  border: none !important;
+  outline: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
   min-width: 0;
+  transition: color var(--transition-fast);
+}
+
+.drawerAccordionParentLabel:hover {
+  color: #FFFFFF !important;
 }
 
 .drawerAccordionChevronBtn {

@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
   const title = `About Us — ${collegeName}`;
   const description = `Learn more about ${collegeName}, our mission, vision, history, and leadership message.`;
   const ogImageUrl = settings.seoConfig?.defaultOgImageUrl || settings.collegeInfo?.logoUrl;
@@ -40,12 +40,26 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const [settings, aboutData] = await Promise.all([
+  const [settings, aboutConfigData] = await Promise.all([
     siteSettingsService.getSettings(),
     aboutPageConfigService.get(),
   ]);
 
   const collegeInfo = settings.collegeInfo || {};
+
+  const aboutData = {
+    ...aboutConfigData,
+    hero: {
+      ...aboutConfigData.hero,
+      badgeText: settings.aboutPage?.heroBadge || aboutConfigData.hero?.badgeText,
+      subtitle: settings.aboutPage?.heroSubtitle || aboutConfigData.hero?.subtitle,
+    },
+    legacyOverview: {
+      ...aboutConfigData.legacyOverview,
+      title: settings.aboutPage?.legacyTitle || aboutConfigData.legacyOverview?.title,
+    },
+    pillarsTitle: settings.aboutPage?.pillarsTitle || aboutConfigData.pillarsTitle,
+  };
 
   return <AboutClient collegeInfo={collegeInfo} aboutData={aboutData} />;
 }

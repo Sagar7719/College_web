@@ -6,7 +6,7 @@ import { CoursesClient } from './CoursesClient';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College, Jaysingpur';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
   const title = `Courses & Degree Programs — ${collegeName}`;
   const description = `Explore undergraduate, postgraduate, and doctoral degree programs offered at ${collegeName}.`;
   const ogImageUrl = settings.seoConfig?.defaultOgImageUrl || settings.collegeInfo?.logoUrl;
@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CoursesPage() {
   const courses = await coursesService.getPublished();
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College, Jaysingpur';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
 
   return <CoursesClient initialCourses={courses} collegeName={collegeName} />;
 }

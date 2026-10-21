@@ -289,7 +289,7 @@ export default function AdminSettingsPage() {
               </h3>
               <Input
                 label="Official College Name *"
-                placeholder="e.g. Jaysingpur College, Jaysingpur"
+                placeholder="e.g. Shivaji University, Kolhapur"
                 value={collegeInfo.name}
                 onChange={(e) => setCollegeInfo({ ...collegeInfo, name: e.target.value })}
                 required
@@ -297,7 +297,7 @@ export default function AdminSettingsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
                 <Input
                   label="Short Name / Abbreviation *"
-                  placeholder="e.g. Jaysingpur College"
+                  placeholder="e.g. Shivaji University"
                   value={collegeInfo.shortName}
                   onChange={(e) => setCollegeInfo({ ...collegeInfo, shortName: e.target.value })}
                   required

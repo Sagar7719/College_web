@@ -3,12 +3,19 @@
    ============================================================================== */
 
 .galleryPage {
-  padding-top: 86px;
+  padding-top: 104px;
   padding-bottom: 50px;
   background-color: var(--color-primary-bg, #F7F2E9);
   min-height: 100vh;
   color: #24221F;
   overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .galleryPage {
+    padding-top: 88px;
+    padding-bottom: 40px;
+  }
 }
 
 /* ── COMPACT CONTROL BAR IN WEBSITE THEME COLOR ── */

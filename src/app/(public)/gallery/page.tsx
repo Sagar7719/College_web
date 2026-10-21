@@ -6,7 +6,7 @@ import { GalleryClient } from './GalleryClient';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College, Jaysingpur';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
   const title = `Photo Gallery & Media Albums — ${collegeName}`;
   const description = `Browse campus photo albums, annual fests, convocations, and infrastructure galleries at ${collegeName}.`;
   const ogImageUrl = settings.seoConfig?.defaultOgImageUrl || settings.collegeInfo?.logoUrl;
@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function GalleryPage() {
   const albums = await galleryService.getPublished();
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College, Jaysingpur';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
 
   return <GalleryClient initialAlbums={albums} collegeName={collegeName} />;
 }

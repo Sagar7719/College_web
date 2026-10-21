@@ -94,11 +94,16 @@ export interface LegacyOverview {
 }
 
 export interface VisionMissionConfig {
+  title?: string;
+  visionLabel?: string;
   vision: string;
+  missionLabel?: string;
   mission: string;
 }
 
 export interface PrincipalDeskConfig {
+  badge?: string;
+  title?: string;
   name: string;
   designation: string;
   photoUrl?: string;
@@ -118,10 +123,16 @@ export interface AboutPageConfigData {
   legacyOverview: LegacyOverview;
   visionMission: VisionMissionConfig;
   principalDesk: PrincipalDeskConfig;
+  pillarsEyebrow?: string;
   pillarsTitle: string;
   pillars: AboutPillarCard[];
+  ctaBadge?: string;
   ctaBannerTitle: string;
   ctaBannerDesc: string;
+  ctaPrimaryBtnText?: string;
+  ctaPrimaryBtnLink?: string;
+  ctaSecondaryBtnText?: string;
+  ctaSecondaryBtnLink?: string;
   updatedAt: string;
 }
 

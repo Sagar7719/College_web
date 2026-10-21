@@ -39,8 +39,8 @@ export const defaultFooterColumns: FooterColumn[] = [
 export const defaultSettings: SiteSettings = {
   id: SETTINGS_DOC_ID,
   collegeInfo: {
-    name: 'Jaysingpur College, Jaysingpur',
-    shortName: 'Jaysingpur College',
+    name: 'Shivaji University, Kolhapur',
+    shortName: 'Shivaji University',
     tagline: 'Empowering Education & Innovation',
     description: 'Welcome to our official college portal providing quality higher education and holistic student development.',
     establishedYear: '2001',
@@ -249,7 +249,7 @@ export const defaultSettings: SiteSettings = {
       { question: 'What are the minimum eligibility criteria for Undergraduate (BCA/B.Sc/B.Com/B.A) courses?', answer: 'Candidates must have passed 10+2 (Higher Secondary Certificate) or equivalent examination from a recognized board with minimum 45% aggregate marks (40% for reserved category candidates).' },
       { question: 'Can I apply for more than one degree programme?', answer: 'Yes, prospective students can select up to 3 preferred degree specializations in a single application registration form.' },
       { question: 'When will the merit list be published?', answer: 'The first merit list for the 2026–27 session will be published on August 05, 2026 on our official portal and campus bulletin board.' },
-      { question: 'Is hostel accommodation and bus transportation available for outstation students?', answer: 'Yes, Jaysingpur College provides dedicated boys & girls hostel facilities, sports complex, central library, and bus transportation routes across neighboring districts.' },
+      { question: 'Is hostel accommodation and bus transportation available for outstation students?', answer: 'Yes, our institution provides dedicated boys & girls hostel facilities, sports complex, central library, and bus transportation routes across neighboring districts.' },
     ],
     helpdeskCtaTitle: 'Need Assistance With Your Application?',
     helpdeskCtaDesc: 'Our dedicated admissions guidance team is available Monday through Saturday (9:00 AM – 5:00 PM) to assist you with registration queries.',

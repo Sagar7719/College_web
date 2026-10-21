@@ -79,7 +79,7 @@ export const defaultAboutData: AboutPageConfigData = {
   id: 'about',
   hero: {
     badgeText: 'Established Institution of Academic Excellence',
-    title: 'About Jaysingpur College',
+    title: 'About Shivaji University, Kolhapur',
     subtitle: 'Established in 1972, our institution stands as a beacon of academic distinction, research innovation, and holistic student empowerment.',
   },
   heroStats: [
@@ -89,7 +89,7 @@ export const defaultAboutData: AboutPageConfigData = {
   ],
   legacyOverview: {
     title: 'Institutional Legacy & Heritage',
-    description: 'Jaysingpur College is a premier higher education institution dedicated to empowering students through multi-disciplinary academic programmes in Science, Technology, Commerce, and Humanities.',
+    description: 'Welcome to our official college portal providing quality higher education and holistic student development.',
     highlights: [
       'Affiliated to State Public University with UGC Accreditation.',
       'State-of-the-art computing laboratories and digital library archives.',
@@ -97,15 +97,21 @@ export const defaultAboutData: AboutPageConfigData = {
     ],
   },
   visionMission: {
+    title: 'Vision & Mission Statement',
+    visionLabel: 'OUR VISION',
     vision: 'To be a center of academic distinction, nurturing scientific inquiry, technological innovation, research excellence, and ethical leadership in every discipline.',
+    missionLabel: 'OUR MISSION',
     mission: 'Providing accessible, high-quality higher education tailored to modern societal demands, fostering critical thinking, character building, and career preparedness.',
   },
   principalDesk: {
-    name: 'Dr. Sagar Ulagadde',
-    designation: 'Principal & Administrative Officer',
+    badge: 'Leadership Message',
+    title: "From the Principal's Desk",
+    name: 'Mr. Sagar Ulagadde',
+    designation: 'Principal',
     photoUrl: '',
-    message: 'Welcome to our esteemed institution. We are committed to fostering academic rigor, ethical values, and research innovation to empower our students for a globally connected world.',
+    message: 'Hello I am Sagar!',
   },
+  pillarsEyebrow: 'Institutional Core',
   pillarsTitle: 'Pillars of Academic Distinction',
   pillars: [
     { title: 'NEP Aligned Syllabus', description: 'Choice-based credit systems and outcome-based curriculum designed for modern careers.', iconKey: 'BookOpen' },
@@ -113,8 +119,13 @@ export const defaultAboutData: AboutPageConfigData = {
     { title: 'Inclusive & Safe Campus', description: 'Zero-tolerance anti-ragging policy, women empowerment cell, and student counseling.', iconKey: 'ShieldCheck' },
     { title: 'Global Alumni Network', description: 'Active mentorship and campus recruitment by leading industrial and technology recruiters.', iconKey: 'Users' },
   ],
+  ctaBadge: 'Start Your Journey',
   ctaBannerTitle: 'Become Part of Our Academic Heritage',
   ctaBannerDesc: 'Applications for the 2026–27 academic session are now open across all departments.',
+  ctaPrimaryBtnText: 'Apply Online Now',
+  ctaPrimaryBtnLink: '/admissions',
+  ctaSecondaryBtnText: 'Contact Campus Helpdesk',
+  ctaSecondaryBtnLink: '/contact',
   updatedAt: new Date().toISOString(),
 };
 
@@ -186,7 +197,7 @@ export const defaultAdmissionsData: AdmissionsConfigData = {
     { question: 'What are the minimum eligibility criteria for Undergraduate (BCA/B.Sc/B.Com/B.A) courses?', answer: 'Candidates must have passed 10+2 (Higher Secondary Certificate) or equivalent examination from a recognized board with minimum 45% aggregate marks (40% for reserved category candidates).' },
     { question: 'Can I apply for more than one degree programme?', answer: 'Yes, prospective students can select up to 3 preferred degree specializations in a single application registration form.' },
     { question: 'When will the merit list be published?', answer: 'The first merit list for the 2026–27 session will be published on August 05, 2026 on our official portal and campus bulletin board.' },
-    { question: 'Is hostel accommodation and bus transportation available for outstation students?', answer: 'Yes, Jaysingpur College provides dedicated boys & girls hostel facilities, sports complex, central library, and bus transportation routes across neighboring districts.' },
+    { question: 'Is hostel accommodation and bus transportation available for outstation students?', answer: 'Yes, our institution provides dedicated boys & girls hostel facilities, sports complex, central library, and bus transportation routes across neighboring districts.' },
   ],
   helpdeskCtaTitle: 'Need Assistance With Your Application?',
   helpdeskCtaDesc: 'Our dedicated admissions guidance team is available Monday through Saturday (9:00 AM – 5:00 PM) to assist you with registration queries.',

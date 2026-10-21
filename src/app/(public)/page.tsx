@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
   const title = settings.seoConfig?.defaultMetaTitle || `${collegeName} | Official Institutional Website`;
   const description = settings.seoConfig?.defaultMetaDescription || settings.collegeInfo?.description || `Official website of ${collegeName}.`;
   return { title, description, alternates: { canonical: '/' } };
@@ -73,7 +73,7 @@ export default async function HomePage() {
     ]);
 
   const info = settings?.collegeInfo;
-  const collegeName = info?.name || 'Jaysingpur College';
+  const collegeName = info?.name || 'Shivaji University, Kolhapur';
   const displayCollegeName = collegeName.replace(/\b\w/g, (c) => c.toUpperCase());
   const estYear = info?.establishedYear || '1972';
   const naacGrade = info?.naacGrade || 'A';
