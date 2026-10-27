@@ -2,7 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { eventsService } from '@/services/cms-modules.service';
 import { siteSettingsService } from '@/services/site-settings.service';
-import { Card, CardBody, Badge, EmptyState } from '@/components/ui';
+import { Badge, EmptyState } from '@/components/ui';
 import styles from '../inner.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -45,23 +45,26 @@ export default async function EventsPage() {
         </div>
 
         {events.length > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          <div className={styles.eventsGrid}>
             {events.map((evt) => (
-              <Card key={evt.id} variant="bordered" hoverable>
-                <CardBody style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
-                      <Badge variant="success">Upcoming</Badge>
-                      <span className="tiny-text" style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>📅 {evt.eventDate.slice(0, 10)}</span>
-                    </div>
-                    <h3 className={styles.sectionTitle} style={{ color: 'var(--color-primary)', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
-                      {evt.title}
-                    </h3>
-                    <p className="small-text" style={{ fontWeight: 700, margin: '0.5rem 0', color: 'var(--color-accent)' }}>📍 {evt.venue}</p>
-                    <p className={styles.bodyText} style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>{evt.description}</p>
-                  </div>
-                </CardBody>
-              </Card>
+              <div key={evt.id} className={styles.eventCard}>
+                <div className={styles.eventMetaRow}>
+                  <Badge variant="success">Upcoming</Badge>
+                  <span className={styles.eventDateBadge}>
+                    📅 {evt.eventDate.slice(0, 10)}
+                  </span>
+                </div>
+                <h3 className={styles.eventTitle}>
+                  {evt.title}
+                </h3>
+                <div className={styles.eventVenue}>
+                  <span>📍</span>
+                  <span>{evt.venue}</span>
+                </div>
+                {evt.description && (
+                  <p className={styles.eventDesc}>{evt.description}</p>
+                )}
+              </div>
             ))}
           </div>
         ) : (

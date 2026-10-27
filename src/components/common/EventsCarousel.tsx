@@ -44,14 +44,22 @@ export function EventsCarousel({ events }: EventsCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
+  const getCardStep = useCallback(() => {
+    if (!scrollRef.current) return 384;
+    const firstCard = scrollRef.current.firstElementChild as HTMLElement;
+    if (!firstCard) return 384;
+    const gap = typeof window !== 'undefined' && window.innerWidth < 640 ? 16 : 24;
+    return firstCard.offsetWidth + gap;
+  }, []);
+
   // Sync scroll position with active index dot
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
     const { scrollLeft } = scrollRef.current;
-    const cardWidth = 360 + 24; // card width + gap
-    const index = Math.round(scrollLeft / cardWidth);
+    const step = getCardStep();
+    const index = Math.round(scrollLeft / step);
     setActiveIndex(Math.min(Math.max(index, 0), events.length - 1));
-  }, [events.length]);
+  }, [events.length, getCardStep]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -63,36 +71,59 @@ export function EventsCarousel({ events }: EventsCarouselProps) {
     };
   }, [handleScroll]);
 
-  // Industry Standard Auto-Play Carousel (Pauses on Hover)
+  const scrollToCard = useCallback((index: number) => {
+    if (!scrollRef.current) return;
+    const targetCard = scrollRef.current.children[index] as HTMLElement;
+    if (targetCard) {
+      const targetLeft =
+        targetCard.offsetParent === scrollRef.current
+          ? targetCard.offsetLeft
+          : targetCard.offsetLeft - scrollRef.current.offsetLeft;
+      scrollRef.current.scrollTo({
+        left: Math.max(0, targetLeft),
+        behavior: 'smooth',
+      });
+    } else {
+      const step = getCardStep();
+      scrollRef.current.scrollTo({
+        left: index * step,
+        behavior: 'smooth',
+      });
+    }
+    setActiveIndex(index);
+  }, [getCardStep]);
+
+  // Industry Standard Auto-Play Carousel (Pauses when off-screen or on Hover)
   useEffect(() => {
     if (isHovered || events.length <= 1) return;
 
+    let isVisible = true;
+    let observer: IntersectionObserver | null = null;
+
+    if (typeof IntersectionObserver !== 'undefined' && scrollRef.current) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          isVisible = entry.isIntersecting;
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(scrollRef.current);
+    }
+
     const timer = setInterval(() => {
-      if (!scrollRef.current) return;
+      if (!scrollRef.current || !isVisible) return;
       const nextIndex = (activeIndex + 1) % events.length;
-      const cardWidth = 360 + 24;
-      scrollRef.current.scrollTo({
-        left: nextIndex * cardWidth,
-        behavior: 'smooth',
-      });
-      setActiveIndex(nextIndex);
+      scrollToCard(nextIndex);
     }, 4500);
 
-    return () => clearInterval(timer);
-  }, [activeIndex, isHovered, events.length]);
-
-  const scrollToCard = (index: number) => {
-    if (!scrollRef.current) return;
-    const cardWidth = 360 + 24;
-    scrollRef.current.scrollTo({
-      left: index * cardWidth,
-      behavior: 'smooth',
-    });
-    setActiveIndex(index);
-  };
+    return () => {
+      clearInterval(timer);
+      if (observer) observer.disconnect();
+    };
+  }, [activeIndex, isHovered, events.length, scrollToCard]);
 
   return (
-    <section className={styles.sec} aria-label="Upcoming Events">
+    <section id="events" className={styles.sec} aria-label="Upcoming Events">
       <div className="container">
         {/* Centered Section Header */}
         <div className={styles.secHeadCenter}>
@@ -111,6 +142,8 @@ export function EventsCarousel({ events }: EventsCarouselProps) {
               className={styles.carouselViewport}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
+              onTouchStart={() => setIsHovered(true)}
+              onTouchEnd={() => setIsHovered(false)}
             >
               {events.map((evt, idx) => {
                 const variantClass = colorVariants[idx % colorVariants.length];

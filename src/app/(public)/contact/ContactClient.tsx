@@ -56,7 +56,7 @@ export function ContactClient({ collegeInfo, socialLinks, contactData }: Contact
             <div className={styles.innerHeroGlassCard}>
               <div className={styles.heroBadge}>
                 <Sparkles size={16} />
-                <span>{contactData.hero.badgeText}</span>
+                <span>{contactData.hero.badgeText?.toLowerCase().includes('admissions') ? 'Campus Help & Support Office' : (contactData.hero.badgeText || 'Campus Help & Support')}</span>
               </div>
               <h1 className={styles.heroTitle}>{contactData.hero.title}</h1>
               <p className={styles.heroSubtitle}>{contactData.hero.subtitle}</p>

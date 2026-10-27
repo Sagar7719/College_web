@@ -120,7 +120,7 @@ export function DownloadsClient() {
 
             <h1
               style={{
-                fontSize: '2.75rem',
+                fontSize: 'clamp(1.75rem, 5vw, 2.75rem)',
                 fontWeight: 800,
                 color: '#FFFFFF',
                 margin: '0 0 1rem 0',
@@ -128,7 +128,7 @@ export function DownloadsClient() {
                 lineHeight: 1.15,
               }}
             >
-              Document Downloads &amp; Downloads Archive
+              Document Downloads &amp; Archive
             </h1>
 
             <p style={{ fontSize: '1.0625rem', color: '#DED4C5', margin: '0 0 2rem 0', lineHeight: 1.6 }}>
@@ -254,7 +254,7 @@ export function DownloadsClient() {
             )}
 
             {/* RESULTS COUNT STRIP */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', color: '#706A61', fontSize: '0.875rem', fontWeight: 700 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.25rem', color: '#706A61', fontSize: '0.875rem', fontWeight: 700 }}>
               <span>
                 Showing {filtered.length} document{filtered.length !== 1 ? 's' : ''}{activeCategory !== 'All' ? ` in "${activeCategory}"` : ''}
               </span>

@@ -33,14 +33,22 @@ export const ProgrammesCarousel: React.FC<ProgrammesCarouselProps> = ({ courses 
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
+  const getCardStep = useCallback(() => {
+    if (!scrollRef.current) return 384;
+    const firstCard = scrollRef.current.firstElementChild as HTMLElement;
+    if (!firstCard) return 384;
+    const gap = typeof window !== 'undefined' && window.innerWidth < 640 ? 16 : 24;
+    return firstCard.offsetWidth + gap;
+  }, []);
+
   // Sync scroll position with active index dot
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
-    const { scrollLeft, clientWidth } = scrollRef.current;
-    const cardWidth = 360 + 24; // card width + gap
-    const index = Math.round(scrollLeft / cardWidth);
+    const { scrollLeft } = scrollRef.current;
+    const step = getCardStep();
+    const index = Math.round(scrollLeft / step);
     setActiveIndex(Math.min(Math.max(index, 0), courses.length - 1));
-  }, [courses.length]);
+  }, [courses.length, getCardStep]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -52,36 +60,59 @@ export const ProgrammesCarousel: React.FC<ProgrammesCarouselProps> = ({ courses 
     };
   }, [handleScroll]);
 
-  // Industry Standard Auto-Play Carousel (Pauses on Hover)
+  const scrollToCard = useCallback((index: number) => {
+    if (!scrollRef.current) return;
+    const targetCard = scrollRef.current.children[index] as HTMLElement;
+    if (targetCard) {
+      const targetLeft =
+        targetCard.offsetParent === scrollRef.current
+          ? targetCard.offsetLeft
+          : targetCard.offsetLeft - scrollRef.current.offsetLeft;
+      scrollRef.current.scrollTo({
+        left: Math.max(0, targetLeft),
+        behavior: 'smooth',
+      });
+    } else {
+      const step = getCardStep();
+      scrollRef.current.scrollTo({
+        left: index * step,
+        behavior: 'smooth',
+      });
+    }
+    setActiveIndex(index);
+  }, [getCardStep]);
+
+  // Industry Standard Auto-Play Carousel (Pauses when off-screen or on Hover)
   useEffect(() => {
     if (isHovered || courses.length <= 1) return;
 
+    let isVisible = true;
+    let observer: IntersectionObserver | null = null;
+
+    if (typeof IntersectionObserver !== 'undefined' && scrollRef.current) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          isVisible = entry.isIntersecting;
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(scrollRef.current);
+    }
+
     const timer = setInterval(() => {
-      if (!scrollRef.current) return;
+      if (!scrollRef.current || !isVisible) return;
       const nextIndex = (activeIndex + 1) % courses.length;
-      const cardWidth = 360 + 24;
-      scrollRef.current.scrollTo({
-        left: nextIndex * cardWidth,
-        behavior: 'smooth',
-      });
-      setActiveIndex(nextIndex);
+      scrollToCard(nextIndex);
     }, 4500);
 
-    return () => clearInterval(timer);
-  }, [activeIndex, isHovered, courses.length]);
-
-  const scrollToCard = (index: number) => {
-    if (!scrollRef.current) return;
-    const cardWidth = 360 + 24;
-    scrollRef.current.scrollTo({
-      left: index * cardWidth,
-      behavior: 'smooth',
-    });
-    setActiveIndex(index);
-  };
+    return () => {
+      clearInterval(timer);
+      if (observer) observer.disconnect();
+    };
+  }, [activeIndex, isHovered, courses.length, scrollToCard]);
 
   return (
-    <section className={styles.sec} aria-label="Explore Our Programmes">
+    <section id="programmes" className={styles.sec} aria-label="Explore Our Programmes">
       <div className="container">
         {/* Centered Section Header */}
         <div className={styles.secHeadCenter}>
@@ -98,6 +129,8 @@ export const ProgrammesCarousel: React.FC<ProgrammesCarouselProps> = ({ courses 
           className={styles.carouselViewport}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
+          onTouchStart={() => setIsHovered(true)}
+          onTouchEnd={() => setIsHovered(false)}
         >
           {courses.map((course, idx) => {
             const variantClass = colorVariants[idx % colorVariants.length];

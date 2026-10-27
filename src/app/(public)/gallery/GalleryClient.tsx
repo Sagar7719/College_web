@@ -244,6 +244,24 @@ export function GalleryClient({ initialAlbums, collegeName }: GalleryClientProps
 
   return (
     <div className={styles.galleryPage}>
+      {/* 1. EXECUTIVE HERO BANNER */}
+      <section className={styles.heroBanner}>
+        <div className="container">
+          <div className={styles.heroContent}>
+            <div className={styles.innerHeroGlassCard}>
+              <div className={styles.heroBadge}>
+                <Camera size={16} />
+                <span>Visual Institutional Archive</span>
+              </div>
+              <h1 className={styles.heroTitle}>Photo Gallery &amp; Media Albums</h1>
+              <p className={styles.heroSubtitle}>
+                Explore memorable campus moments, cultural celebrations, academic convocation ceremonies, sporting championships, and infrastructure at {collegeName}.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="container">
         {/* Compact Control Bar in Website Theme Color */}
         <div className={styles.controlsRow}>

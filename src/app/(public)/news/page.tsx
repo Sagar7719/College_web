@@ -78,7 +78,7 @@ export default async function NewsPage() {
 
           <h1
             style={{
-              fontSize: '2.75rem',
+              fontSize: 'clamp(1.75rem, 5vw, 2.75rem)',
               fontWeight: 800,
               color: '#FFFFFF',
               margin: '0 0 1rem 0',
@@ -98,19 +98,23 @@ export default async function NewsPage() {
       {/* ==============================================================================
          2. NEWS ARTICLES CARDS GRID
          ============================================================================== */}
-      <div className="container" style={{ maxWidth: '1100px', margin: '0 auto', padding: '3rem 1.5rem 0 1.5rem' }}>
+      <div className="container" style={{ maxWidth: '1100px', margin: '0 auto', padding: '2.5rem 1rem 4rem 1rem' }}>
         {articles.length > 0 ? (
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-              gap: '1.75rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 350px))',
+              justifyContent: 'center',
+              gap: '2rem',
             }}
           >
             {articles.map((item) => (
               <div
                 key={item.id}
                 style={{
+                  maxWidth: '350px',
+                  width: '100%',
+                  margin: '0 auto',
                   backgroundColor: '#FFFFFF',
                   borderRadius: '16px',
                   border: '1.5px solid #E8DFD1',
@@ -118,12 +122,12 @@ export default async function NewsPage() {
                   boxShadow: '0 4px 20px rgba(36, 34, 31, 0.04)',
                   display: 'flex',
                   flexDirection: 'column',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.25s ease',
                 }}
               >
                 {/* Cover Image or Fallback */}
                 {item.coverImageUrl ? (
-                  <div style={{ position: 'relative', width: '100%', height: '210px', overflow: 'hidden' }}>
+                  <div style={{ position: 'relative', width: '100%', height: '230px', backgroundColor: '#F5EFE6', overflow: 'hidden' }}>
                     <img
                       src={item.coverImageUrl}
                       alt={item.title}
@@ -131,6 +135,7 @@ export default async function NewsPage() {
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
+                        objectPosition: 'top center',
                         display: 'block',
                       }}
                     />
@@ -146,6 +151,7 @@ export default async function NewsPage() {
                         fontSize: '0.725rem',
                         fontWeight: 800,
                         boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                        zIndex: 2,
                       }}
                     >
                       PRESS RELEASE

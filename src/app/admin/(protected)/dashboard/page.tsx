@@ -2,7 +2,18 @@ import React from 'react';
 import Link from 'next/link';
 import { getAdminDb } from '@/lib/firebase/admin';
 import { siteSettingsService } from '@/services/site-settings.service';
-import { Button, Badge } from '@/components/ui';
+import { Button } from '@/components/ui';
+import {
+  FileText,
+  Landmark,
+  GraduationCap,
+  Users,
+  Megaphone,
+  Newspaper,
+  Calendar,
+  Image as ImageIcon,
+  Download,
+} from 'lucide-react';
 import styles from '@/components/admin/admin.module.css';
 
 export default async function AdminDashboardPage() {
@@ -31,39 +42,93 @@ export default async function AdminDashboardPage() {
     siteSettingsService.getSettings().catch(() => null),
   ]);
 
-  const collegeName = settings?.collegeInfo?.name || 'College CMS';
+  const collegeName = settings?.collegeInfo?.name || 'Shivaji University Kolhapur';
   const isSetupCompleted = Boolean(settings?.setupCompleted);
   const isMaintenanceActive = Boolean(settings?.maintenanceMode);
 
   const metrics = [
-    { title: 'Dynamic Pages', count: pagesCount, icon: '📄', href: '/admin/pages', theme: styles.metricTerracotta },
-    { title: 'Departments', count: departmentsCount, icon: '🏛️', href: '/admin/departments', theme: styles.metricEmerald },
-    { title: 'Courses & Programs', count: coursesCount, icon: '🎓', href: '/admin/courses', theme: styles.metricSapphire },
-    { title: 'Faculty Members', count: facultyCount, icon: '👨‍🏫', href: '/admin/faculty', theme: styles.metricPurple },
-    { title: 'Notices & Circulars', count: noticesCount, icon: '📌', href: '/admin/notices', theme: styles.metricGold },
-    { title: 'News Stories', count: newsCount, icon: '📰', href: '/admin/news', theme: styles.metricCrimson },
-    { title: 'Campus Events', count: eventsCount, icon: '📅', href: '/admin/events', theme: styles.metricTeal },
-    { title: 'Photo Albums', count: galleryCount, icon: '🖼️', href: '/admin/gallery', theme: styles.metricIndigo },
-    { title: 'Downloads Center', count: downloadsCount, icon: '📥', href: '/admin/downloads', theme: styles.metricTerracotta },
+    { title: 'Dynamic Pages', count: pagesCount, icon: <FileText size={22} />, href: '/admin/pages', theme: styles.metricTerracotta },
+    { title: 'Departments', count: departmentsCount, icon: <Landmark size={22} />, href: '/admin/departments', theme: styles.metricEmerald },
+    { title: 'Courses & Programs', count: coursesCount, icon: <GraduationCap size={22} />, href: '/admin/courses', theme: styles.metricSapphire },
+    { title: 'Faculty Members', count: facultyCount, icon: <Users size={22} />, href: '/admin/faculty', theme: styles.metricPurple },
+    { title: 'Notices & Circulars', count: noticesCount, icon: <Megaphone size={22} />, href: '/admin/notices', theme: styles.metricGold },
+    { title: 'News Stories', count: newsCount, icon: <Newspaper size={22} />, href: '/admin/news', theme: styles.metricCrimson },
+    { title: 'Campus Events', count: eventsCount, icon: <Calendar size={22} />, href: '/admin/events', theme: styles.metricTeal },
+    { title: 'Photo Albums', count: galleryCount, icon: <ImageIcon size={22} />, href: '/admin/gallery', theme: styles.metricIndigo },
+    { title: 'Downloads Center', count: downloadsCount, icon: <Download size={22} />, href: '/admin/downloads', theme: styles.metricMint },
   ];
 
   return (
-    <div>
+    <div className={styles.adminMainInner}>
       {/* Welcome Banner */}
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
-          <Badge variant="info">CMS Administration</Badge>
+          <span
+            style={{
+              backgroundColor: '#F5EBE6',
+              color: '#B4532A',
+              padding: '4px 12px',
+              borderRadius: '100px',
+              fontSize: '0.8125rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+            }}
+          >
+            CMS Administration
+          </span>
           {isSetupCompleted ? (
-            <Badge variant="success">Setup Completed ✓</Badge>
+            <span
+              style={{
+                backgroundColor: '#DCFCE7',
+                color: '#15803D',
+                padding: '4px 12px',
+                borderRadius: '100px',
+                fontSize: '0.8125rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              Setup Completed ✓
+            </span>
           ) : (
-            <Badge variant="warning">Initial Setup Pending</Badge>
+            <span
+              style={{
+                backgroundColor: '#FEF3C7',
+                color: '#D97706',
+                padding: '4px 12px',
+                borderRadius: '100px',
+                fontSize: '0.8125rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              Initial Setup Pending
+            </span>
           )}
           {isMaintenanceActive && (
-            <Badge variant="danger">🚨 Maintenance Mode Active</Badge>
+            <span
+              style={{
+                backgroundColor: '#FEE2E2',
+                color: '#DC2626',
+                padding: '4px 12px',
+                borderRadius: '100px',
+                fontSize: '0.8125rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              🚨 Maintenance Mode Active
+            </span>
           )}
         </div>
-        <h1 className={styles.headerTitle} style={{ fontSize: '2.15rem', marginBottom: '0.5rem' }}>{collegeName} Overview</h1>
-        <p style={{ color: '#706A61', fontSize: '0.9375rem', margin: 0 }}>
+        <h1 className={styles.dashboardTitle}>
+          {collegeName} Overview
+        </h1>
+        <p className={styles.dashboardSubtitle}>
           Manage dynamic pages, navigation, academic departments, notices, faculty, and site settings.
         </p>
       </div>
@@ -106,7 +171,7 @@ export default async function AdminDashboardPage() {
         </div>
       )}
 
-      {/* 3D Squircle RGB Metrics Cards Grid */}
+      {/* Coordinated Pastel Metric Stat Cards Grid */}
       <div className={styles.metricsGrid}>
         {metrics.map((m) => (
           <Link key={m.title} href={m.href} style={{ textDecoration: 'none' }}>

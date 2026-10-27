@@ -7,6 +7,18 @@
   background-color: var(--color-primary-bg, #F7F2E9);
   position: relative;
   overflow: hidden;
+  scroll-margin-top: 100px;
+}
+
+@media (max-width: 768px) {
+  .sec {
+    padding: 110px 0 60px;
+    scroll-margin-top: 100px;
+  }
+  .secHeadCenter {
+    margin: 0 auto 28px;
+    padding: 0 16px;
+  }
 }
 
 .secHeadCenter {
@@ -47,11 +59,20 @@
   overflow-x: auto;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  padding: 12px 4px 32px 4px;
+  padding: 12px 0 32px 0;
   display: flex;
-  gap: 24px;
+  gap: 20px;
+  position: relative;
+  box-sizing: border-box;
   scrollbar-width: none !important; /* Firefox */
   -ms-overflow-style: none !important; /* IE/Edge */
+}
+
+@media (max-width: 639px) {
+  .carouselViewport {
+    gap: 16px;
+    padding: 8px 0 20px 0;
+  }
 }
 
 .carouselViewport::-webkit-scrollbar {
@@ -62,12 +83,14 @@
 
 /* ── CARD BASE ── */
 .progCard {
-  flex: 0 0 calc(100% - 32px);
-  max-width: 380px;
-  scroll-snap-align: center;
+  flex: 0 0 100%;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  scroll-snap-align: start;
   background-color: #FFFFFF;
-  border-radius: 24px;
-  padding: 32px 28px;
+  border-radius: 20px;
+  padding: 24px 20px;
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 20px rgba(20, 18, 15, 0.04);
@@ -77,16 +100,30 @@
   border: 1px solid rgba(222, 212, 197, 0.8);
 }
 
+@media (max-width: 360px) {
+  .progCard {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+}
+
 @media (min-width: 640px) {
   .progCard {
-    flex: 0 0 340px;
-    scroll-snap-align: start;
+    flex: 0 0 calc(50% - 10px);
+    width: calc(50% - 10px);
+    max-width: calc(50% - 10px);
+    padding: 30px 26px;
+    border-radius: 24px;
   }
 }
 
 @media (min-width: 1024px) {
   .progCard {
-    flex: 0 0 360px;
+    flex: 0 0 calc(33.333% - 14px);
+    width: calc(33.333% - 14px);
+    max-width: calc(33.333% - 14px);
+    padding: 32px 28px;
+    border-radius: 24px;
   }
 }
 
@@ -181,6 +218,7 @@
   flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -281,7 +319,7 @@
   padding: 0 28px;
   background-color: transparent;
   color: #24221F;
-  border: 1.5 solid #24221F;
+  border: 1.5px solid #24221F;
   border-radius: 100px;
   font-weight: 700;
   font-size: 0.9375rem;

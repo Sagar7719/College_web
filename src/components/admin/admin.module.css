@@ -1,18 +1,27 @@
 /* ==============================================================================
-   EXECUTIVE ENTERPRISE CMS ADMIN PANEL STYLING SYSTEM
-   Sidebar: Obsidian Dark (#080504 / #110C09)
-   Accent: Terracotta Gradient (#C85A32 -> #A04220)
-   Header: Glassmorphic (#FFFFFF 94% + Backdrop Blur)
-   Main Shell: Warm Ivory Surface (#FAF8F5)
+   COLLEGE CMS ADMIN PANEL STYLING SYSTEM
+   Sidebar: Warm Light Ivory (#F5F1EB)
+   Main Content: Soft Warm Ivory (#F8F7F4)
+   Header & Cards: Pure White (#FFFFFF)
+   Borders: Subtle Warm Neutral (#E5DDD2)
+   Primary Text: Deep Charcoal (#292524)
+   Secondary Text: Warm Muted Grey (#78716C)
+   Primary Accent: Terracotta (#B4532A)
+   Secondary Accent: Sage Green (#647C6A)
+   Active Nav Background: Soft Terracotta Cream (#EFE2D6)
+   Hover Background: Warm Cream (#F0EAE2)
    ============================================================================== */
 
-/* --- Main Admin Shell --- */
+/* --- Main Admin Shell: Viewport-Constrained Independent Scrolling Layout --- */
 .adminShell {
   display: flex;
-  min-height: 100vh;
-  background-color: #FAF8F5;
+  height: 100vh;
+  max-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #F8F7F4;
   font-family: var(--font-sans);
-  color: #24221F;
+  color: #292524;
 }
 
 .mainWrapper {
@@ -20,54 +29,59 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  background-color: #F8F7F4;
 }
 
-/* --- Executive Obsidian Sidebar --- */
+/* --- Warm Light Ivory Sidebar --- */
 .sidebar {
   width: 280px;
-  background: radial-gradient(circle at 10% 10%, #17110E 0%, #0A0806 100%);
-  color: #F5F0E8;
+  background-color: #F5F1EB;
+  color: #292524;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  position: sticky;
-  top: 0;
   height: 100vh;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 100vh;
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 90;
-  border-right: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 6px 0 32px rgba(0, 0, 0, 0.35);
+  border-right: 1px solid #E5DDD2;
+  box-shadow: none;
 }
 
 .sidebarHeader {
   padding: 1.25rem 1.25rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  border-bottom: 1px solid #E5DDD2;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  background: linear-gradient(180deg, #1A130F 0%, #0A0806 100%);
+  background-color: #F5F1EB;
+  flex-shrink: 0;
 }
 
 .sidebarBrandBadge {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #C85A32 0%, #8A2D10 100%);
+  background: #B4532A;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #FFFFFF;
-  font-size: 1.35rem;
-  box-shadow: 0 6px 20px rgba(200, 90, 50, 0.45);
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(180, 83, 42, 0.25);
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .sidebarTitle {
   font-family: var(--font-display) !important;
-  font-size: 1.15rem;
+  font-size: 1.125rem;
   font-weight: 800;
-  color: #FFFFFF;
+  color: #292524;
   line-height: 1.2;
   letter-spacing: -0.015em;
   display: block;
@@ -75,26 +89,32 @@
 
 .sidebarSubTitle {
   font-size: 0.6875rem;
-  color: #4ADE80;
+  color: #15803D;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
+/* Sidebar Body - Scrolls independently between fixed header and fixed footer */
 .sidebarBody {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 1rem 0;
+  overflow-x: hidden;
+  padding: 0.75rem 0;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-color: #D6CEC5 transparent;
 }
 
 .sidebarBody::-webkit-scrollbar {
   width: 5px;
 }
 .sidebarBody::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: #D6CEC5;
   border-radius: 10px;
+}
+.sidebarBody::-webkit-scrollbar-thumb:hover {
+  background: #B8B0A5;
 }
 
 .navGroup {
@@ -106,8 +126,8 @@
   font-size: 0.6875rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #A09A90;
+  letter-spacing: 0.08em;
+  color: #78716C;
 }
 
 .sidebarList {
@@ -124,62 +144,68 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0.625rem 1rem;
-  color: rgba(226, 223, 216, 0.72);
+  padding: 0.625rem 0.875rem;
+  color: #292524;
   font-size: 0.875rem;
   font-weight: 600;
-  border-radius: 10px;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
-  border-left: 3px solid transparent;
+  border-left: 3.5px solid transparent;
 }
 
 .sidebarLinkIcon {
   font-size: 1.1rem;
   flex-shrink: 0;
   opacity: 0.85;
-  transition: transform 0.22s ease;
+  color: #78716C;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .sidebarLink:hover {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.06);
-  transform: translateX(3px);
+  color: #292524;
+  background-color: #F0EAE2;
 }
 
 .sidebarLink:hover .sidebarLinkIcon {
-  transform: scale(1.15);
+  color: #292524;
   opacity: 1;
 }
 
 .sidebarLinkActive {
-  color: #FFAA8A !important;
-  background: linear-gradient(90deg, rgba(200, 90, 50, 0.22) 0%, rgba(200, 90, 50, 0.06) 100%) !important;
-  border-left-color: #C85A32 !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: #B4532A !important;
+  background-color: #EFE2D6 !important;
+  border-left-color: #B4532A !important;
 }
 
+.sidebarLinkActive .sidebarLinkIcon {
+  color: #B4532A !important;
+  opacity: 1;
+}
+
+/* Sidebar Footer - Pinned fixed at bottom of sidebar */
 .sidebarFooter {
-  padding: 1rem 1.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: #050302;
+  padding: 0.875rem 1rem;
+  border-top: 1px solid #E5DDD2;
+  background-color: #F5F1EB;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .sidebarUserAvatar {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #C85A32 0%, #A04220 100%);
+  background: #78716C;
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 0.875rem;
-  box-shadow: 0 4px 12px rgba(200, 90, 50, 0.3);
+  font-size: 0.8125rem;
+  box-shadow: 0 2px 6px rgba(41, 37, 36, 0.15);
 }
 
 .sidebarUserInfo {
@@ -190,7 +216,7 @@
 .sidebarUserName {
   font-size: 0.8125rem;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #292524;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -198,34 +224,31 @@
 
 .sidebarUserStatus {
   font-size: 0.6875rem;
-  color: #4ADE80;
+  color: #15803D;
   display: flex;
   align-items: center;
   gap: 4px;
   font-weight: 600;
 }
 
-/* --- Executive Glass Top Header --- */
+/* --- Clean White Executive Top Header --- */
 .adminHeader {
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(222, 212, 197, 0.7);
-  padding: 1rem 2rem;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #E5DDD2;
+  padding: 0.875rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 4px 20px rgba(24, 22, 19, 0.03);
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 80;
+  box-shadow: 0 1px 4px rgba(41, 37, 36, 0.02);
 }
 
 .headerTitle {
   font-family: var(--font-display) !important;
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: #24221F;
+  color: #292524;
   margin: 0;
   letter-spacing: -0.02em;
 }
@@ -235,28 +258,28 @@
   align-items: center;
   gap: 6px;
   font-size: 0.8125rem;
-  color: #706A61;
+  color: #78716C;
   margin-top: 2px;
   font-weight: 500;
 }
 
 .mobileMenuBtn {
   display: none;
-  background: #F4EBE6;
-  border: 1px solid rgba(200, 90, 50, 0.2);
-  color: #C85A32;
+  background: #F5F1EB;
+  border: 1px solid #E5DDD2;
+  color: #B4532A;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 1.25rem;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 .mobileMenuBtn:hover {
-  background: #C85A32;
+  background: #B4532A;
   color: #FFFFFF;
 }
 
@@ -271,22 +294,20 @@
   align-items: center;
   gap: 6px;
   padding: 0.4375rem 0.875rem;
-  background: #F7F2E9;
-  border: 1px solid rgba(222, 212, 197, 0.8);
+  background: #F5F1EB;
+  border: 1px solid #E5DDD2;
   border-radius: 8px;
-  color: #24221F;
+  color: #292524;
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 .publicViewBtn:hover {
-  background: #C85A32;
-  color: #FFFFFF;
-  border-color: #C85A32;
-  box-shadow: 0 4px 14px rgba(200, 90, 50, 0.25);
-  transform: translateY(-1px);
+  background: #EFE2D6;
+  color: #B4532A;
+  border-color: #B4532A;
 }
 
 .userInfo {
@@ -296,35 +317,76 @@
 .userEmail {
   font-size: 0.84375rem;
   font-weight: 700;
-  color: #24221F;
+  color: #292524;
   margin: 0;
 }
 
 .userRole {
   font-size: 0.71875rem;
-  color: #706A61;
+  color: #78716C;
   font-weight: 600;
 }
 
-/* --- Admin Body & Main Content Surface --- */
+/* Header Logout Button */
+.headerLogoutBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #FFFFFF;
+  border: 1px solid #E5DDD2;
+  color: #292524;
+  padding: 0.4375rem 0.875rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.headerLogoutBtn:hover {
+  border-color: #B4532A;
+  color: #B4532A;
+  background-color: #F5EBE6;
+}
+
+/* --- Admin Main Content Surface - Independent Vertical Scroll Container --- */
 .adminMain {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 2rem;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2rem;
+  background-color: #F8F7F4;
+  scrollbar-width: thin;
+  scrollbar-color: #D6CEC5 transparent;
+}
+
+.adminMain::-webkit-scrollbar {
+  width: 6px;
+}
+.adminMain::-webkit-scrollbar-thumb {
+  background: #D6CEC5;
+  border-radius: 10px;
+}
+.adminMain::-webkit-scrollbar-thumb:hover {
+  background: #B8B0A5;
+}
+
+.adminMainInner {
+  max-width: 1560px;
+  width: 100%;
 }
 
 /* --- Responsive Mobile Drawer --- */
 .drawerOverlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(6, 4, 3, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(41, 37, 36, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 1000;
   display: flex;
-  animation: fadeIn 0.25s ease;
+  animation: fadeIn 0.2s ease;
 }
 
 @keyframes fadeIn {
@@ -332,31 +394,77 @@
   to { opacity: 1; }
 }
 
-/* --- Phase 2: Executive Dashboard Metrics & Callouts --- */
+.drawerContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 300px;
+  max-width: 85vw;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #F5F1EB;
+  border-right: 1px solid #E5DDD2;
+  box-shadow: 8px 0 32px rgba(41, 37, 36, 0.15);
+  animation: slideInLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Dashboard Typography */
+.dashboardTitle {
+  font-family: var(--font-display) !important;
+  font-size: 2.15rem;
+  font-weight: 800;
+  color: #292524;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.dashboardSubtitle {
+  color: #78716C;
+  font-size: 0.9375rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* --- Dashboard Stat Cards & Metrics Grid --- */
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
   margin-bottom: 2.5rem;
 }
 
 .metricCard {
   background: #FFFFFF;
-  border: 1px solid rgba(222, 212, 197, 0.7);
+  border: 1px solid #E5DDD2;
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(24, 22, 19, 0.03);
+  box-shadow: 0 2px 8px rgba(41, 37, 36, 0.03);
 }
 
 .metricCard:hover {
   background: #FFFFFF;
-  transform: translateY(-6px);
+  transform: translateY(-2px);
+  border-color: #D6CEC5;
+  box-shadow: 0 6px 18px rgba(41, 37, 36, 0.06);
 }
 
 .metricIconBox {
@@ -368,113 +476,154 @@
   justify-content: center;
   font-size: 1.35rem;
   flex-shrink: 0;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s ease;
 }
 
 .metricTitle {
   font-size: 0.8125rem;
   font-weight: 700;
-  color: #706A61;
-  margin: 0 0 2px;
+  color: #78716C;
+  margin: 0 0 4px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
 }
 
 .metricValue {
   font-family: var(--font-display) !important;
-  font-size: 1.75rem;
+  font-size: 1.85rem;
   font-weight: 800;
-  color: #24221F;
+  color: #292524;
   margin: 0;
   line-height: 1.1;
 }
 
-/* Metric RGB Themes */
-.metricTerracotta { border-color: rgba(200, 90, 50, 0.22); }
-.metricTerracotta .metricIconBox { background: rgba(200, 90, 50, 0.1); color: #C85A32; border: 1px solid rgba(200, 90, 50, 0.25); }
-.metricTerracotta:hover { border-color: #C85A32; box-shadow: 0 16px 36px -8px rgba(200, 90, 50, 0.25); }
-.metricTerracotta:hover .metricIconBox { background: linear-gradient(135deg, #C85A32 0%, #A04220 100%); color: #FFFFFF; transform: scale(1.1) rotate(4deg); box-shadow: 0 8px 22px rgba(200, 90, 50, 0.4); }
+/* Pastel Coordinated Metric Card Themes - Matching Approved Visual Palette */
+.metricTerracotta .metricIconBox {
+  background: #FFEDD5;
+  color: #B4532A;
+  border: 1px solid #FED7AA;
+}
+.metricTerracotta:hover {
+  border-color: #B4532A;
+}
 
-.metricEmerald { border-color: rgba(21, 128, 61, 0.22); }
-.metricEmerald .metricIconBox { background: rgba(21, 128, 61, 0.1); color: #15803D; border: 1px solid rgba(21, 128, 61, 0.25); }
-.metricEmerald:hover { border-color: #15803D; box-shadow: 0 16px 36px -8px rgba(21, 128, 61, 0.25); }
-.metricEmerald:hover .metricIconBox { background: linear-gradient(135deg, #15803D 0%, #0F622F 100%); color: #FFFFFF; transform: scale(1.1) rotate(4deg); box-shadow: 0 8px 22px rgba(21, 128, 61, 0.4); }
+.metricEmerald .metricIconBox {
+  background: #ECFDF5;
+  color: #059669;
+  border: 1px solid #A7F3D0;
+}
+.metricEmerald:hover {
+  border-color: #059669;
+}
 
-.metricSapphire { border-color: rgba(37, 99, 235, 0.22); }
-.metricSapphire .metricIconBox { background: rgba(37, 99, 235, 0.1); color: #2563EB; border: 1px solid rgba(37, 99, 235, 0.25); }
-.metricSapphire:hover { border-color: #2563EB; box-shadow: 0 16px 36px -8px rgba(37, 99, 235, 0.25); }
-.metricSapphire:hover .metricIconBox { background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); color: #FFFFFF; transform: scale(1.1) rotate(4deg); box-shadow: 0 8px 22px rgba(37, 99, 235, 0.4); }
+.metricSapphire .metricIconBox {
+  background: #F3E8FF;
+  color: #7C3AED;
+  border: 1px solid #DDD6FE;
+}
+.metricSapphire:hover {
+  border-color: #7C3AED;
+}
 
-.metricGold { border-color: rgba(217, 119, 6, 0.22); }
-.metricGold .metricIconBox { background: rgba(217, 119, 6, 0.1); color: #D97706; border: 1px solid rgba(217, 119, 6, 0.25); }
-.metricGold:hover { border-color: #D97706; box-shadow: 0 16px 36px -8px rgba(217, 119, 6, 0.25); }
-.metricGold:hover .metricIconBox { background: linear-gradient(135deg, #D97706 0%, #B45309 100%); color: #FFFFFF; transform: scale(1.1) rotate(4deg); box-shadow: 0 8px 22px rgba(217, 119, 6, 0.4); }
+.metricPurple .metricIconBox {
+  background: #FEE2E2;
+  color: #E11D48;
+  border: 1px solid #FECDD3;
+}
+.metricPurple:hover {
+  border-color: #E11D48;
+}
 
-.metricPurple { border-color: rgba(147, 51, 234, 0.22); }
-.metricPurple .metricIconBox { background: rgba(147, 51, 234, 0.1); color: #9333EA; border: 1px solid rgba(147, 51, 234, 0.25); }
-.metricPurple:hover { border-color: #9333EA; box-shadow: 0 16px 36px -8px rgba(147, 51, 234, 0.25); }
-.metricPurple:hover .metricIconBox { background: linear-gradient(135deg, #9333EA 0%, #7E22CE 100%); color: #FFFFFF; transform: scale(1.1) rotate(4deg); box-shadow: 0 8px 22px rgba(147, 51, 234, 0.4); }
+.metricGold .metricIconBox {
+  background: #FEF3C7;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+}
+.metricGold:hover {
+  border-color: #D97706;
+}
 
-.metricCrimson { border-color: rgba(220, 38, 38, 0.22); }
-.metricCrimson .metricIconBox { background: rgba(220, 38, 38, 0.1); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.25); }
-.metricCrimson:hover { border-color: #DC2626; box-shadow: 0 16px 36px -8px rgba(220, 38, 38, 0.25); }
-.metricCrimson:hover .metricIconBox { background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); color: #FFFFFF; transform: scale(1.1) rotate(4deg); box-shadow: 0 8px 22px rgba(220, 38, 38, 0.4); }
+.metricCrimson .metricIconBox {
+  background: #FFE4E6;
+  color: #E11D48;
+  border: 1px solid #FECDD3;
+}
+.metricCrimson:hover {
+  border-color: #E11D48;
+}
 
-.metricTeal { border-color: rgba(13, 148, 136, 0.22); }
-.metricTeal .metricIconBox { background: rgba(13, 148, 136, 0.1); color: #0D9488; border: 1px solid rgba(13, 148, 136, 0.25); }
-.metricTeal:hover { border-color: #0D9488; box-shadow: 0 16px 36px -8px rgba(13, 148, 136, 0.25); }
-.metricTeal:hover .metricIconBox { background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); color: #FFFFFF; transform: scale(1.1) rotate(4deg); box-shadow: 0 8px 22px rgba(13, 148, 136, 0.4); }
+.metricTeal .metricIconBox {
+  background: #E0F2FE;
+  color: #0284C7;
+  border: 1px solid #BAE6FD;
+}
+.metricTeal:hover {
+  border-color: #0284C7;
+}
 
-.metricIndigo { border-color: rgba(79, 70, 229, 0.22); }
-.metricIndigo .metricIconBox { background: rgba(79, 70, 229, 0.1); color: #4F46E5; border: 1px solid rgba(79, 70, 229, 0.25); }
-.metricIndigo:hover { border-color: #4F46E5; box-shadow: 0 16px 36px -8px rgba(79, 70, 229, 0.25); }
-.metricIndigo:hover .metricIconBox { background: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%); color: #FFFFFF; transform: scale(1.1) rotate(4deg); box-shadow: 0 8px 22px rgba(79, 70, 229, 0.4); }
+.metricIndigo .metricIconBox {
+  background: #EDE9FE;
+  color: #7C3AED;
+  border: 1px solid #DDD6FE;
+}
+.metricIndigo:hover {
+  border-color: #7C3AED;
+}
+
+.metricMint .metricIconBox {
+  background: #D1FAE5;
+  color: #059669;
+  border: 1px solid #A7F3D0;
+}
+.metricMint:hover {
+  border-color: #059669;
+}
 
 /* Banners */
 .noticeBannerBlue {
-  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
-  border: 1px solid #93C5FD;
-  border-left: 5px solid #2563EB;
-  border-radius: 14px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-left: 4px solid #647C6A;
+  border-radius: 12px;
   padding: 1.25rem 1.5rem;
   margin-bottom: 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 2px 8px rgba(41, 37, 36, 0.03);
 }
 
 .noticeBannerRed {
-  background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
-  border: 1px solid #FCA5A5;
-  border-left: 5px solid #DC2626;
-  border-radius: 14px;
+  background: #FFFBFB;
+  border: 1px solid #FEE2E2;
+  border-left: 4px solid #DC2626;
+  border-radius: 12px;
   padding: 1.25rem 1.5rem;
   margin-bottom: 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.08);
+  box-shadow: 0 2px 8px rgba(41, 37, 36, 0.03);
 }
 
 .noticeBannerTitle {
   font-family: var(--font-display) !important;
   font-size: 1.0625rem;
   font-weight: 700;
-  color: #1E293B;
+  color: #292524;
   margin: 0 0 4px;
 }
 
 .noticeBannerDesc {
   font-size: 0.875rem;
-  color: #475569;
+  color: #78716C;
   margin: 0;
   line-height: 1.45;
 }
 
-/* --- Table Action Icon Buttons (Clean Enterprise Squircle Icons) --- */
+/* --- Table Action Icon Buttons --- */
 .iconActionGroup {
   display: flex;
   align-items: center;
@@ -485,39 +634,41 @@
 .iconActionBtn {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #F7F2E9;
-  border: 1px solid rgba(222, 212, 197, 0.8);
-  color: #5C554B;
+  background: #FFFFFF;
+  border: 1px solid #E5DDD2;
+  color: #78716C;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
   text-decoration: none;
   position: relative;
   flex-shrink: 0;
 }
 
 .iconActionBtn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(24, 22, 19, 0.1);
+  transform: translateY(-1px);
+  color: #292524;
+  border-color: #D6CEC5;
+  box-shadow: 0 2px 6px rgba(41, 37, 36, 0.06);
 }
 
 .iconActionBtnEdit:hover:not(:disabled) {
-  background: rgba(200, 90, 50, 0.12);
-  border-color: #C85A32;
-  color: #C85A32;
+  background: #F5EBE6;
+  border-color: #B4532A;
+  color: #B4532A;
 }
 
 .iconActionBtnPreview:hover:not(:disabled) {
-  background: rgba(37, 99, 235, 0.12);
-  border-color: #2563EB;
-  color: #2563EB;
+  background: #F0FDF4;
+  border-color: #647C6A;
+  color: #647C6A;
 }
 
 .iconActionBtnDanger:hover:not(:disabled) {
-  background: rgba(220, 38, 38, 0.12);
+  background: #FEF2F2;
   border-color: #DC2626;
   color: #DC2626;
 }
@@ -525,9 +676,9 @@
 .iconActionBtn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
-  background: #F4F0E8;
-  border-color: rgba(222, 212, 197, 0.4);
-  color: #A0988C;
+  background: #F5F1EB;
+  border-color: #E5DDD2;
+  color: #A8A29E;
 }
 
 /* --- Phase 4: Premium Obsidian Glass Login Screen --- */
@@ -873,6 +1024,12 @@
   opacity: 1;
 }
 
+@media (max-width: 1200px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1023px) {
   .sidebar {
     display: none;
@@ -880,7 +1037,93 @@
   .mobileMenuBtn {
     display: flex;
   }
+  .adminHeader {
+    padding: 0.75rem 1.25rem;
+  }
   .adminMain {
     padding: 1.25rem;
+  }
+  .userInfo {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .userEmail,
+  .userRole,
+  .userInfo {
+    display: none !important;
+  }
+  .adminHeader {
+    padding: 0.625rem 1rem;
+    gap: 0.5rem;
+  }
+  .headerTitle {
+    font-size: 1.05rem;
+    line-height: 1.25;
+  }
+  .breadcrumbPath {
+    display: none !important;
+  }
+  .userControl {
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .publicViewBtn span,
+  .headerLogoutBtn span {
+    display: none !important;
+  }
+  .publicViewBtn,
+  .headerLogoutBtn {
+    padding: 0.45rem 0.625rem;
+    border-radius: 8px;
+  }
+  .dashboardTitle {
+    font-size: 1.65rem;
+    line-height: 1.25;
+  }
+  .dashboardSubtitle {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .adminMain {
+    padding: 1rem 0.875rem;
+  }
+  .metricsGrid {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+  .metricCard {
+    padding: 1rem 1.25rem;
+    gap: 1rem;
+  }
+  .metricValue {
+    font-size: 1.65rem;
+  }
+  .metricIconBox {
+    width: 46px;
+    height: 46px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .adminHeader {
+    padding: 0.625rem 0.75rem;
+    gap: 0.375rem;
+  }
+  .headerTitle {
+    font-size: 0.95rem;
+  }
+  .dashboardTitle {
+    font-size: 1.4rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  .adminMainInner {
+    max-width: 1600px;
   }
 }

@@ -106,11 +106,102 @@
   margin-top: var(--space-6);
 }
 
-.facultyGrid {
+/* --- Campus Events Grid --- */
+.eventsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 380px));
+  justify-content: center;
   gap: var(--space-6);
   margin-top: var(--space-6);
+}
+
+@media (max-width: 680px) {
+  .eventsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.eventCard {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-6);
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.eventCard:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.eventMetaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.eventDateBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.eventTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1.3;
+  margin-bottom: var(--space-2);
+}
+
+.eventVenue {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--space-3);
+}
+
+.eventDesc {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.facultyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 340px));
+  justify-content: center;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+@media (max-width: 640px) {
+  .facultyGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .facultyCard {
@@ -124,7 +215,10 @@
   box-shadow: var(--shadow-sm);
   align-items: center;
   text-align: center;
-  padding: var(--space-6) var(--space-4);
+  padding: var(--space-6) var(--space-4) var(--space-6);
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .facultyCard:hover {
@@ -188,7 +282,11 @@
   color: var(--color-text-secondary);
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: 0.25rem;
+  margin-top: auto;
+  padding-top: var(--space-3);
+  word-break: break-word;
+  max-width: 100%;
 }
 
 /* --- Downloads Resources --- */
@@ -442,7 +540,7 @@
 
 @media (max-width: 768px) {
   .subpageWrapper {
-    padding-top: 88px;
+    padding-top: 104px;
     padding-bottom: 50px;
   }
 }
@@ -459,7 +557,7 @@
 
 @media (max-width: 768px) {
   .innerDarkHeroBanner {
-    padding: 6rem 1rem 2.5rem 1rem;
+    padding: 6.75rem 1rem 2.5rem 1rem;
   }
 }
 
@@ -560,7 +658,6 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
   display: inline-block;
   line-height: 1.12;
   letter-spacing: -0.03em;
@@ -843,6 +940,7 @@
   margin-bottom: 24px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1656,6 +1754,7 @@
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -2126,4 +2225,66 @@
   font-size: 0.875rem;
   font-weight: 800;
   color: var(--color-accent);
+}
+
+/* ==============================================================================
+   RESPONSIVE POLISH & MOBILE ADAPTATIONS FOR INNER PAGES
+   ============================================================================== */
+@media (max-width: 768px) {
+  .pageHeader {
+    margin-bottom: var(--space-6);
+  }
+  .contactGrid {
+    gap: var(--space-6);
+  }
+  .contactFormCard {
+    padding: var(--space-6) var(--space-4);
+  }
+  .contactInfoCard {
+    padding: var(--space-6) var(--space-4);
+  }
+  .programsGrid {
+    grid-template-columns: 1fr;
+  }
+  .facultyGrid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 320px));
+    justify-content: center;
+    gap: var(--space-4);
+  }
+  .eventsGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  .principalMessageFlex {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .principalQuote {
+    border-left: none;
+    border-top: 3px solid var(--color-accent);
+    padding-left: 0;
+    padding-top: var(--space-3);
+  }
+  .downloadRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 480px) {
+  .filterTabs {
+    gap: var(--space-1);
+  }
+  .filterTab {
+    padding: 0.4rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+  .facultyGrid {
+    grid-template-columns: 1fr;
+  }
+  .eventsGrid {
+    grid-template-columns: 1fr;
+  }
 }
