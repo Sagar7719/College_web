@@ -121,14 +121,15 @@ export function SearchClient() {
     results.events.length;
 
   return (
-    <div className="container" style={{ padding: '3rem 1.5rem' }}>
-      <div className={styles.pageHeader}>
-        <Badge variant="default" style={{ marginBottom: '0.75rem' }}>Global Search</Badge>
-        <h1 className={styles.pageTitle}>Search College Website</h1>
-        <p className={styles.pageSubtitle}>
-          Find notices, courses, departments, faculty profiles, and news.
-        </p>
-      </div>
+    <div className={styles.subpageWrapper}>
+      <div className="container">
+        <div className={styles.pageHeader}>
+          <Badge variant="default" style={{ marginBottom: '0.75rem' }}>Global Search</Badge>
+          <h1 className={styles.pageTitle}>Search College Website</h1>
+          <p className={styles.pageSubtitle}>
+            Find notices, courses, departments, faculty profiles, and news.
+          </p>
+        </div>
 
       <Card variant="bordered" style={{ marginBottom: '3rem' }}>
         <CardBody style={{ padding: '1.75rem' }}>
@@ -341,5 +342,6 @@ export function SearchClient() {
         </div>
       )}
     </div>
-  );
+  </div>
+);
 }

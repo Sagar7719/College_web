@@ -46,7 +46,7 @@ export default function AdminNavigationManagerScreen() {
   const [treeItems, setTreeItems] = useState<NavigationItem[]>([]);
   const [publishedPages, setPublishedPages] = useState<Page[]>([]);
   const [selectablePages, setSelectablePages] = useState<SelectablePageOption[]>([]);
-  const [collegeName, setCollegeName] = useState('Jaysingpur College, Jaysingpur');
+  const [collegeName, setCollegeName] = useState('Shivaji University, Kolhapur');
   const [loading, setLoading] = useState(true);
 
   // Drag and Drop States

@@ -102,14 +102,27 @@ function ColumnTicker<T extends { id: string; title: string }>({
   const [isHovered, setIsHovered] = useState(false);
   const viewportRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll loop effect
+  // Auto-scroll loop effect (pauses when off-screen, hovered, or touched)
   useEffect(() => {
     if (isHovered || items.length <= 3) return;
 
     const viewport = viewportRef.current;
     if (!viewport) return;
 
+    let isVisible = true;
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== 'undefined' && viewport) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          isVisible = entry.isIntersecting;
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(viewport);
+    }
+
     const interval = setInterval(() => {
+      if (!isVisible) return;
       if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 5) {
         viewport.scrollTop = 0;
       } else {
@@ -117,7 +130,10 @@ function ColumnTicker<T extends { id: string; title: string }>({
       }
     }, 40);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (observer) observer.disconnect();
+    };
   }, [isHovered, items.length]);
 
   return (
@@ -125,6 +141,8 @@ function ColumnTicker<T extends { id: string; title: string }>({
       className={styles.tickerColumn}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={() => setIsHovered(true)}
+      onTouchEnd={() => setIsHovered(false)}
     >
       {/* Header */}
       <div className={styles.tickerHeader}>

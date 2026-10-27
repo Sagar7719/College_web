@@ -83,7 +83,7 @@ export const Footer: React.FC<FooterProps> = ({ initialSettings }) => {
           <div className={styles.footerGrid}>
             {/* Column 1: Brand & About */}
             <div className={styles.footerBrandCol}>
-              <h3 className={styles.footerBrandTitle}>{collegeInfo.name || 'Jaysingpur College, Jaysingpur'}</h3>
+              <h3 className={styles.footerBrandTitle}>{collegeInfo.name || 'Shivaji University, Kolhapur'}</h3>
               <p className={styles.footerAboutText}>{description}</p>
 
               {hasAnySocial && (
@@ -209,7 +209,7 @@ export const Footer: React.FC<FooterProps> = ({ initialSettings }) => {
         <div className="container">
           <div className={styles.footerBottomInner}>
             <p className={styles.copyrightText}>
-              {footerConfig.copyrightText || `© ${new Date().getFullYear()} ${collegeInfo.name || 'Jaysingpur College, Jaysingpur'}. All rights reserved.`}
+              {footerConfig.copyrightText || `© ${new Date().getFullYear()} ${collegeInfo.name || 'Shivaji University, Kolhapur'}. All rights reserved.`}
             </p>
             <div className={styles.footerBottomLinks}>
               <Link href="/about" className={styles.footerBottomLink}>

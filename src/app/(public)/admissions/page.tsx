@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
   const title = `Admissions 2026-2027 — ${collegeName}`;
   const description = `Explore admissions criteria, eligibility, counseling dates, and online application guidelines for ${collegeName}.`;
 

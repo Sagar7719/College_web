@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
   const title = `Academic Departments — ${collegeName}`;
   const description = `Discover state-of-the-art academic departments, research faculties, and laboratories at ${collegeName}.`;
   const ogImageUrl = settings.seoConfig?.defaultOgImageUrl || settings.collegeInfo?.logoUrl;

@@ -24,7 +24,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ title, onOpenMobileMen
 
   return (
     <header className={styles.adminHeader}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: 0 }}>
         <button
           onClick={onOpenMobileMenu}
           className={styles.mobileMenuBtn}
@@ -32,19 +32,25 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ title, onOpenMobileMen
         >
           <Menu size={20} />
         </button>
-        <div>
+        <div style={{ minWidth: 0 }}>
           <h1 className={styles.headerTitle}>{title}</h1>
           <div className={styles.breadcrumbPath}>
             <span>CMS Admin</span>
             <span>/</span>
-            <span style={{ color: '#C85A32', fontWeight: 600 }}>{title}</span>
+            <span style={{ color: '#B4532A', fontWeight: 600 }}>{title}</span>
           </div>
         </div>
       </div>
 
       <div className={styles.userControl}>
         {/* Direct Link to View Public Website */}
-        <Link href="/" target="_blank" className={styles.publicViewBtn} title="View Live Public Website" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <Link
+          href="/"
+          target="_blank"
+          className={styles.publicViewBtn}
+          title="View Live Public Website"
+          aria-label="View Live Public Website"
+        >
           <span>View Website</span>
           <ExternalLink size={14} />
         </Link>
@@ -52,16 +58,22 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ title, onOpenMobileMen
         {user && (
           <div className={styles.userInfo}>
             <p className={styles.userEmail}>{user.email || 'Administrator'}</p>
-            <span className={styles.userRole} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <ShieldCheck size={12} />
+            <span className={styles.userRole}>
+              <ShieldCheck size={12} color="#78716C" />
               Super Admin
             </span>
           </div>
         )}
-        <Button variant="outline" size="sm" onClick={handleLogout} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className={styles.headerLogoutBtn}
+          title="Sign out of Admin Panel"
+          aria-label="Sign out of Admin Panel"
+        >
           <LogOut size={14} />
-          Logout
-        </Button>
+          <span>Logout</span>
+        </button>
       </div>
     </header>
   );

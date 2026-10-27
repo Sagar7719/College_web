@@ -3,10 +3,17 @@
    ============================================================================== */
 
 .albumDetailPage {
-  padding-top: 100px;
+  padding-top: 104px;
   padding-bottom: 90px;
   background-color: var(--color-primary-bg, #F7F2E9);
   min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .albumDetailPage {
+    padding-top: 88px;
+    padding-bottom: 60px;
+  }
 }
 
 .breadcrumb {

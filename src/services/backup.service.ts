@@ -57,7 +57,7 @@ export const backupService = {
     return {
       schemaVersion: '2.0',
       timestamp: new Date().toISOString(),
-      collegeName: collegeName || 'Jaysingpur College, Jaysingpur',
+      collegeName: collegeName || 'Shivaji University, Kolhapur',
       totalRecords,
       collections: collectionsData,
     };
@@ -88,7 +88,7 @@ export const backupService = {
     return {
       schemaVersion: '2.0',
       timestamp: new Date().toISOString(),
-      collegeName: collegeName || 'Jaysingpur College, Jaysingpur',
+      collegeName: collegeName || 'Shivaji University, Kolhapur',
       totalRecords,
       collections: collectionsData,
     };

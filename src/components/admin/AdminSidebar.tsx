@@ -49,7 +49,7 @@ interface NavGroup {
   items: NavItem[];
 }
 
-const enterpriseNavGroups: NavGroup[] = [
+export const enterpriseNavGroups: NavGroup[] = [
   {
     label: 'MAIN CONSOLE',
     items: [
@@ -171,7 +171,7 @@ export const AdminSidebar: React.FC = () => {
         transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
-      {/* Executive Glassmorphic Header */}
+      {/* College CMS Sidebar Header */}
       <div
         className={styles.sidebarHeader}
         style={{
@@ -187,8 +187,8 @@ export const AdminSidebar: React.FC = () => {
             <div style={{ minWidth: 0, flex: 1 }}>
               <div className={styles.sidebarTitle}>College CMS</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE80' }}></span>
-                <span className={styles.sidebarSubTitle} style={{ margin: 0, color: '#4ADE80' }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#15803D' }}></span>
+                <span className={styles.sidebarSubTitle} style={{ margin: 0 }}>
                   Firestore Live
                 </span>
               </div>
@@ -202,9 +202,9 @@ export const AdminSidebar: React.FC = () => {
           onClick={toggleCollapse}
           title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           style={{
-            background: 'rgba(255, 255, 255, 0.08)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            color: '#FFAA8A',
+            background: '#FFFFFF',
+            border: '1px solid #E5DDD2',
+            color: '#78716C',
             borderRadius: '8px',
             width: '28px',
             height: '28px',
@@ -221,9 +221,9 @@ export const AdminSidebar: React.FC = () => {
 
       {/* Quick Search Filter (Expanded Mode) */}
       {!isCollapsed && (
-        <div style={{ padding: '0.75rem 1.25rem 0.25rem' }}>
+        <div style={{ padding: '0.75rem 1.25rem 0.25rem', flexShrink: 0 }}>
           <div style={{ position: 'relative' }}>
-            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255, 255, 255, 0.4)' }} />
+            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#78716C' }} />
             <input
               type="text"
               placeholder="Search menu..."
@@ -233,9 +233,9 @@ export const AdminSidebar: React.FC = () => {
                 width: '100%',
                 padding: '7px 12px 7px 30px',
                 borderRadius: '8px',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                color: '#FFFFFF',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E5DDD2',
+                color: '#292524',
                 fontSize: '0.8125rem',
                 outline: 'none',
               }}
@@ -251,7 +251,7 @@ export const AdminSidebar: React.FC = () => {
                   transform: 'translateY(-50%)',
                   background: 'none',
                   border: 'none',
-                  color: 'rgba(255, 255, 255, 0.5)',
+                  color: '#78716C',
                   cursor: 'pointer',
                   fontSize: '0.75rem',
                 }}
@@ -263,7 +263,7 @@ export const AdminSidebar: React.FC = () => {
         </div>
       )}
 
-      {/* Navigation Body */}
+      {/* Navigation Body - Independently Scrollable */}
       <div className={styles.sidebarBody}>
         {filteredNavGroups.map((group, idx) => (
           <div key={idx} className={styles.navGroup}>
@@ -292,20 +292,20 @@ export const AdminSidebar: React.FC = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: isCollapsed ? 'center' : 'space-between',
-                          background: isChildActive ? 'linear-gradient(90deg, rgba(200, 90, 50, 0.28) 0%, rgba(200, 90, 50, 0.08) 100%)' : 'transparent',
-                          color: isChildActive ? '#FFAA8A' : '#F5F0E8',
+                          background: isChildActive ? '#EFE2D6' : 'transparent',
+                          color: isChildActive ? '#B4532A' : '#292524',
                           border: 'none',
                           cursor: 'pointer',
                           textAlign: 'left',
                           padding: isCollapsed ? '0.625rem 0' : '0.625rem 0.875rem',
                           borderRadius: '8px',
-                          borderLeft: isChildActive ? '3.5px solid #C85A32' : '3.5px solid transparent',
+                          borderLeft: isChildActive ? '3.5px solid #B4532A' : '3.5px solid transparent',
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                          <span className={styles.sidebarLinkIcon}>{item.icon}</span>
+                          <span className={styles.sidebarLinkIcon} style={{ color: isChildActive ? '#B4532A' : '#78716C' }}>{item.icon}</span>
                           {!isCollapsed && (
-                            <span style={{ fontWeight: 700, fontSize: '0.875rem', color: isChildActive ? '#FFAA8A' : '#F5F0E8' }}>
+                            <span style={{ fontWeight: 700, fontSize: '0.875rem', color: isChildActive ? '#B4532A' : '#292524' }}>
                               {item.label}
                             </span>
                           )}
@@ -313,11 +313,11 @@ export const AdminSidebar: React.FC = () => {
                         {!isCollapsed && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             {item.badge && (
-                              <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#FFAA8A', background: 'rgba(200, 90, 50, 0.25)', padding: '2px 6px', borderRadius: '4px' }}>
+                              <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#15803D', background: '#DCFCE7', padding: '2px 6px', borderRadius: '4px' }}>
                                 {item.badge}
                               </span>
                             )}
-                            <span style={{ fontSize: '0.75rem', color: isChildActive ? '#FFAA8A' : 'rgba(245, 240, 232, 0.6)' }}>
+                            <span style={{ fontSize: '0.75rem', color: isChildActive ? '#B4532A' : '#78716C' }}>
                               {isSubMenuOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                             </span>
                           </div>
@@ -334,7 +334,7 @@ export const AdminSidebar: React.FC = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 3,
-                            borderLeft: '1px dashed rgba(255, 255, 255, 0.18)',
+                            borderLeft: '1px dashed #D6CEC5',
                             marginLeft: 18,
                           }}
                         >
@@ -351,17 +351,17 @@ export const AdminSidebar: React.FC = () => {
                                     fontSize: '0.8125rem',
                                     padding: '6px 12px',
                                     borderRadius: '6px',
-                                    color: isSubActive ? '#FFAA8A' : 'rgba(245, 240, 232, 0.85)',
+                                    color: isSubActive ? '#B4532A' : '#78716C',
                                     fontWeight: isSubActive ? 800 : 600,
-                                    backgroundColor: isSubActive ? 'rgba(200, 90, 50, 0.22)' : 'transparent',
-                                    borderLeft: isSubActive ? '3px solid #C85A32' : '3px solid transparent',
+                                    backgroundColor: isSubActive ? '#EFE2D6' : 'transparent',
+                                    borderLeft: isSubActive ? '3px solid #B4532A' : '3px solid transparent',
                                     textDecoration: 'none',
                                     transition: 'all 0.2s ease',
                                   }}
                                 >
                                   <span>{sub.label}</span>
                                   {sub.badge && (
-                                    <span style={{ fontSize: '0.625rem', padding: '1px 5px', borderRadius: '3px', background: 'rgba(255, 255, 255, 0.15)', color: '#FFFFFF' }}>
+                                    <span style={{ fontSize: '0.625rem', padding: '1px 5px', borderRadius: '3px', background: '#DCFCE7', color: '#15803D' }}>
                                       {sub.badge}
                                     </span>
                                   )}
@@ -385,23 +385,23 @@ export const AdminSidebar: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: isCollapsed ? 'center' : 'space-between',
-                        color: isDirectActive ? '#FFAA8A' : '#F5F0E8',
-                        background: isDirectActive ? 'linear-gradient(90deg, rgba(200, 90, 50, 0.28) 0%, rgba(200, 90, 50, 0.08) 100%)' : 'transparent',
-                        borderLeft: isDirectActive ? '3.5px solid #C85A32' : '3.5px solid transparent',
+                        color: isDirectActive ? '#B4532A' : '#292524',
+                        background: isDirectActive ? '#EFE2D6' : 'transparent',
+                        borderLeft: isDirectActive ? '3.5px solid #B4532A' : '3.5px solid transparent',
                         borderRadius: '8px',
                         padding: isCollapsed ? '0.625rem 0' : '0.625rem 0.875rem',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span className={styles.sidebarLinkIcon}>{item.icon}</span>
+                        <span className={styles.sidebarLinkIcon} style={{ color: isDirectActive ? '#B4532A' : '#78716C' }}>{item.icon}</span>
                         {!isCollapsed && (
-                          <span style={{ color: isDirectActive ? '#FFAA8A' : '#F5F0E8', fontWeight: isDirectActive ? 800 : 600, fontSize: '0.875rem' }}>
+                          <span style={{ color: isDirectActive ? '#B4532A' : '#292524', fontWeight: isDirectActive ? 800 : 600, fontSize: '0.875rem' }}>
                             {item.label}
                           </span>
                         )}
                       </div>
                       {!isCollapsed && item.badge && (
-                        <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#4ADE80', background: 'rgba(74, 222, 128, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                        <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#15803D', background: '#DCFCE7', padding: '2px 6px', borderRadius: '4px' }}>
                           {item.badge}
                         </span>
                       )}
@@ -414,7 +414,7 @@ export const AdminSidebar: React.FC = () => {
         ))}
       </div>
 
-      {/* User Status & Sign Out Footer */}
+      {/* User Status & Sign Out Footer - Fixed at bottom */}
       <div
         className={styles.sidebarFooter}
         style={{
@@ -426,27 +426,27 @@ export const AdminSidebar: React.FC = () => {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <div className={styles.sidebarUserAvatar}>{userInitial}</div>
+          <div className={styles.sidebarUserAvatar} style={{ background: '#78716C', color: '#FFFFFF' }}>{userInitial}</div>
           {!isCollapsed && (
             <div className={styles.sidebarUserInfo}>
-              <div className={styles.sidebarUserName}>{user?.email || 'Administrator'}</div>
+              <div className={styles.sidebarUserName} style={{ color: '#292524' }}>{user?.email || 'Administrator'}</div>
               <div className={styles.sidebarUserStatus} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <ShieldCheck size={12} color="#4ADE80" />
+                <ShieldCheck size={12} color="#15803D" />
                 <span>Super Admin</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Quick Logout Button */}
+        {/* Quick Exit Button matching reference design */}
         <button
           type="button"
           onClick={() => logout()}
           title="Sign Out of Admin Console"
           style={{
-            background: 'rgba(239, 68, 68, 0.15)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            color: '#F87171',
+            background: '#FFFFFF',
+            border: '1px solid #E5DDD2',
+            color: '#B4532A',
             borderRadius: '6px',
             padding: isCollapsed ? '6px' : '5px 10px',
             fontSize: '0.75rem',

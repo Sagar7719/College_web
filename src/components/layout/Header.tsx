@@ -135,7 +135,7 @@ export const Header: React.FC<HeaderProps> = ({ initialSettings, initialNavItems
   }, []);
 
   const collegeInfo = settings?.collegeInfo || defaultSettings.collegeInfo;
-  const collegeName = collegeInfo.name || 'Jaysingpur College, Jaysingpur';
+  const collegeName = collegeInfo.name || 'Shivaji University, Kolhapur';
   const tagline = collegeInfo.tagline || 'Empowering Education & Innovation';
   const logoSrc = collegeInfo.logoUrl || '/images/college_emblem.png';
 

@@ -3,10 +3,17 @@
    ============================================================================== */
 
 .coursesPage {
-  padding-top: 100px;
+  padding-top: 108px;
   padding-bottom: 90px;
   background-color: var(--color-primary-bg, #F7F2E9);
   min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .coursesPage {
+    padding-top: 88px;
+    padding-bottom: 60px;
+  }
 }
 
 /* ── HERO BANNER ── */

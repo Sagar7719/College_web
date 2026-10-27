@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
   const title = settings.seoConfig?.defaultMetaTitle || `${collegeName} | Official Institutional Website`;
   const description = settings.seoConfig?.defaultMetaDescription || settings.collegeInfo?.description || `Official website of ${collegeName}.`;
   return { title, description, alternates: { canonical: '/' } };
@@ -73,7 +73,7 @@ export default async function HomePage() {
     ]);
 
   const info = settings?.collegeInfo;
-  const collegeName = info?.name || 'Jaysingpur College';
+  const collegeName = info?.name || 'Shivaji University, Kolhapur';
   const displayCollegeName = collegeName.replace(/\b\w/g, (c) => c.toUpperCase());
   const estYear = info?.establishedYear || '1972';
   const naacGrade = info?.naacGrade || 'A';
@@ -131,7 +131,7 @@ export default async function HomePage() {
       </section>
 
       {/* GATEWAYS BAR */}
-      <section className={styles.heroGatewaysBar}>
+      <section id="gateways" className={styles.heroGatewaysBar}>
         <div className="container">
           <div className={styles.masterGlassDeck}>
             <div className={styles.gatewaysGrid}>
@@ -157,7 +157,7 @@ export default async function HomePage() {
       </section>
 
       {/* STATS STRIP */}
-      <section className={styles.statsBar} aria-label="Key Highlights">
+      <section id="stats" className={styles.statsBar} aria-label="Key Highlights">
         <div className={`container ${styles.statsRow}`}>
           {hpData.stats.map((stat, idx) => (
             <div key={idx} className={styles.stat}>
@@ -174,7 +174,7 @@ export default async function HomePage() {
       </section>
 
       {/* FEATURE STRIP */}
-      <section className={styles.featureStrip} aria-label="Key Pillars">
+      <section id="features" className={styles.featureStrip} aria-label="Key Pillars">
         <div className={`container ${styles.featureRow}`}>
           {hpData.featurePillars.map((f) => (
             <div key={f.title} className={styles.featureItem}>
@@ -191,7 +191,7 @@ export default async function HomePage() {
       </section>
 
       {/* WHY CHOOSE US */}
-      <section className={styles.secAlt} aria-label="Why Choose Us">
+      <section id="why-choose-us" className={styles.secAlt} aria-label="Why Choose Us">
         <div className="container">
           <div className={styles.secHead}>
             <span className={styles.eyebrow}>Why Choose Us</span>
@@ -216,7 +216,7 @@ export default async function HomePage() {
       )}
 
       {/* LATEST NOTICES & DOWNLOADS (VERTICAL TICKER MARQUEE) */}
-      <section className={styles.secAlt} aria-label="Notices and Downloads">
+      <section id="notices" className={styles.secAlt} aria-label="Notices and Downloads">
         <div className="container">
           <VerticalNoticeTicker notices={notices} downloads={downloads} />
         </div>
@@ -226,7 +226,7 @@ export default async function HomePage() {
       <QuickLinksCarousel quickLinks={hpData.quickLinks} />
 
       {/* ABOUT / EDITORIAL */}
-      <section className={styles.secWhite} aria-label="About and Leadership Message">
+      <section id="about" className={styles.secWhite} aria-label="About and Leadership Message">
         <div className="container">
           <div className={styles.aboutRow}>
             <div className={styles.aboutImg}>
@@ -281,7 +281,7 @@ export default async function HomePage() {
       )}
 
       {/* ACCREDITATION & RECOGNITION */}
-      <section className={styles.accredBar} aria-label="Accreditation & Recognition">
+      <section id="accreditations" className={styles.accredBar} aria-label="Accreditation & Recognition">
         <div className={`container ${styles.accredRow}`}>
           {hpData.accreditations.map((item, idx) => (
             <div key={idx} className={styles.accredItem}>

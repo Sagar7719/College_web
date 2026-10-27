@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College, Jaysingpur';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
   const title = `${album.title} — Photo Gallery`;
   const description = album.category
     ? `View ${album.images?.length || 0} photos in the ${album.category} album "${album.title}" at ${collegeName}.`

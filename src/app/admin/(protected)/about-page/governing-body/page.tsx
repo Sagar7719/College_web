@@ -35,7 +35,7 @@ const initialGoverningMembers: GoverningMember[] = [
     designation: 'Member Secretary & Principal',
     role: 'Ex-Officio Secretary',
     photoUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop',
-    bio: 'Principal of Jaysingpur College and Head of Academic Quality Assurance.',
+    bio: 'Principal and Head of Academic Quality Assurance.',
   },
 ];
 

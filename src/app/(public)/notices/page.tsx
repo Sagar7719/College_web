@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   const settings = await siteSettingsService.getSettings();
-  const collegeName = settings.collegeInfo?.name || 'Jaysingpur College';
+  const collegeName = settings.collegeInfo?.name || 'Shivaji University, Kolhapur';
   const title = `Official Notices & Circulars — ${collegeName}`;
   const description = `Stay updated with official academic circulars, exam schedules, and administrative announcements from ${collegeName}.`;
   const ogImageUrl = settings.seoConfig?.defaultOgImageUrl || settings.collegeInfo?.logoUrl;

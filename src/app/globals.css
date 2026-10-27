@@ -134,6 +134,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
@@ -143,6 +145,9 @@ body {
   flex-direction: column;
   color: var(--color-text-primary);
   background-color: var(--color-primary-bg);
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 :focus-visible {
@@ -243,10 +248,31 @@ a:hover {
   padding-right: var(--space-7);
 }
 
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1360px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1440px;
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     padding-left: 20px;
     padding-right: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 
@@ -279,19 +305,14 @@ a:hover {
   }
 }
 
-button,
-a[class*="btn"],
+.btnLaser,
 .btnPrimary,
 .btnOutlineDark,
-.btnSmall,
-.btnSmallOutline,
 .btnPrimaryTerracotta,
 .btnSecondary,
 .btnDark,
-[class*="btnPrimary"],
-[class*="btnOutline"],
-[class*="btnSmall"],
-[class*="btn"] {
+[class*="btn-primary"],
+[class*="btnPrimary"] {
   position: relative;
   z-index: 1;
   isolation: isolate;
@@ -299,19 +320,14 @@ a[class*="btn"],
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-button::after,
-a[class*="btn"]::after,
+.btnLaser::after,
 .btnPrimary::after,
 .btnOutlineDark::after,
-.btnSmall::after,
-.btnSmallOutline::after,
 .btnPrimaryTerracotta::after,
 .btnSecondary::after,
 .btnDark::after,
-[class*="btnPrimary"]::after,
-[class*="btnOutline"]::after,
-[class*="btnSmall"]::after,
-[class*="btn"]::after {
+[class*="btn-primary"]::after,
+[class*="btnPrimary"]::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -336,28 +352,20 @@ a[class*="btn"]::after,
   z-index: 3;
 }
 
-button:hover::after,
-a[class*="btn"]:hover::after,
+.btnLaser:hover::after,
 .btnPrimary:hover::after,
 .btnOutlineDark:hover::after,
-.btnSmall:hover::after,
-.btnSmallOutline:hover::after,
 .btnPrimaryTerracotta:hover::after,
 .btnSecondary:hover::after,
 .btnDark:hover::after,
-[class*="btnPrimary"]:hover::after,
-[class*="btnOutline"]:hover::after,
-[class*="btnSmall"]:hover::after,
-[class*="btn"]:hover::after {
+[class*="btn-primary"]:hover::after,
+[class*="btnPrimary"]:hover::after {
   opacity: 1;
 }
 
-button:hover,
-a[class*="btn"]:hover,
+.btnLaser:hover,
 .btnPrimary:hover,
 .btnOutlineDark:hover,
-.btnSmall:hover,
-.btnSmallOutline:hover,
 .btnPrimaryTerracotta:hover {
   box-shadow: 0 0 18px rgba(184, 92, 58, 0.3);
   transform: translateY(-2px);

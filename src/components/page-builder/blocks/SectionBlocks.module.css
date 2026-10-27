@@ -45,6 +45,21 @@
   line-height: 1.6;
 }
 
+@media (max-width: 768px) {
+  .heroOverlay {
+    padding: var(--space-8) var(--space-4);
+    min-height: 280px;
+  }
+  .heroTitle {
+    font-size: clamp(1.6rem, 6vw, 2.25rem);
+    margin-bottom: var(--space-3);
+  }
+  .heroSubtitle {
+    font-size: 0.9375rem;
+    margin-bottom: var(--space-5);
+  }
+}
+
 /* --- Heading Block --- */
 .headingBlock {
   margin-bottom: var(--space-6);
